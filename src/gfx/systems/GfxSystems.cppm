@@ -27,7 +27,7 @@ export namespace Gfx {
         Core::EnTTRegistry& mRegistry;
         Core::Scheduler& mScheduler;
         Core::TaskHandle mTickHandle{};
-        BGFXSystem mBGFXSystem{};
+        BGFXSystem mBGFXSystem;
         ShaderProgramLoadSystem mShaderProgramLoadSystem{};
         MaterialLoadSystem mMaterialLoadSystem{};
 

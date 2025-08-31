@@ -5,12 +5,16 @@ module;
 
 export module Gfx.BGFXSystem;
 
+import Core.EnTTRegistry;
+import Gfx.BGFXContext;
+
 export namespace Gfx {
 
 	class BGFXSystem {
 	public:
 
-		BGFXSystem();
+		BGFXSystem(Core::EnTTRegistry&);
+		~BGFXSystem();
 
 		void initSystem(entt::registry& registry);
 		void destroySystem(entt::registry& registry);
@@ -19,9 +23,13 @@ export namespace Gfx {
 	private:
 
 		void onWindowInternalCreated(entt::registry&, entt::entity);
+		static void _destroyDroppedTextures(const entt::registry&, BGFXContext& context);
+		void _destroyTrackedTextures(BGFXContext& context) const;
 
 		bgfx::UniformHandle mTexColourUniformHandle{};
 		bgfx::UniformHandle mAlphaColourUniformHandle{};
+
+		Core::EnTTRegistry& mRegistry;
 
 	};
 

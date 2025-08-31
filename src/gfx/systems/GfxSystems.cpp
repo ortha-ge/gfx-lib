@@ -16,7 +16,8 @@ namespace Gfx {
 
     GfxSystems::GfxSystems(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
         : mRegistry{ registry }
-        , mScheduler{ scheduler } {
+        , mScheduler{ scheduler }
+		, mBGFXSystem{ registry } {
 
         Core::reflect<Colour>(Core::getCurrentReflectionContext());
         Core::reflect<TextureCoordinates>(Core::getCurrentReflectionContext());
