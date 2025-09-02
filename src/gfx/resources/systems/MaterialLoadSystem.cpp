@@ -9,6 +9,7 @@ import Core.FileDescriptor;
 import Core.FileLoadRequest;
 import Core.ImageDescriptor;
 import Core.JsonTypeLoaderAdapter;
+import Core.ResourceLoadRequest;
 import Core.TypeLoader;
 import Gfx.MaterialDescriptor;
 import Gfx.MaterialResource;
@@ -18,43 +19,61 @@ namespace Gfx {
 
 	MaterialLoadSystem::MaterialLoadSystem() = default;
 
-	void MaterialLoadSystem::tickSystem(Core::EnTTRegistry &registry) {
-		entt::registry &_registry(registry);
+	void MaterialLoadSystem::tickSystem(entt::registry& registry) {
+		auto createProgramResourceView = registry.view<const MaterialDescriptor>(entt::exclude<MaterialResource>);
+		createProgramResourceView.each([this, &registry](entt::entity entity,
+			const MaterialDescriptor &materialDescriptor) {
 
-		auto createProgramResourceView = _registry.view<const MaterialDescriptor>(entt::exclude<MaterialResource>);
-		createProgramResourceView.each([this, &registry = _registry](entt::entity entity,
-																	 const MaterialDescriptor &materialDescriptor) {
-			const auto programResource = registry.create();
-			registry.emplace<Core::FileDescriptor>(programResource, materialDescriptor.shaderProgramFilePath);
-			registry.emplace<Core::TypeLoader>(
-					programResource, std::make_unique<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>());
-			registry.emplace<Core::FileLoadRequest>(programResource);
-
-			const auto imageResource = registry.create();
-			registry.emplace<Core::FileDescriptor>(imageResource, materialDescriptor.textureImageFilePath);
-			registry.emplace<Core::ImageDescriptor>(imageResource);
-			registry.emplace<Core::FileLoadRequest>(imageResource);
-
-			registry.emplace<MaterialResource>(entity, programResource, imageResource, materialDescriptor.spriteFrames,
-											   materialDescriptor.alphaColour, materialDescriptor.width,
-											   materialDescriptor.height);
-
-			mTrackedMaterials.emplace_back(entity, programResource, imageResource);
+			_tryCreateMaterialResource(registry, entity, materialDescriptor);
 		});
 
+		_tryCleanupTrackedMaterialResources(registry);
+	}
+
+	void MaterialLoadSystem::_tryCreateMaterialResource(entt::registry& registry,
+		entt::entity entity, const MaterialDescriptor& materialDescriptor) {
+
+		const auto programResource = registry.create();
+		registry.emplace<Core::ResourceLoadRequest>(programResource,
+			Core::ResourceLoadRequest::create<Core::TypeLoader>(
+				materialDescriptor.shaderProgramFilePath,
+				std::make_shared<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>()
+			)
+		);
+
+		const auto imageResource = registry.create();
+		registry.emplace<Core::ResourceLoadRequest>(imageResource,
+			Core::ResourceLoadRequest::create<Core::ImageDescriptor>(
+				materialDescriptor.textureImageFilePath
+			)
+		);
+
+		registry.emplace<MaterialResource>(entity,
+			programResource,
+			imageResource,
+			materialDescriptor.spriteFrames,
+			materialDescriptor.alphaColour,
+			materialDescriptor.width,
+			materialDescriptor.height
+		);
+
+		mTrackedMaterials.emplace_back(entity, programResource, imageResource);
+	}
+
+	void MaterialLoadSystem::_tryCleanupTrackedMaterialResources(entt::registry& registry) {
 		for (auto it = mTrackedMaterials.begin(); it != mTrackedMaterials.end();) {
 			auto currentIt = it++;
 
-			if (_registry.valid(currentIt->entity) && _registry.all_of<MaterialResource>(currentIt->entity)) {
+			if (registry.valid(currentIt->entity) && registry.all_of<MaterialResource>(currentIt->entity)) {
 				continue;
 			}
 
-			if (_registry.valid(currentIt->textureEntity)) {
-				_registry.destroy(currentIt->textureEntity);
+			if (registry.valid(currentIt->textureEntity)) {
+				registry.destroy(currentIt->textureEntity);
 			}
 
-			if (_registry.valid(currentIt->shaderProgramEntity)) {
-				_registry.destroy(currentIt->shaderProgramEntity);
+			if (registry.valid(currentIt->shaderProgramEntity)) {
+				registry.destroy(currentIt->shaderProgramEntity);
 			}
 
 			mTrackedMaterials.erase(currentIt);

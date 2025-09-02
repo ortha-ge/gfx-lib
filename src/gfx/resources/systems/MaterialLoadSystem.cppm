@@ -1,11 +1,14 @@
 module;
 
-#include <entt/entity/entity.hpp>
 #include <list>
+
+#include <entt/fwd.hpp>
+#include <entt/entity/entity.hpp>
 
 export module Gfx.MaterialLoadSystem;
 
 import Core.EnTTRegistry;
+import Gfx.MaterialDescriptor;
 
 export namespace Gfx {
 
@@ -13,9 +16,13 @@ export namespace Gfx {
 	public:
 		MaterialLoadSystem();
 
-		void tickSystem(Core::EnTTRegistry &registry);
+		void tickSystem(entt::registry&);
 
 	private:
+
+		void _tryCreateMaterialResource(entt::registry&, entt::entity, const MaterialDescriptor&);
+		void _tryCleanupTrackedMaterialResources(entt::registry&);
+
 		struct TrackedMaterialResources {
 			entt::entity entity{entt::null};
 			entt::entity shaderProgramEntity{entt::null};
