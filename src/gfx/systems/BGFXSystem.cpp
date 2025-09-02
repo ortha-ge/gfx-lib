@@ -1,38 +1,6 @@
 module;
 
-#include <filesystem>
-#include <fstream>
-
-#include <bx/platform.h>
-
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
-#if GLFW_VERSION_MINOR < 2
-#error "GLFW 3.2 or later is required"
-#endif // GLFW_VERSION_MINOR < 2
-
-#if BX_PLATFORM_LINUX
-#if ENTRY_CONFIG_USE_WAYLAND
-#include <wayland-egl.h>
-#define GLFW_EXPOSE_NATIVE_WAYLAND
-#else
-#define GLFW_EXPOSE_NATIVE_X11
-#define GLFW_EXPOSE_NATIVE_GLX
-#endif
-#include <GLFW/glfw3native.h>
-#elif BX_PLATFORM_OSX
-#define GLFW_EXPOSE_NATIVE_COCOA
-#define GLFW_EXPOSE_NATIVE_NSGL
-#include <GLFW/glfw3native.h>
-#elif BX_PLATFORM_WINDOWS
-#define GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_EXPOSE_NATIVE_WGL
-#include <GLFW/glfw3native.h>
-#endif //
-
 #include <bgfx/bgfx.h>
-#include <bgfx/platform.h>
 #include <bx/math.h>
 #include <entt/entt.hpp>
 
@@ -41,11 +9,11 @@ module Gfx.BGFXSystem;
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
 import Core.ImageResource;
+import Core.NativeWindowHandles;
 import Core.RawDataResource;
 import Core.ResourceHandle;
 import Core.Spatial;
 import Core.Window;
-import Core.WindowInternal;
 import Gfx.BGFXContext;
 import Gfx.BGFXDrawCallback;
 import Gfx.MaterialResource;
@@ -309,61 +277,20 @@ namespace Gfx::BGFXSystemInternal {
 
 namespace Gfx {
 
-	void* glfwNativeWindowHandle(GLFWwindow* _window) {
-#if BX_PLATFORM_LINUX
-#if ENTRY_CONFIG_USE_WAYLAND
-		wl_egl_window* win_impl = (wl_egl_window*) glfwGetWindowUserPointer(_window);
-		if (!win_impl) {
-			int width, height;
-			glfwGetWindowSize(_window, &width, &height);
-			struct wl_surface* surface = (struct wl_surface*) glfwGetWaylandWindow(_window);
-			if (!surface)
-				return nullptr;
-			win_impl = wl_egl_window_create(surface, width, height);
-			glfwSetWindowUserPointer(_window, (void*) (uintptr_t) win_impl);
-		}
-		return (void*) (uintptr_t) win_impl;
-#else
-		return reinterpret_cast<void*>(glfwGetX11Window(_window));
-#endif
-#elif BX_PLATFORM_OSX
-		return glfwGetCocoaWindow(_window);
-#elif BX_PLATFORM_WINDOWS
-		return glfwGetWin32Window(_window);
-#elif BX_PLATFORM_EMSCRIPTEN
-		return nullptr;
-#else
-		static_assert(false, "Unhandled platform");
-#endif
-	}
-
-	void* getNativeDisplayHandle() {
-#if BX_PLATFORM_LINUX
-#if ENTRY_CONFIG_USE_WAYLAND
-		return glfwGetWaylandDisplay();
-#else
-		return glfwGetX11Display();
-#endif // ENTRY_CONFIG_USE_WAYLAND
-#else
-		return NULL;
-#endif // BX_PLATFORM_*
-	}
-
 	void BGFXSystem::onWindowInternalCreated(entt::registry& registry, entt::entity entity) {
 		if (!registry.view<const BGFXContext>().empty()) {
 			return;
 		}
 
-		auto&& [windowInternal, window] = registry.get<Core::WindowInternal, Core::Window>(entity);
+		auto&& [nativeWindowHandles, window] = registry.get<Core::NativeWindowHandles, Core::Window>(entity);
 
-		void* nativeWindowHandle = glfwNativeWindowHandle(windowInternal.window);
-		if (!nativeWindowHandle) {
+		if (!nativeWindowHandles.windowHandle) {
 			return;
 		}
 
 		bgfx::Init initData;
-		initData.platformData.nwh = nativeWindowHandle;
-		initData.platformData.ndt = getNativeDisplayHandle();
+		initData.platformData.nwh = nativeWindowHandles.windowHandle;
+		initData.platformData.ndt = nativeWindowHandles.displayHandle;
 		initData.resolution.width = window.width;
 		initData.resolution.height = window.height;
 
@@ -386,7 +313,7 @@ namespace Gfx {
 	BGFXSystem::~BGFXSystem() = default;
 
 	void BGFXSystem::initSystem(entt::registry& registry) {
-		registry.on_construct<Core::WindowInternal>().connect<&BGFXSystem::onWindowInternalCreated>(this);
+		registry.on_construct<Core::NativeWindowHandles>().connect<&BGFXSystem::onWindowInternalCreated>(this);
 	}
 
 	void BGFXSystem::destroySystem(entt::registry& registry) {
