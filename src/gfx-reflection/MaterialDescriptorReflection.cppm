@@ -13,7 +13,7 @@ export import Gfx.MaterialDescriptor;
 template<>
 void Core::reflect<Gfx::MaterialDescriptor>(ReflectionContext& context) {
     using namespace Gfx;
-    auto classReflection = ClassReflectionBuilder<MaterialDescriptor>("MaterialDescriptor")
+    auto classReflection = ClassReflectionBuilder<MaterialDescriptor>("Material")
         .property("shaderProgramFilePath", &MaterialDescriptor::shaderProgramFilePath)
         .property("textureImageFilePath", &MaterialDescriptor::textureImageFilePath)
         .property("width", &MaterialDescriptor::width)

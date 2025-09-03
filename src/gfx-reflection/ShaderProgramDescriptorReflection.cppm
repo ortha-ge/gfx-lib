@@ -13,7 +13,7 @@ export import Gfx.ShaderProgramDescriptor;
 template <>
 void Core::reflect<Gfx::ShaderProgramDescriptor>(ReflectionContext& context) {
     using namespace Gfx;
-    auto classReflection = ClassReflectionBuilder<ShaderProgramDescriptor>("ShaderProgramDescriptor")
+    auto classReflection = ClassReflectionBuilder<ShaderProgramDescriptor>("ShaderProgram")
         .property("vertexShaderFilePath", &ShaderProgramDescriptor::vertexShaderFilePath)
         .property("fragmentShaderFilePath", &ShaderProgramDescriptor::fragmentShaderFilePath)
         .build();
