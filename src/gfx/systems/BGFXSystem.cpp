@@ -13,6 +13,7 @@ import Core.NativeWindowHandles;
 import Core.RawDataResource;
 import Core.ResourceHandle;
 import Core.Spatial;
+import Core.TypeId;
 import Core.Window;
 import Gfx.BGFXContext;
 import Gfx.BGFXDrawCallback;
@@ -43,6 +44,14 @@ namespace Gfx::BGFXSystemInternal {
 		bgfx::UniformHandle textureUniformHandle{};
 	};
 
+	struct BGFXVertexLayout {
+		bgfx::VertexLayout vertexLayout{};
+	};
+
+	struct BGFXUniforms {
+		std::unordered_map<std::string, bgfx::UniformHandle> uniforms{};
+	};
+
 	struct QuadBufferData {
 		bgfx::TransientVertexBuffer transientVertexBuffer{};
 		bgfx::TransientIndexBuffer transientIndexBuffer{};
@@ -50,25 +59,6 @@ namespace Gfx::BGFXSystemInternal {
 		uint32_t maxVertexCount{};
 		uint32_t maxIndexCount{};
 	};
-
-	struct PosColorVertex {
-		float x{};
-		float y{};
-		float z{};
-		float u{};
-		float v{};
-
-		static void init() {
-			layout.begin()
-					.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-					.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-					.end();
-		};
-
-		static bgfx::VertexLayout layout;
-	};
-
-	bgfx::VertexLayout PosColorVertex::layout;
 
 	std::optional<entt::entity> getMaterialResourceIfReadyToRender(const entt::registry& registry,
 																   const entt::entity materialResourceHandle) {
@@ -134,16 +124,24 @@ namespace Gfx::BGFXSystemInternal {
 				return;
 			}
 
+			const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgramResource);
+			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
+				!registry.all_of<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity)) {
+				return;
+			}
+
+			const auto& vertexLayout{ registry.get<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity) };
+
 			constexpr uint32_t maxVertices = (32 << 10);
 			constexpr uint32_t maxIndices = (32 << 10);
 			if (!materialBuffers.contains(*materialResourceEntity)) {
-				if (bgfx::getAvailTransientVertexBuffer(maxVertices, PosColorVertex::layout) < maxVertices ||
+				if (bgfx::getAvailTransientVertexBuffer(maxVertices, vertexLayout.vertexLayout) < maxVertices ||
 					bgfx::getAvailTransientIndexBuffer(maxIndices) < maxIndices) {
 					return;
 				}
 
 				bgfx::TransientVertexBuffer transientVertexBuffer{};
-				bgfx::allocTransientVertexBuffer(&transientVertexBuffer, maxVertices, PosColorVertex::layout);
+				bgfx::allocTransientVertexBuffer(&transientVertexBuffer, maxVertices, vertexLayout.vertexLayout);
 
 				bgfx::TransientIndexBuffer transientIndexBuffer{};
 				bgfx::allocTransientIndexBuffer(&transientIndexBuffer, maxIndices);
@@ -165,6 +163,14 @@ namespace Gfx::BGFXSystemInternal {
 			return;
 		}
 
+		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgramResource);
+		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
+			!registry.all_of<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity)) {
+			return;
+			}
+
+		const auto& vertexLayout{ registry.get<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity) };
+
 		const auto& frameCoords{materialResource.spriteFrames[renderObject.currentSpriteFrame]};
 		const uint32_t startVertex = bufferData.quadCount * 4;
 		const uint32_t startIndex = bufferData.quadCount * 6;
@@ -179,13 +185,67 @@ namespace Gfx::BGFXSystemInternal {
 				frameCoords.x0 / materialResource.width, frameCoords.y0 / materialResource.height,
 				frameCoords.x1 / materialResource.width, frameCoords.y1 / materialResource.height};
 
-		PosColorVertex* vertexHead =
-				reinterpret_cast<PosColorVertex*>(bufferData.transientVertexBuffer.data) + startVertex;
-		vertexHead[0] = {spatial.x, spatial.y, spatial.z, factoredCoords.x0, factoredCoords.y0};
-		vertexHead[1] = {spatial.x, spatial.y + quadHeight, spatial.z, factoredCoords.x0, factoredCoords.y1};
-		vertexHead[2] = {spatial.x + quadWidth, spatial.y + quadHeight, spatial.z, factoredCoords.x1,
-						 factoredCoords.y1};
-		vertexHead[3] = {spatial.x + quadWidth, spatial.y, spatial.z, factoredCoords.x1, factoredCoords.y0};
+		using DecodedAttributes = std::tuple<uint8_t, bgfx::AttribType::Enum, bool, bool>;
+		DecodedAttributes posAttributes;
+		vertexLayout.vertexLayout.decode(bgfx::Attrib::Position,
+			std::get<0>(posAttributes),
+			std::get<1>(posAttributes),
+			std::get<2>(posAttributes),
+			std::get<3>(posAttributes)
+		);
+
+		DecodedAttributes texCoord0Attributes;
+		vertexLayout.vertexLayout.decode(bgfx::Attrib::TexCoord0,
+			std::get<0>(texCoord0Attributes),
+			std::get<1>(texCoord0Attributes),
+			std::get<2>(texCoord0Attributes),
+			std::get<3>(texCoord0Attributes)
+		);
+
+		auto&& [posCount, posType, _posNormalized, _posAsInt] = posAttributes;
+		auto&& [texCoord0Count, texCoord0Type, _texCoord0Normalized, _texCoord0AsInt] = texCoord0Attributes;
+
+		if (posCount != 3 || posType != bgfx::AttribType::Float) {
+			return;
+		}
+
+		if (texCoord0Count != 2 || texCoord0Type != bgfx::AttribType::Float) {
+			return;
+		}
+
+		for (size_t i = 0; i < 4; ++i) {
+			uint8_t* vertexHead = bufferData.transientVertexBuffer.data + vertexLayout.vertexLayout.getStride() * (startVertex + i);
+			float* positionHead = reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::Position));
+			float* texCoordHead = reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::TexCoord0));
+
+			if (i == 0) {
+				positionHead[0] = spatial.x;
+				positionHead[1] = spatial.y;
+				positionHead[2] = spatial.z;
+				texCoordHead[0] = factoredCoords.x0;
+				texCoordHead[1] = factoredCoords.y0;
+			} else if (i == 1) {
+				positionHead[0] = spatial.x;
+				positionHead[1] = spatial.y + quadHeight;
+				positionHead[2] = spatial.z;
+				texCoordHead[0] = factoredCoords.x0;
+				texCoordHead[1] = factoredCoords.y1;
+			} else if (i == 2) {
+				positionHead[0] = spatial.x + quadWidth;
+				positionHead[1] = spatial.y + quadHeight;
+				positionHead[2] = spatial.z;
+				texCoordHead[0] = factoredCoords.x1;
+				texCoordHead[1] = factoredCoords.y1;
+			} else if (i == 3) {
+				positionHead[0] = spatial.x + quadWidth;
+				positionHead[1] = spatial.y;
+				positionHead[2] = spatial.z;
+				texCoordHead[0] = factoredCoords.x1;
+				texCoordHead[1] = factoredCoords.y0;
+			} else {
+				assert(false);
+			}
+		}
 
 		uint16_t* indexHead = reinterpret_cast<uint16_t*>(bufferData.transientIndexBuffer.data) + startIndex;
 
@@ -209,15 +269,17 @@ namespace Gfx::BGFXSystemInternal {
 				return;
 			}
 
-			const MaterialResource& materialResource = registry.get<MaterialResource>(*materialResourceEntity);
-			auto& quadBufferData{materialBuffers[*materialResourceEntity]};
+			if (!materialBuffers.contains(*materialResourceEntity)) {
+				return;
+			}
 
+			auto& quadBufferData{materialBuffers[*materialResourceEntity]};
+			const MaterialResource& materialResource = registry.get<MaterialResource>(*materialResourceEntity);
 			extractRenderObjectToMaterialBuffer(registry, quadBufferData, spatial, renderObject, materialResource);
 		});
 	}
 
-	void renderPerMaterialBuffers(entt::registry& registry, const PerMaterialBufferMap& materialBuffers,
-								  bgfx::UniformHandle textureColourUniform, bgfx::UniformHandle alphaColourUniform) {
+	void renderPerMaterialBuffers(entt::registry& registry, const PerMaterialBufferMap& materialBuffers) {
 
 		for (const auto& [materialEntity, transientBufferData] : materialBuffers) {
 			if (materialEntity == entt::null || !registry.all_of<MaterialResource>(materialEntity)) {
@@ -240,12 +302,21 @@ namespace Gfx::BGFXSystemInternal {
 			const auto& shaderProgramResourceHandle =
 					registry.get<Core::ResourceHandle>(materialResource.shaderProgramResource);
 			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-				!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity)) {
+				!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity) ||
+				!registry.all_of<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity)) {
 				return;
 			}
 
 			const auto& bgfxProgram = registry.get<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity);
+			const auto& bgfxUniforms = registry.get<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity);
 			const auto& bgfxTexture = registry.get<BGFXTexture>(textureImageResourceHandle.mResourceEntity);
+
+			if (!bgfxUniforms.uniforms.contains("s_texColour") || !bgfxUniforms.uniforms.contains("u_alphaColour")) {
+				return;
+			}
+
+			bgfx::UniformHandle textureColourUniform{ bgfxUniforms.uniforms.at("s_texColour") };
+			bgfx::UniformHandle alphaColourUniform{ bgfxUniforms.uniforms.at("u_alphaColour") };
 
 			float mtx[16];
 			bx::mtxIdentity(mtx);
@@ -300,12 +371,6 @@ namespace Gfx {
 
 		entt::entity contextEntity = registry.create();
 		registry.emplace<BGFXContext>(contextEntity);
-
-		// Create vertex stream declaration.
-		BGFXSystemInternal::PosColorVertex::init();
-
-		mTexColourUniformHandle = bgfx::createUniform("s_texColour", bgfx::UniformType::Sampler);
-		mAlphaColourUniformHandle = bgfx::createUniform("u_alphaColour", bgfx::UniformType::Vec4);
 	}
 
 	BGFXSystem::BGFXSystem(Core::EnTTRegistry& registry) : mRegistry{registry} {}
@@ -337,6 +402,12 @@ namespace Gfx {
 		auto bgfxContextEntity{bgfxContextView.front()};
 		auto& bgfxContext{registry.get<BGFXContext>(bgfxContextEntity)};
 
+		registry.view<const ShaderProgramResource>(entt::exclude<BGFXUniforms>)
+				.each([&registry, &bgfxContext](entt::entity entity,
+													const ShaderProgramResource& shaderProgramResource) {
+					_tryCreateUniforms(bgfxContext, registry, entity, shaderProgramResource);
+				});
+
 		registry.view<const ShaderDescriptor, const Core::RawDataResource>(
 						entt::exclude<Core::FileLoadRequest, BGFXShader>)
 				.each([&registry, &bgfxContext](entt::entity entity, const Core::RawDataResource& rawDataResource) {
@@ -347,6 +418,12 @@ namespace Gfx {
 				.each([&registry, &bgfxContext](entt::entity entity,
 												const ShaderProgramResource& shaderProgramResource) {
 					_tryCreateShaderProgram(bgfxContext, registry, entity, shaderProgramResource);
+				});
+
+		registry.view<const ShaderProgramResource>(entt::exclude<BGFXVertexLayout>)
+				.each([&registry, &bgfxContext](entt::entity entity,
+												const ShaderProgramResource& shaderProgramResource) {
+					_tryCreateVertexLayout(bgfxContext, registry, entity, shaderProgramResource);
 				});
 
 		registry.view<const Core::ImageResource>(entt::exclude<BGFXTexture>)
@@ -373,7 +450,7 @@ namespace Gfx {
 		using namespace BGFXSystemInternal;
 		auto materialBuffers = createPerMaterialBuffers(registry);
 		extractRenderObjectsToPerMaterialBuffers(registry, materialBuffers);
-		renderPerMaterialBuffers(registry, materialBuffers, mTexColourUniformHandle, mAlphaColourUniformHandle);
+		renderPerMaterialBuffers(registry, materialBuffers);
 
 		registry.view<BGFXDrawCallback>().each(
 				[&registry](const BGFXDrawCallback& drawCallback) { drawCallback.drawCallback(registry); });
@@ -433,9 +510,6 @@ namespace Gfx {
 			bgfx::destroy(shaderProgramHandle);
 		}
 
-		bgfx::destroy(mTexColourUniformHandle);
-		bgfx::destroy(mAlphaColourUniformHandle);
-
 		context.trackedTextureHandles.clear();
 		context.trackedShaderHandles.clear();
 		context.trackedShaderProgramHandles.clear();
@@ -492,6 +566,74 @@ namespace Gfx {
 
 		registry.emplace<BGFXProgram>(entity, program);
 		bgfxContext.trackedShaderProgramHandles.emplace_back(entity, program);
+	}
+
+	void BGFXSystem::_tryCreateVertexLayout(BGFXContext&,
+		entt::registry& registry, entt::entity entity, const ShaderProgramResource& shaderProgramResource) {
+
+		using namespace BGFXSystemInternal;
+		bgfx::VertexLayout vertexLayout{};
+		vertexLayout.begin();
+
+		for (auto&& inputAttribute : shaderProgramResource.vertexLayout.attributes) {
+			bgfx::Attrib::Enum attribute{};
+			switch (inputAttribute.attributeId) {
+				case ShaderVertexLayoutAttributeId::Position:
+					attribute = bgfx::Attrib::Position;
+					break;
+				case ShaderVertexLayoutAttributeId::TexCoord0:
+					attribute = bgfx::Attrib::TexCoord0;
+					break;
+				default:
+					vertexLayout.end();
+					return;
+			}
+
+			bgfx::AttribType::Enum attributeType{};
+			if (inputAttribute.typeId == Core::TypeId::get<float>()) {
+				attributeType = bgfx::AttribType::Float;
+			} else {
+				printf("Unhandled attribute type.\n");
+				vertexLayout.end();
+				return;
+			}
+
+			vertexLayout.add(attribute, inputAttribute.count, attributeType);
+		}
+
+		vertexLayout.end();
+		registry.emplace<BGFXVertexLayout>(entity, vertexLayout);
+	}
+
+	void BGFXSystem::_tryCreateUniforms(BGFXContext&,
+		entt::registry& registry, entt::entity entity, const ShaderProgramResource& shaderProgramResource) {
+
+		using namespace BGFXSystemInternal;
+		BGFXUniforms bgfxUniforms{};
+		for (auto&& uniform : shaderProgramResource.uniforms) {
+			if (bgfxUniforms.uniforms.contains(uniform.name)) {
+				printf("Uniform with duplicate name encountered.\n");
+				return;
+			}
+
+			bgfx::UniformType::Enum uniformType{};
+			switch (uniform.type) {
+				case ShaderUniformType::Sampler:
+					uniformType = bgfx::UniformType::Sampler;
+					break;
+				case ShaderUniformType::Float4:
+					uniformType = bgfx::UniformType::Vec4;
+					break;
+				default:
+					printf("Unhandled uniform type.\n");
+					return;
+			}
+
+			bgfx::UniformHandle uniformHandle{ bgfx::createUniform(uniform.name.c_str(), uniformType) };
+			bgfxUniforms.uniforms.emplace(uniform.name, uniformHandle);
+		}
+
+		registry.emplace<BGFXUniforms>(entity, std::move(bgfxUniforms));
 	}
 
 	void BGFXSystem::_tryCreateTexture(BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity,

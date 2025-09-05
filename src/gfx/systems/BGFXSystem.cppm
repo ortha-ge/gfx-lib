@@ -31,10 +31,9 @@ export namespace Gfx {
 
 		static void _tryCreateShader(BGFXContext&, entt::registry&, entt::entity, const Core::RawDataResource&);
 		static void _tryCreateShaderProgram(BGFXContext&, entt::registry&, entt::entity, const ShaderProgramResource&);
+		static void _tryCreateVertexLayout(BGFXContext&, entt::registry&, entt::entity, const ShaderProgramResource&);
+		static void _tryCreateUniforms(BGFXContext&, entt::registry&, entt::entity, const ShaderProgramResource&);
 		static void _tryCreateTexture(BGFXContext&, entt::registry&, entt::entity, const Core::ImageResource&);
-
-		bgfx::UniformHandle mTexColourUniformHandle{};
-		bgfx::UniformHandle mAlphaColourUniformHandle{};
 
 		Core::EnTTRegistry& mRegistry;
 

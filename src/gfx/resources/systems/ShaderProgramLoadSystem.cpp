@@ -38,7 +38,12 @@ namespace Gfx {
 			Core::ResourceLoadRequest::create<ShaderDescriptor>(shaderProgramDescriptor.fragmentShaderFilePath)
 		);
 
-		registry.emplace<ShaderProgramResource>(entity, vsResource, fsResource);
+		registry.emplace<ShaderProgramResource>(entity,
+			vsResource,
+			fsResource,
+			shaderProgramDescriptor.uniforms,
+			shaderProgramDescriptor.vertexLayout
+		);
 
 		mTrackedShaderPrograms.emplace_back(entity, vsResource, fsResource);
 	}
