@@ -8,13 +8,15 @@ module;
 export module Gfx.ShaderProgramLoadSystem;
 
 import Core.EnTTRegistry;
+import Core.Scheduler;
 import Gfx.ShaderProgramDescriptor;
 
 export namespace Gfx {
 
 	class ShaderProgramLoadSystem {
 	public:
-		ShaderProgramLoadSystem();
+		ShaderProgramLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler);
+		~ShaderProgramLoadSystem();
 
 		void tickSystem(entt::registry&);
 
@@ -28,6 +30,10 @@ export namespace Gfx {
 			entt::entity vsShaderEntity{entt::null};
 			entt::entity fsShaderEntity{entt::null};
 		};
+
+		Core::EnTTRegistry& mRegistry;
+		Core::Scheduler& mScheduler;
+		Core::TaskHandle mTickHandle;
 
 		std::list<TrackedShaderProgramResources> mTrackedShaderPrograms{};
 	};

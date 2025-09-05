@@ -9,15 +9,26 @@ import Core.FileDescriptor;
 import Core.FileLoadRequest;
 import Core.ResourceLoadRequest;
 import Gfx.ShaderDescriptor;
+import Gfx.ShaderProgram;
 import Gfx.ShaderProgramDescriptor;
-import Gfx.ShaderProgramResource;
 
 namespace Gfx {
 
-	ShaderProgramLoadSystem::ShaderProgramLoadSystem() = default;
+	ShaderProgramLoadSystem::ShaderProgramLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+		: mRegistry{ registry }
+		, mScheduler{ scheduler } {
+
+		mTickHandle = mScheduler.schedule([this]() {
+			tickSystem(mRegistry);
+		});
+	}
+
+	ShaderProgramLoadSystem::~ShaderProgramLoadSystem() {
+		mScheduler.unschedule(std::move(mTickHandle));
+	}
 
 	void ShaderProgramLoadSystem::tickSystem(entt::registry& registry) {
-		auto createProgramResourceView = registry.view<const ShaderProgramDescriptor>(entt::exclude<ShaderProgramResource>);
+		auto createProgramResourceView = registry.view<const ShaderProgramDescriptor>(entt::exclude<ShaderProgram>);
 		createProgramResourceView.each([this, &registry](entt::entity entity, const ShaderProgramDescriptor &programDescriptor) {
 			_tryCreateShaderProgramResource(registry, entity, programDescriptor);
 		});
@@ -38,7 +49,7 @@ namespace Gfx {
 			Core::ResourceLoadRequest::create<ShaderDescriptor>(shaderProgramDescriptor.fragmentShaderFilePath)
 		);
 
-		registry.emplace<ShaderProgramResource>(entity,
+		registry.emplace<ShaderProgram>(entity,
 			vsResource,
 			fsResource,
 			shaderProgramDescriptor.uniforms,
@@ -51,7 +62,7 @@ namespace Gfx {
 	void ShaderProgramLoadSystem::_tryCleanupTrackedShaderProgramResources(entt::registry& registry) {
 		for (auto it = mTrackedShaderPrograms.begin(); it != mTrackedShaderPrograms.end();) {
 			auto currentIt = it++;
-			if (registry.valid(currentIt->entity) && registry.all_of<ShaderProgramResource>(currentIt->entity)) {
+			if (registry.valid(currentIt->entity) && registry.all_of<ShaderProgram>(currentIt->entity)) {
 				continue;
 			}
 

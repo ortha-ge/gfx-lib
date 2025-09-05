@@ -5,16 +5,16 @@ module;
 
 #include <entt/entity/entity.hpp>
 
-export module Gfx.MaterialResource;
+export module Gfx.Material;
 
 import Gfx.Colour;
 import Gfx.TextureCoordinates;
 
 export namespace Gfx {
 
-    struct MaterialResource {
-        entt::entity shaderProgramResource{ entt::null };
-        entt::entity textureImageResource{ entt::null };
+    struct Material {
+        entt::entity shaderProgram{ entt::null };
+        entt::entity textureImage{ entt::null };
         std::vector<TextureCoordinates> spriteFrames{};
         std::optional<Colour> alphaColour{};
         float width{};

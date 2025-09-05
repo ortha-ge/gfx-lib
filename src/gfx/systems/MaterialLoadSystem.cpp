@@ -7,21 +7,31 @@ module Gfx.MaterialLoadSystem;
 import Core.EnTTRegistry;
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
-import Core.ImageDescriptor;
 import Core.JsonTypeLoaderAdapter;
 import Core.ResourceLoadRequest;
 import Core.TypeLoader;
+import Gfx.ImageDescriptor;
+import Gfx.Material;
 import Gfx.MaterialDescriptor;
-import Gfx.MaterialResource;
-import Gfx.ShaderProgramDescriptor;
 import Gfx.Reflection.ShaderProgramDescriptor;
 
 namespace Gfx {
 
-	MaterialLoadSystem::MaterialLoadSystem() = default;
+	MaterialLoadSystem::MaterialLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+		: mRegistry{ registry }
+		, mScheduler{ scheduler } {
+
+		mTickHandle = mScheduler.schedule([this]() {
+			tickSystem(mRegistry);
+		});
+	}
+
+	MaterialLoadSystem::~MaterialLoadSystem() {
+		mScheduler.unschedule(std::move(mTickHandle));
+	}
 
 	void MaterialLoadSystem::tickSystem(entt::registry& registry) {
-		registry.view<const MaterialDescriptor>(entt::exclude<MaterialResource>)
+		registry.view<const MaterialDescriptor>(entt::exclude<Material>)
 				.each([this, &registry](entt::entity entity, const MaterialDescriptor& materialDescriptor) {
 					_tryCreateMaterialResource(registry, entity, materialDescriptor);
 				});
@@ -42,9 +52,9 @@ namespace Gfx {
 		const auto imageResource = registry.create();
 		registry.emplace<Core::ResourceLoadRequest>(
 				imageResource,
-				Core::ResourceLoadRequest::create<Core::ImageDescriptor>(materialDescriptor.textureImageFilePath));
+				Core::ResourceLoadRequest::create<ImageDescriptor>(materialDescriptor.textureImageFilePath));
 
-		registry.emplace<MaterialResource>(entity, programResource, imageResource, materialDescriptor.spriteFrames,
+		registry.emplace<Material>(entity, programResource, imageResource, materialDescriptor.spriteFrames,
 										   materialDescriptor.alphaColour, materialDescriptor.width,
 										   materialDescriptor.height);
 
@@ -55,7 +65,7 @@ namespace Gfx {
 		for (auto it = mTrackedMaterials.begin(); it != mTrackedMaterials.end();) {
 			auto currentIt = it++;
 
-			if (registry.valid(currentIt->entity) && registry.all_of<MaterialResource>(currentIt->entity)) {
+			if (registry.valid(currentIt->entity) && registry.all_of<Material>(currentIt->entity)) {
 				continue;
 			}
 

@@ -8,13 +8,15 @@ module;
 export module Gfx.MaterialLoadSystem;
 
 import Core.EnTTRegistry;
+import Core.Scheduler;
 import Gfx.MaterialDescriptor;
 
 export namespace Gfx {
 
 	class MaterialLoadSystem {
 	public:
-		MaterialLoadSystem();
+		MaterialLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler);
+		~MaterialLoadSystem();
 
 		void tickSystem(entt::registry&);
 
@@ -28,6 +30,10 @@ export namespace Gfx {
 			entt::entity shaderProgramEntity{entt::null};
 			entt::entity textureEntity{entt::null};
 		};
+
+		Core::EnTTRegistry& mRegistry;
+		Core::Scheduler& mScheduler;
+		Core::TaskHandle mTickHandle;
 
 		std::list<TrackedMaterialResources> mTrackedMaterials{};
 	};

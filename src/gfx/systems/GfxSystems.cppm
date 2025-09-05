@@ -5,6 +5,7 @@ export module Gfx.Systems;
 import Core.EnTTRegistry;
 import Core.Scheduler;
 import Gfx.BGFXSystem;
+import Gfx.ImageLoadSystem;
 import Gfx.MaterialLoadSystem;
 import Gfx.ShaderProgramLoadSystem;
 
@@ -14,7 +15,6 @@ export namespace Gfx {
     public:
 
         GfxSystems(Core::EnTTRegistry&, Core::Scheduler&);
-        ~GfxSystems();
 
         GfxSystems(GfxSystems&&) = delete;
         GfxSystems& operator=(GfxSystems&&) noexcept = delete;
@@ -24,12 +24,10 @@ export namespace Gfx {
 
     private:
 
-        Core::EnTTRegistry& mRegistry;
-        Core::Scheduler& mScheduler;
-        Core::TaskHandle mTickHandle{};
         BGFXSystem mBGFXSystem;
-        ShaderProgramLoadSystem mShaderProgramLoadSystem{};
-        MaterialLoadSystem mMaterialLoadSystem{};
+		ImageLoadSystem mImageLoadSystem;
+		ShaderProgramLoadSystem mShaderProgramLoadSystem;
+		MaterialLoadSystem mMaterialLoadSystem;
 
     };
 

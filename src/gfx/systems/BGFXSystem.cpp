@@ -8,7 +8,6 @@ module Gfx.BGFXSystem;
 
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
-import Core.ImageResource;
 import Core.NativeWindowHandles;
 import Core.RawDataResource;
 import Core.ResourceHandle;
@@ -17,11 +16,12 @@ import Core.TypeId;
 import Core.Window;
 import Gfx.BGFXContext;
 import Gfx.BGFXDrawCallback;
-import Gfx.MaterialResource;
+import Gfx.Image;
+import Gfx.Material;
 import Gfx.RenderObject;
 import Gfx.ShaderDescriptor;
+import Gfx.ShaderProgram;
 import Gfx.ShaderProgramDescriptor;
-import Gfx.ShaderProgramResource;
 import Gfx.TextureCoordinates;
 
 namespace Gfx::BGFXSystemInternal {
@@ -69,26 +69,26 @@ namespace Gfx::BGFXSystemInternal {
 		const auto& resourceHandle = registry.get<Core::ResourceHandle>(materialResourceHandle);
 
 		const entt::entity materialResourceEntity = resourceHandle.mResourceEntity;
-		if (materialResourceEntity == entt::null || !registry.all_of<MaterialResource>(materialResourceEntity)) {
+		if (materialResourceEntity == entt::null || !registry.all_of<Material>(materialResourceEntity)) {
 			return std::nullopt;
 		}
 
-		const auto& materialResource = registry.get<MaterialResource>(materialResourceEntity);
+		const auto& materialResource = registry.get<Material>(materialResourceEntity);
 
-		if (materialResource.textureImageResource == entt::null ||
-			!registry.all_of<Core::ResourceHandle>(materialResource.textureImageResource)) {
+		if (materialResource.textureImage == entt::null ||
+			!registry.all_of<Core::ResourceHandle>(materialResource.textureImage)) {
 
 			return std::nullopt;
 		}
 
-		if (materialResource.shaderProgramResource == entt::null ||
-			!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgramResource)) {
+		if (materialResource.shaderProgram == entt::null ||
+			!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgram)) {
 
 			return std::nullopt;
 		}
 
 		const auto& textureImageResourceHandle =
-				registry.get<Core::ResourceHandle>(materialResource.textureImageResource);
+				registry.get<Core::ResourceHandle>(materialResource.textureImage);
 
 		if (textureImageResourceHandle.mResourceEntity == entt::null ||
 			!registry.all_of<BGFXTexture>(textureImageResourceHandle.mResourceEntity)) {
@@ -97,7 +97,7 @@ namespace Gfx::BGFXSystemInternal {
 		}
 
 		const auto& shaderProgramResourceHandle =
-				registry.get<Core::ResourceHandle>(materialResource.shaderProgramResource);
+				registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
 
 		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 			!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity)) {
@@ -119,12 +119,12 @@ namespace Gfx::BGFXSystemInternal {
 				return;
 			}
 
-			const MaterialResource& materialResource = registry.get<MaterialResource>(*materialResourceEntity);
+			const Material& materialResource = registry.get<Material>(*materialResourceEntity);
 			if (renderObject.currentSpriteFrame >= materialResource.spriteFrames.size()) {
 				return;
 			}
 
-			const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgramResource);
+			const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
 			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 				!registry.all_of<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity)) {
 				return;
@@ -157,13 +157,13 @@ namespace Gfx::BGFXSystemInternal {
 
 	void extractRenderObjectToMaterialBuffer(entt::registry& registry, QuadBufferData& bufferData,
 											 const Core::Spatial& spatial, const RenderObject& renderObject,
-											 const MaterialResource& materialResource) {
+											 const Material& materialResource) {
 
 		if (renderObject.currentSpriteFrame >= materialResource.spriteFrames.size()) {
 			return;
 		}
 
-		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgramResource);
+		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
 		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 			!registry.all_of<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity)) {
 			return;
@@ -274,7 +274,7 @@ namespace Gfx::BGFXSystemInternal {
 			}
 
 			auto& quadBufferData{materialBuffers[*materialResourceEntity]};
-			const MaterialResource& materialResource = registry.get<MaterialResource>(*materialResourceEntity);
+			const Material& materialResource = registry.get<Material>(*materialResourceEntity);
 			extractRenderObjectToMaterialBuffer(registry, quadBufferData, spatial, renderObject, materialResource);
 		});
 	}
@@ -282,25 +282,25 @@ namespace Gfx::BGFXSystemInternal {
 	void renderPerMaterialBuffers(entt::registry& registry, const PerMaterialBufferMap& materialBuffers) {
 
 		for (const auto& [materialEntity, transientBufferData] : materialBuffers) {
-			if (materialEntity == entt::null || !registry.all_of<MaterialResource>(materialEntity)) {
+			if (materialEntity == entt::null || !registry.all_of<Material>(materialEntity)) {
 				continue;
 			}
 
-			const MaterialResource& materialResource = registry.get<MaterialResource>(materialEntity);
-			if (!registry.all_of<Core::ResourceHandle>(materialResource.textureImageResource) ||
-				!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgramResource)) {
+			const Material& materialResource = registry.get<Material>(materialEntity);
+			if (!registry.all_of<Core::ResourceHandle>(materialResource.textureImage) ||
+				!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgram)) {
 				return;
 			}
 
 			const auto& textureImageResourceHandle =
-					registry.get<Core::ResourceHandle>(materialResource.textureImageResource);
+					registry.get<Core::ResourceHandle>(materialResource.textureImage);
 			if (textureImageResourceHandle.mResourceEntity == entt::null ||
 				!registry.all_of<BGFXTexture>(textureImageResourceHandle.mResourceEntity)) {
 				return;
 			}
 
 			const auto& shaderProgramResourceHandle =
-					registry.get<Core::ResourceHandle>(materialResource.shaderProgramResource);
+					registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
 			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 				!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity) ||
 				!registry.all_of<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity)) {
@@ -373,9 +373,21 @@ namespace Gfx {
 		registry.emplace<BGFXContext>(contextEntity);
 	}
 
-	BGFXSystem::BGFXSystem(Core::EnTTRegistry& registry) : mRegistry{registry} {}
+	BGFXSystem::BGFXSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+		: mRegistry{ registry }
+		, mScheduler{ scheduler } {
 
-	BGFXSystem::~BGFXSystem() = default;
+		initSystem(mRegistry);
+
+		mTickHandle = mScheduler.schedule([this]() {
+			tickSystem(mRegistry);
+		});
+	}
+
+	BGFXSystem::~BGFXSystem() {
+		mScheduler.unschedule(std::move(mTickHandle));
+		destroySystem(mRegistry);
+	}
 
 	void BGFXSystem::initSystem(entt::registry& registry) {
 		registry.on_construct<Core::NativeWindowHandles>().connect<&BGFXSystem::onWindowInternalCreated>(this);
@@ -402,10 +414,10 @@ namespace Gfx {
 		auto bgfxContextEntity{bgfxContextView.front()};
 		auto& bgfxContext{registry.get<BGFXContext>(bgfxContextEntity)};
 
-		registry.view<const ShaderProgramResource>(entt::exclude<BGFXUniforms>)
+		registry.view<const ShaderProgram>(entt::exclude<BGFXUniforms>)
 				.each([&registry, &bgfxContext](entt::entity entity,
-													const ShaderProgramResource& shaderProgramResource) {
-					_tryCreateUniforms(bgfxContext, registry, entity, shaderProgramResource);
+													const ShaderProgram& shaderProgram) {
+					_tryCreateUniforms(bgfxContext, registry, entity, shaderProgram);
 				});
 
 		registry.view<const ShaderDescriptor, const Core::RawDataResource>(
@@ -414,21 +426,21 @@ namespace Gfx {
 					_tryCreateShader(bgfxContext, registry, entity, rawDataResource);
 				});
 
-		registry.view<const ShaderProgramResource>(entt::exclude<BGFXProgram>)
+		registry.view<const ShaderProgram>(entt::exclude<BGFXProgram>)
 				.each([&registry, &bgfxContext](entt::entity entity,
-												const ShaderProgramResource& shaderProgramResource) {
-					_tryCreateShaderProgram(bgfxContext, registry, entity, shaderProgramResource);
+												const ShaderProgram& shaderProgram) {
+					_tryCreateShaderProgram(bgfxContext, registry, entity, shaderProgram);
 				});
 
-		registry.view<const ShaderProgramResource>(entt::exclude<BGFXVertexLayout>)
+		registry.view<const ShaderProgram>(entt::exclude<BGFXVertexLayout>)
 				.each([&registry, &bgfxContext](entt::entity entity,
-												const ShaderProgramResource& shaderProgramResource) {
-					_tryCreateVertexLayout(bgfxContext, registry, entity, shaderProgramResource);
+												const ShaderProgram& shaderProgram) {
+					_tryCreateVertexLayout(bgfxContext, registry, entity, shaderProgram);
 				});
 
-		registry.view<const Core::ImageResource>(entt::exclude<BGFXTexture>)
-				.each([&registry, &bgfxContext](entt::entity entity, const Core::ImageResource& imageResource) {
-					_tryCreateTexture(bgfxContext, registry, entity, imageResource);
+		registry.view<const Image>(entt::exclude<BGFXTexture>)
+				.each([&registry, &bgfxContext](entt::entity entity, const Image& image) {
+					_tryCreateTexture(bgfxContext, registry, entity, image);
 				});
 
 		const bgfx::ViewId viewId{0};
@@ -530,21 +542,21 @@ namespace Gfx {
 	}
 
 	void BGFXSystem::_tryCreateShaderProgram(BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity,
-											 const ShaderProgramResource& shaderProgramResource) {
+											 const ShaderProgram& shaderProgram) {
 		using namespace BGFXSystemInternal;
 
-		if (shaderProgramResource.vertexShaderResource == entt::null ||
-			shaderProgramResource.fragmentShaderResource == entt::null) {
+		if (shaderProgram.vertexShader == entt::null ||
+			shaderProgram.fragmentShader == entt::null) {
 			return;
 		}
 
-		if (!registry.all_of<Core::ResourceHandle>(shaderProgramResource.vertexShaderResource) ||
-			!registry.all_of<Core::ResourceHandle>(shaderProgramResource.fragmentShaderResource)) {
+		if (!registry.all_of<Core::ResourceHandle>(shaderProgram.vertexShader) ||
+			!registry.all_of<Core::ResourceHandle>(shaderProgram.fragmentShader)) {
 			return;
 		}
 
-		const auto& vsResourceHandle{registry.get<Core::ResourceHandle>(shaderProgramResource.vertexShaderResource)};
-		const auto& fsResourceHandle{registry.get<Core::ResourceHandle>(shaderProgramResource.fragmentShaderResource)};
+		const auto& vsResourceHandle{registry.get<Core::ResourceHandle>(shaderProgram.vertexShader)};
+		const auto& fsResourceHandle{registry.get<Core::ResourceHandle>(shaderProgram.fragmentShader)};
 
 		if (!registry.all_of<BGFXShader>(vsResourceHandle.mResourceEntity) ||
 			!registry.all_of<BGFXShader>(fsResourceHandle.mResourceEntity)) {
@@ -569,13 +581,13 @@ namespace Gfx {
 	}
 
 	void BGFXSystem::_tryCreateVertexLayout(BGFXContext&,
-		entt::registry& registry, entt::entity entity, const ShaderProgramResource& shaderProgramResource) {
+		entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
 
 		using namespace BGFXSystemInternal;
 		bgfx::VertexLayout vertexLayout{};
 		vertexLayout.begin();
 
-		for (auto&& inputAttribute : shaderProgramResource.vertexLayout.attributes) {
+		for (auto&& inputAttribute : shaderProgram.vertexLayout.attributes) {
 			bgfx::Attrib::Enum attribute{};
 			switch (inputAttribute.attributeId) {
 				case ShaderVertexLayoutAttributeId::Position:
@@ -606,11 +618,11 @@ namespace Gfx {
 	}
 
 	void BGFXSystem::_tryCreateUniforms(BGFXContext&,
-		entt::registry& registry, entt::entity entity, const ShaderProgramResource& shaderProgramResource) {
+		entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
 
 		using namespace BGFXSystemInternal;
 		BGFXUniforms bgfxUniforms{};
-		for (auto&& uniform : shaderProgramResource.uniforms) {
+		for (auto&& uniform : shaderProgram.uniforms) {
 			if (bgfxUniforms.uniforms.contains(uniform.name)) {
 				printf("Uniform with duplicate name encountered.\n");
 				return;
@@ -637,7 +649,7 @@ namespace Gfx {
 	}
 
 	void BGFXSystem::_tryCreateTexture(BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity,
-									   const Core::ImageResource& imageResource) {
+									   const Image& imageResource) {
 		using namespace BGFXSystemInternal;
 
 		const bgfx::Memory* mem = bgfx::copy(imageResource.image.data(), imageResource.image.size());

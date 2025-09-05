@@ -4,8 +4,9 @@ cmake_minimum_required(VERSION 3.31)
 set (gfx-lib-src
         src/gfx/systems/BGFXSystem.cpp
         src/gfx/systems/GfxSystems.cpp
-        src/gfx/resources/systems/MaterialLoadSystem.cpp
-        src/gfx/resources/systems/ShaderProgramLoadSystem.cpp
+        src/gfx/systems/ImageLoadSystem.cpp
+        src/gfx/systems/MaterialLoadSystem.cpp
+        src/gfx/systems/ShaderProgramLoadSystem.cpp
 )
 
 set (gfx-lib-modules
@@ -13,22 +14,25 @@ set (gfx-lib-modules
         src/gfx/BGFXDrawCallback.cppm
         src/gfx/Camera.cppm
         src/gfx/Colour.cppm
+        src/gfx/Image.cppm
+        src/gfx/Material.cppm
         src/gfx/Projection.cppm
         src/gfx/RenderObject.cppm
+        src/gfx/ShaderProgram.cppm
         src/gfx/TextureCoordinates.cppm
         src/gfx/Viewport.cppm
         src/gfx/descriptors/CameraDescriptor.cppm
+        src/gfx/descriptors/ImageDescriptor.cppm
         src/gfx/descriptors/ViewportDescriptor.cppm
-        src/gfx/resources/MaterialResource.cppm
-        src/gfx/resources/ShaderProgramResource.cppm
-        src/gfx/resources/descriptors/MaterialDescriptor.cppm
-        src/gfx/resources/descriptors/ShaderDescriptor.cppm
-        src/gfx/resources/descriptors/ShaderProgramDescriptor.cppm
+        src/gfx/descriptors/MaterialDescriptor.cppm
+        src/gfx/descriptors/ShaderDescriptor.cppm
+        src/gfx/descriptors/ShaderProgramDescriptor.cppm
         src/gfx/services/GfxSystemsService.cppm
         src/gfx/systems/BGFXSystem.cppm
         src/gfx/systems/GfxSystems.cppm
-        src/gfx/resources/systems/MaterialLoadSystem.cppm
-        src/gfx/resources/systems/ShaderProgramLoadSystem.cppm
+        src/gfx/systems/ImageLoadSystem.cppm
+        src/gfx/systems/MaterialLoadSystem.cppm
+        src/gfx/systems/ShaderProgramLoadSystem.cppm
 )
 
 set (gfx-lib-reflection-modules

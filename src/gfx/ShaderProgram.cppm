@@ -4,15 +4,15 @@ module;
 
 #include <entt/entity/entity.hpp>
 
-export module Gfx.ShaderProgramResource;
+export module Gfx.ShaderProgram;
 
 import Gfx.ShaderProgramDescriptor;
 
 export namespace Gfx {
 
-    struct ShaderProgramResource {
-		entt::entity vertexShaderResource{};
-		entt::entity fragmentShaderResource{};
+    struct ShaderProgram {
+		entt::entity vertexShader{};
+		entt::entity fragmentShader{};
 		std::vector<ShaderUniformDescriptor> uniforms;
 		ShaderVertexLayoutDescriptor vertexLayout{};
     };
