@@ -16,6 +16,7 @@ import Core.TypeId;
 import Core.Window;
 import Gfx.BGFXContext;
 import Gfx.BGFXDrawCallback;
+import Gfx.Camera;
 import Gfx.Image;
 import Gfx.Material;
 import Gfx.RenderObject;
@@ -23,6 +24,7 @@ import Gfx.ShaderDescriptor;
 import Gfx.ShaderProgram;
 import Gfx.ShaderProgramDescriptor;
 import Gfx.TextureCoordinates;
+import Gfx.Viewport;
 
 namespace Gfx::BGFXSystemInternal {
 
@@ -443,26 +445,57 @@ namespace Gfx {
 					_tryCreateTexture(bgfxContext, registry, entity, image);
 				});
 
-		const bgfx::ViewId viewId{0};
-		bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
-		bgfx::setViewRect(viewId, 0, 0, bgfx::BackbufferRatio::Equal);
-
-		bgfx::touch(viewId);
-		bgfx::dbgTextClear();
-		bgfx::setDebug(BGFX_DEBUG_TEXT);
-
-		float view[16];
-		bx::mtxIdentity(view);
-
-		float proj[16];
-		bx::mtxOrtho(proj, 0.0f, 1360.0f, 768.0f, 0.0f, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
-		bgfx::setViewTransform(0, view, proj);
-
 		// TODO: pre-sort render objects by material and THEN create and submit buffers one by one.
 		using namespace BGFXSystemInternal;
 		auto materialBuffers = createPerMaterialBuffers(registry);
 		extractRenderObjectsToPerMaterialBuffers(registry, materialBuffers);
-		renderPerMaterialBuffers(registry, materialBuffers);
+
+		bgfx::ViewId currentViewId{ 0 };
+		registry.view<Viewport>()
+			.each([&currentViewId, &registry, &materialBuffers](const Viewport& viewport) {
+				const bgfx::ViewId viewId = currentViewId++;
+				constexpr float width = 1360.0f;
+				constexpr float height = 768.0f;
+
+				const float left = viewport.x * width;
+				const float right = viewport.width * width;
+				const float top = viewport.y * height;
+				const float bottom = viewport.height * height;
+
+				bgfx::setViewRect(viewId, left, top, right - left, bottom - top);
+				bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
+
+				bgfx::touch(viewId);
+				bgfx::dbgTextClear();
+				bgfx::setDebug(BGFX_DEBUG_TEXT);
+
+				if (!registry.all_of<Camera, Core::Spatial>(viewport.camera)) {
+					return;
+				}
+
+				//const auto& camera{ registry.get<Camera>(viewport.camera) };
+				const auto& spatial{ registry.get<Core::Spatial>(viewport.camera) };
+
+				float view[16];
+				bx::mtxIdentity(view);
+				bx::mtxTranslate(view, spatial.x, spatial.y, spatial.z);
+
+				float proj[16];
+				bx::mtxOrtho(
+					proj,
+					left,
+					right,
+					bottom,
+					top,
+					0.0f,
+					1000.0f,
+					0.0f,
+					bgfx::getCaps()->homogeneousDepth
+				);
+				bgfx::setViewTransform(viewId, view, proj);
+
+				renderPerMaterialBuffers(registry, materialBuffers);
+			});
 
 		registry.view<BGFXDrawCallback>().each(
 				[&registry](const BGFXDrawCallback& drawCallback) { drawCallback.drawCallback(registry); });
