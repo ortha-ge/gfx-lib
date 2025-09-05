@@ -5,10 +5,11 @@ module;
 
 export module Gfx.Reflection.TextureCoordinates;
 
+export import Gfx.TextureCoordinates;
+
 import Core.ClassReflection;
 import Core.ReflectionContext;
 import Core.TypeId;
-export import Gfx.TextureCoordinates;
 
 template<>
 void Core::reflect<Gfx::TextureCoordinates>(ReflectionContext& reflectionContext) {

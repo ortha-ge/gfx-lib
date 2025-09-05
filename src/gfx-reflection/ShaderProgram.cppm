@@ -5,11 +5,12 @@ module;
 
 export module Gfx.Reflection.ShaderProgramDescriptor;
 
+export import Gfx.ShaderProgramDescriptor;
+
 import Core.ClassReflection;
 import Core.EnumReflection;
 import Core.ReflectionContext;
 import Core.TypeId;
-export import Gfx.ShaderProgramDescriptor;
 
 template <>
 void Core::reflect<Gfx::ShaderVertexLayoutAttributeId>(ReflectionContext& reflectionContext) {
@@ -23,8 +24,6 @@ void Core::reflect<Gfx::ShaderVertexLayoutAttributeId>(ReflectionContext& reflec
 template <>
 void Core::reflect<Gfx::ShaderVertexLayoutAttribute>(ReflectionContext& reflectionContext) {
 	using namespace Gfx;
-	reflect<ShaderVertexLayoutAttributeId>(reflectionContext);
-
 	reflectionContext.addClass<ShaderVertexLayoutAttribute>("ShaderVertexLayoutAttribute")
 		.property("id", &ShaderVertexLayoutAttribute::attributeId)
 		.property("elementCount", &ShaderVertexLayoutAttribute::count)
@@ -52,7 +51,6 @@ void Core::reflect<Gfx::ShaderUniformType>(ReflectionContext& reflectionContext)
 template <>
 void Core::reflect<Gfx::ShaderUniformDescriptor>(ReflectionContext& reflectionContext) {
 	using namespace Gfx;
-	Core::reflect<ShaderUniformType>(reflectionContext);
 	reflectionContext.addClass<ShaderUniformDescriptor>("ShaderUniform")
 		.property("name", &ShaderUniformDescriptor::name)
 		.property("type", &ShaderUniformDescriptor::type)
@@ -62,10 +60,6 @@ void Core::reflect<Gfx::ShaderUniformDescriptor>(ReflectionContext& reflectionCo
 template <>
 void Core::reflect<Gfx::ShaderProgramDescriptor>(ReflectionContext& reflectionContext) {
 	using namespace Gfx;
-	reflect<ShaderVertexLayoutAttribute>(reflectionContext);
-	reflect<ShaderVertexLayoutDescriptor>(reflectionContext);
-	reflect<ShaderUniformDescriptor>(reflectionContext);
-
     reflectionContext.addClass<ShaderProgramDescriptor>("ShaderProgram")
         .property("vertexShaderFilePath", &ShaderProgramDescriptor::vertexShaderFilePath)
         .property("fragmentShaderFilePath", &ShaderProgramDescriptor::fragmentShaderFilePath)
