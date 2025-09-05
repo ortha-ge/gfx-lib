@@ -13,10 +13,7 @@ export namespace Gfx {
 	// Vertex Layout
 	// Uniform Descriptors
 
-	enum class ShaderVertexLayoutAttributeId : uint8_t {
-		Position,
-		TexCoord0
-	};
+	enum class ShaderVertexLayoutAttributeId : uint8_t { Position, TexCoord0 };
 
 	struct ShaderVertexLayoutAttribute {
 		ShaderVertexLayoutAttributeId attributeId{};
@@ -28,21 +25,18 @@ export namespace Gfx {
 		std::vector<ShaderVertexLayoutAttribute> attributes;
 	};
 
-	enum class ShaderUniformType : uint8_t {
-		Sampler,
-		Float4
-	};
+	enum class ShaderUniformType : uint8_t { Sampler, Float4 };
 
 	struct ShaderUniformDescriptor {
 		ShaderUniformType type{};
 		std::string name;
 	};
 
-    struct ShaderProgramDescriptor {
+	struct ShaderProgramDescriptor {
 		std::string vertexShaderFilePath;
 		std::string fragmentShaderFilePath;
 		std::vector<ShaderUniformDescriptor> uniforms;
 		ShaderVertexLayoutDescriptor vertexLayout{};
-    };
+	};
 
-} // Gfx
+} // namespace Gfx

@@ -21,42 +21,36 @@ namespace Gfx {
 		: mRegistry{ registry }
 		, mScheduler{ scheduler } {
 
-		mTickHandle = mScheduler.schedule([this]() {
-			tickSystem(mRegistry);
-		});
+		mTickHandle = mScheduler.schedule([this]() { tickSystem(mRegistry); });
 	}
 
-	MaterialLoadSystem::~MaterialLoadSystem() {
-		mScheduler.unschedule(std::move(mTickHandle));
-	}
+	MaterialLoadSystem::~MaterialLoadSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void MaterialLoadSystem::tickSystem(entt::registry& registry) {
 		registry.view<const MaterialDescriptor>(entt::exclude<Material>)
-				.each([this, &registry](entt::entity entity, const MaterialDescriptor& materialDescriptor) {
-					_tryCreateMaterialResource(registry, entity, materialDescriptor);
-				});
+			.each([this, &registry](entt::entity entity, const MaterialDescriptor& materialDescriptor) {
+				_tryCreateMaterialResource(registry, entity, materialDescriptor);
+			});
 
 		_tryCleanupTrackedMaterialResources(registry);
 	}
 
-	void MaterialLoadSystem::_tryCreateMaterialResource(entt::registry& registry, entt::entity entity,
-														const MaterialDescriptor& materialDescriptor) {
+	void MaterialLoadSystem::_tryCreateMaterialResource(
+		entt::registry& registry, entt::entity entity, const MaterialDescriptor& materialDescriptor) {
 
 		const auto programResource = registry.create();
 		registry.emplace<Core::ResourceLoadRequest>(
-				programResource,
-				Core::ResourceLoadRequest::create<Core::TypeLoader>(
-						materialDescriptor.shaderProgramFilePath,
-						std::make_shared<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>()));
+			programResource, Core::ResourceLoadRequest::create<Core::TypeLoader>(
+								 materialDescriptor.shaderProgramFilePath,
+								 std::make_shared<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>()));
 
 		const auto imageResource = registry.create();
 		registry.emplace<Core::ResourceLoadRequest>(
-				imageResource,
-				Core::ResourceLoadRequest::create<ImageDescriptor>(materialDescriptor.textureImageFilePath));
+			imageResource, Core::ResourceLoadRequest::create<ImageDescriptor>(materialDescriptor.textureImageFilePath));
 
-		registry.emplace<Material>(entity, programResource, imageResource, materialDescriptor.spriteFrames,
-										   materialDescriptor.alphaColour, materialDescriptor.width,
-										   materialDescriptor.height);
+		registry.emplace<Material>(
+			entity, programResource, imageResource, materialDescriptor.spriteFrames, materialDescriptor.alphaColour,
+			materialDescriptor.width, materialDescriptor.height);
 
 		mTrackedMaterials.emplace_back(entity, programResource, imageResource);
 	}

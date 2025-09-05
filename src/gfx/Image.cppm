@@ -16,7 +16,7 @@ export namespace Gfx {
 		uint32_t height{};
 		uint32_t depth{};
 		uint16_t numLayers{};
-		uint8_t  numMips{};
+		uint8_t numMips{};
 		bool hasAlpha{};
 		bool cubeMap{};
 		bool ktx{};
@@ -25,4 +25,4 @@ export namespace Gfx {
 		bool srgb{};
 	};
 
-} // Core
+} // namespace Gfx

@@ -16,4 +16,4 @@ export namespace Gfx {
 		std::list<std::pair<entt::entity, bgfx::ShaderHandle>> trackedShaderHandles{};
 	};
 
-} // Gfx
+} // namespace Gfx

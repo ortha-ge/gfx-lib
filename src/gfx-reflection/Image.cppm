@@ -9,9 +9,9 @@ import Core.ImageDescriptor;
 import Core.ReflectionContext;
 import Core.TypeId;
 
-template <>
+template<>
 void Core::reflect<Core::ImageDescriptor>(ReflectionContext& reflectionContext) {
 	reflectionContext.addClass<ImageDescriptor>("Image")
 		.property("imageFilePath", &ImageDescriptor::imageFilePath)
-	.build();
+		.build();
 }

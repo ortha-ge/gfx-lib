@@ -4,6 +4,6 @@ export module Gfx.ShaderDescriptor;
 
 export namespace Gfx {
 
-    struct ShaderDescriptor {};
+	struct ShaderDescriptor {};
 
-} // Gfx
+} // namespace Gfx

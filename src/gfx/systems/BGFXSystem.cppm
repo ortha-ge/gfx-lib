@@ -16,7 +16,6 @@ export namespace Gfx {
 
 	class BGFXSystem {
 	public:
-
 		BGFXSystem(Core::EnTTRegistry&, Core::Scheduler&);
 		~BGFXSystem();
 
@@ -25,7 +24,6 @@ export namespace Gfx {
 		void tickSystem(entt::registry& registry);
 
 	private:
-
 		void onWindowInternalCreated(entt::registry&, entt::entity);
 		static void _destroyDroppedTextures(const entt::registry&, BGFXContext& context);
 		void _destroyTrackedTextures(BGFXContext& context) const;
@@ -40,7 +38,6 @@ export namespace Gfx {
 		Core::Scheduler& mScheduler;
 
 		Core::TaskHandle mTickHandle{};
-
 	};
 
-} // Gfx
+} // namespace Gfx

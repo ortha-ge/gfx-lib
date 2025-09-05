@@ -5,7 +5,7 @@ export import Gfx.ViewportDescriptor;
 import Core.ClassReflection;
 import Core.ReflectionContext;
 
-template <>
+template<>
 void Core::reflect<Gfx::ViewportDescriptor>(ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 	reflectionContext.addClass<Gfx::ViewportDescriptor>("Viewport")
@@ -13,5 +13,5 @@ void Core::reflect<Gfx::ViewportDescriptor>(ReflectionContext& reflectionContext
 		.property("y", &ViewportDescriptor::y)
 		.property("width", &ViewportDescriptor::width)
 		.property("height", &ViewportDescriptor::height)
-	.build();
+		.build();
 }

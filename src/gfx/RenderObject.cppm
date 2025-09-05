@@ -13,4 +13,4 @@ export namespace Gfx {
 		std::chrono::time_point<std::chrono::steady_clock> lastAnimUpdateTime{};
 	};
 
-} // Gfx
+} // namespace Gfx

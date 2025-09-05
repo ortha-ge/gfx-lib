@@ -10,11 +10,10 @@ import Core.ReflectionContext;
 
 namespace Gfx {
 
-    GfxSystems::GfxSystems(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
-        : mBGFXSystem{ registry, scheduler }
+	GfxSystems::GfxSystems(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+		: mBGFXSystem{ registry, scheduler }
 		, mImageLoadSystem(registry, scheduler)
 		, mShaderProgramLoadSystem(registry, scheduler)
-		, mMaterialLoadSystem(registry, scheduler) {
-    }
+		, mMaterialLoadSystem(registry, scheduler) {}
 
-} // Gfx
+} // namespace Gfx

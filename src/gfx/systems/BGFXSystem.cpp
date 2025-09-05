@@ -62,8 +62,8 @@ namespace Gfx::BGFXSystemInternal {
 		uint32_t maxIndexCount{};
 	};
 
-	std::optional<entt::entity> getMaterialResourceIfReadyToRender(const entt::registry& registry,
-																   const entt::entity materialResourceHandle) {
+	std::optional<entt::entity>
+	getMaterialResourceIfReadyToRender(const entt::registry& registry, const entt::entity materialResourceHandle) {
 		if (materialResourceHandle == entt::null || !registry.all_of<Core::ResourceHandle>(materialResourceHandle)) {
 			return std::nullopt;
 		}
@@ -89,8 +89,7 @@ namespace Gfx::BGFXSystemInternal {
 			return std::nullopt;
 		}
 
-		const auto& textureImageResourceHandle =
-				registry.get<Core::ResourceHandle>(materialResource.textureImage);
+		const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(materialResource.textureImage);
 
 		if (textureImageResourceHandle.mResourceEntity == entt::null ||
 			!registry.all_of<BGFXTexture>(textureImageResourceHandle.mResourceEntity)) {
@@ -98,8 +97,7 @@ namespace Gfx::BGFXSystemInternal {
 			return std::nullopt;
 		}
 
-		const auto& shaderProgramResourceHandle =
-				registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
+		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
 
 		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 			!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity)) {
@@ -126,7 +124,8 @@ namespace Gfx::BGFXSystemInternal {
 				return;
 			}
 
-			const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
+			const auto& shaderProgramResourceHandle =
+				registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
 			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 				!registry.all_of<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity)) {
 				return;
@@ -149,17 +148,17 @@ namespace Gfx::BGFXSystemInternal {
 				bgfx::allocTransientIndexBuffer(&transientIndexBuffer, maxIndices);
 
 				materialBuffers.emplace(
-						*materialResourceEntity,
-						QuadBufferData{transientVertexBuffer, transientIndexBuffer, 0, maxVertices, maxIndices});
+					*materialResourceEntity,
+					QuadBufferData{ transientVertexBuffer, transientIndexBuffer, 0, maxVertices, maxIndices });
 			}
 		});
 
 		return materialBuffers;
 	}
 
-	void extractRenderObjectToMaterialBuffer(entt::registry& registry, QuadBufferData& bufferData,
-											 const Core::Spatial& spatial, const RenderObject& renderObject,
-											 const Material& materialResource) {
+	void extractRenderObjectToMaterialBuffer(
+		entt::registry& registry, QuadBufferData& bufferData, const Core::Spatial& spatial,
+		const RenderObject& renderObject, const Material& materialResource) {
 
 		if (renderObject.currentSpriteFrame >= materialResource.spriteFrames.size()) {
 			return;
@@ -169,11 +168,11 @@ namespace Gfx::BGFXSystemInternal {
 		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 			!registry.all_of<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity)) {
 			return;
-			}
+		}
 
 		const auto& vertexLayout{ registry.get<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity) };
 
-		const auto& frameCoords{materialResource.spriteFrames[renderObject.currentSpriteFrame]};
+		const auto& frameCoords{ materialResource.spriteFrames[renderObject.currentSpriteFrame] };
 		const uint32_t startVertex = bufferData.quadCount * 4;
 		const uint32_t startIndex = bufferData.quadCount * 6;
 		if (startVertex + 4 >= bufferData.maxVertexCount || startIndex + 6 >= bufferData.maxIndexCount) {
@@ -183,26 +182,21 @@ namespace Gfx::BGFXSystemInternal {
 		const float halfQuadWidth = (frameCoords.x1 - frameCoords.x0) * spatial.scaleX * 0.5f;
 		const float halfQuadHeight = (frameCoords.y1 - frameCoords.y0) * spatial.scaleY * 0.5f;
 
-		const TextureCoordinates factoredCoords{
-				frameCoords.x0 / materialResource.width, frameCoords.y0 / materialResource.height,
-				frameCoords.x1 / materialResource.width, frameCoords.y1 / materialResource.height};
+		const TextureCoordinates factoredCoords{ frameCoords.x0 / materialResource.width,
+												 frameCoords.y0 / materialResource.height,
+												 frameCoords.x1 / materialResource.width,
+												 frameCoords.y1 / materialResource.height };
 
 		using DecodedAttributes = std::tuple<uint8_t, bgfx::AttribType::Enum, bool, bool>;
 		DecodedAttributes posAttributes;
-		vertexLayout.vertexLayout.decode(bgfx::Attrib::Position,
-			std::get<0>(posAttributes),
-			std::get<1>(posAttributes),
-			std::get<2>(posAttributes),
-			std::get<3>(posAttributes)
-		);
+		vertexLayout.vertexLayout.decode(
+			bgfx::Attrib::Position, std::get<0>(posAttributes), std::get<1>(posAttributes), std::get<2>(posAttributes),
+			std::get<3>(posAttributes));
 
 		DecodedAttributes texCoord0Attributes;
-		vertexLayout.vertexLayout.decode(bgfx::Attrib::TexCoord0,
-			std::get<0>(texCoord0Attributes),
-			std::get<1>(texCoord0Attributes),
-			std::get<2>(texCoord0Attributes),
-			std::get<3>(texCoord0Attributes)
-		);
+		vertexLayout.vertexLayout.decode(
+			bgfx::Attrib::TexCoord0, std::get<0>(texCoord0Attributes), std::get<1>(texCoord0Attributes),
+			std::get<2>(texCoord0Attributes), std::get<3>(texCoord0Attributes));
 
 		auto&& [posCount, posType, _posNormalized, _posAsInt] = posAttributes;
 		auto&& [texCoord0Count, texCoord0Type, _texCoord0Normalized, _texCoord0AsInt] = texCoord0Attributes;
@@ -216,9 +210,12 @@ namespace Gfx::BGFXSystemInternal {
 		}
 
 		for (size_t i = 0; i < 4; ++i) {
-			uint8_t* vertexHead = bufferData.transientVertexBuffer.data + vertexLayout.vertexLayout.getStride() * (startVertex + i);
-			float* positionHead = reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::Position));
-			float* texCoordHead = reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::TexCoord0));
+			uint8_t* vertexHead =
+				bufferData.transientVertexBuffer.data + vertexLayout.vertexLayout.getStride() * (startVertex + i);
+			float* positionHead =
+				reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::Position));
+			float* texCoordHead =
+				reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::TexCoord0));
 
 			if (i == 0) {
 				positionHead[0] = spatial.x - halfQuadWidth;
@@ -264,8 +261,8 @@ namespace Gfx::BGFXSystemInternal {
 	}
 
 	void extractRenderObjectsToPerMaterialBuffers(entt::registry& registry, PerMaterialBufferMap& materialBuffers) {
-		registry.view<Core::Spatial, RenderObject>().each([&registry, &materialBuffers](auto& spatial,
-																						auto& renderObject) {
+		registry.view<Core::Spatial, RenderObject>().each([&registry,
+														   &materialBuffers](auto& spatial, auto& renderObject) {
 			auto materialResourceEntity = getMaterialResourceIfReadyToRender(registry, renderObject.materialResource);
 			if (!materialResourceEntity) {
 				return;
@@ -275,7 +272,7 @@ namespace Gfx::BGFXSystemInternal {
 				return;
 			}
 
-			auto& quadBufferData{materialBuffers[*materialResourceEntity]};
+			auto& quadBufferData{ materialBuffers[*materialResourceEntity] };
 			const Material& materialResource = registry.get<Material>(*materialResourceEntity);
 			extractRenderObjectToMaterialBuffer(registry, quadBufferData, spatial, renderObject, materialResource);
 		});
@@ -294,15 +291,14 @@ namespace Gfx::BGFXSystemInternal {
 				return;
 			}
 
-			const auto& textureImageResourceHandle =
-					registry.get<Core::ResourceHandle>(materialResource.textureImage);
+			const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(materialResource.textureImage);
 			if (textureImageResourceHandle.mResourceEntity == entt::null ||
 				!registry.all_of<BGFXTexture>(textureImageResourceHandle.mResourceEntity)) {
 				return;
 			}
 
 			const auto& shaderProgramResourceHandle =
-					registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
+				registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
 			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 				!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity) ||
 				!registry.all_of<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity)) {
@@ -328,17 +324,18 @@ namespace Gfx::BGFXSystemInternal {
 			bgfx::setIndexBuffer(&transientBufferData.transientIndexBuffer, 0, transientBufferData.quadCount * 6);
 			bgfx::setTexture(0, textureColourUniform, bgfxTexture.textureHandle);
 
-			const auto& alphaColour = materialResource.alphaColour.value_or({255.0f, 255.0f, 255.0f, 255.0f});
+			const auto& alphaColour = materialResource.alphaColour.value_or({ 255.0f, 255.0f, 255.0f, 255.0f });
 			bgfx::setUniform(alphaColourUniform, &alphaColour);
 
 			// Set render states.
-			bgfx::setState(0 | BGFX_STATE_WRITE_RGB |
-						   BGFX_STATE_WRITE_A
-						   //| BGFX_STATE_WRITE_Z
-						   //| BGFX_STATE_DEPTH_TEST_LESS
-						   | BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA) |
-						   BGFX_STATE_BLEND_EQUATION_ADD
-						   //| BGFX_STATE_MSAA
+			bgfx::setState(
+				0 | BGFX_STATE_WRITE_RGB |
+				BGFX_STATE_WRITE_A
+				//| BGFX_STATE_WRITE_Z
+				//| BGFX_STATE_DEPTH_TEST_LESS
+				| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA) |
+				BGFX_STATE_BLEND_EQUATION_ADD
+				//| BGFX_STATE_MSAA
 			);
 
 			// Submit primitive for rendering to view 0.
@@ -381,9 +378,7 @@ namespace Gfx {
 
 		initSystem(mRegistry);
 
-		mTickHandle = mScheduler.schedule([this]() {
-			tickSystem(mRegistry);
-		});
+		mTickHandle = mScheduler.schedule([this]() { tickSystem(mRegistry); });
 	}
 
 	BGFXSystem::~BGFXSystem() {
@@ -413,37 +408,34 @@ namespace Gfx {
 			return;
 		}
 
-		auto bgfxContextEntity{bgfxContextView.front()};
-		auto& bgfxContext{registry.get<BGFXContext>(bgfxContextEntity)};
+		auto bgfxContextEntity{ bgfxContextView.front() };
+		auto& bgfxContext{ registry.get<BGFXContext>(bgfxContextEntity) };
 
 		registry.view<const ShaderProgram>(entt::exclude<BGFXUniforms>)
-				.each([&registry, &bgfxContext](entt::entity entity,
-													const ShaderProgram& shaderProgram) {
-					_tryCreateUniforms(bgfxContext, registry, entity, shaderProgram);
-				});
+			.each([&registry, &bgfxContext](entt::entity entity, const ShaderProgram& shaderProgram) {
+				_tryCreateUniforms(bgfxContext, registry, entity, shaderProgram);
+			});
 
-		registry.view<const ShaderDescriptor, const Core::RawDataResource>(
-						entt::exclude<Core::FileLoadRequest, BGFXShader>)
-				.each([&registry, &bgfxContext](entt::entity entity, const Core::RawDataResource& rawDataResource) {
-					_tryCreateShader(bgfxContext, registry, entity, rawDataResource);
-				});
+		registry
+			.view<const ShaderDescriptor, const Core::RawDataResource>(entt::exclude<Core::FileLoadRequest, BGFXShader>)
+			.each([&registry, &bgfxContext](entt::entity entity, const Core::RawDataResource& rawDataResource) {
+				_tryCreateShader(bgfxContext, registry, entity, rawDataResource);
+			});
 
 		registry.view<const ShaderProgram>(entt::exclude<BGFXProgram>)
-				.each([&registry, &bgfxContext](entt::entity entity,
-												const ShaderProgram& shaderProgram) {
-					_tryCreateShaderProgram(bgfxContext, registry, entity, shaderProgram);
-				});
+			.each([&registry, &bgfxContext](entt::entity entity, const ShaderProgram& shaderProgram) {
+				_tryCreateShaderProgram(bgfxContext, registry, entity, shaderProgram);
+			});
 
 		registry.view<const ShaderProgram>(entt::exclude<BGFXVertexLayout>)
-				.each([&registry, &bgfxContext](entt::entity entity,
-												const ShaderProgram& shaderProgram) {
-					_tryCreateVertexLayout(bgfxContext, registry, entity, shaderProgram);
-				});
+			.each([&registry, &bgfxContext](entt::entity entity, const ShaderProgram& shaderProgram) {
+				_tryCreateVertexLayout(bgfxContext, registry, entity, shaderProgram);
+			});
 
 		registry.view<const Image>(entt::exclude<BGFXTexture>)
-				.each([&registry, &bgfxContext](entt::entity entity, const Image& image) {
-					_tryCreateTexture(bgfxContext, registry, entity, image);
-				});
+			.each([&registry, &bgfxContext](entt::entity entity, const Image& image) {
+				_tryCreateTexture(bgfxContext, registry, entity, image);
+			});
 
 		// TODO: pre-sort render objects by material and THEN create and submit buffers one by one.
 		using namespace BGFXSystemInternal;
@@ -451,59 +443,48 @@ namespace Gfx {
 		extractRenderObjectsToPerMaterialBuffers(registry, materialBuffers);
 
 		bgfx::ViewId currentViewId{ 0 };
-		registry.view<Viewport>()
-			.each([&currentViewId, &registry, &materialBuffers](const Viewport& viewport) {
-				const bgfx::ViewId viewId = currentViewId++;
-				constexpr float width = 1360.0f;
-				constexpr float height = 768.0f;
+		registry.view<Viewport>().each([&currentViewId, &registry, &materialBuffers](const Viewport& viewport) {
+			const bgfx::ViewId viewId = currentViewId++;
+			constexpr float width = 1360.0f;
+			constexpr float height = 768.0f;
 
-				const float left = viewport.x * width;
-				const float right = viewport.width * width;
-				const float top = viewport.y * height;
-				const float bottom = viewport.height * height;
+			const float left = viewport.x * width;
+			const float right = viewport.width * width;
+			const float top = viewport.y * height;
+			const float bottom = viewport.height * height;
 
-				bgfx::setViewRect(viewId, left, top, right - left, bottom - top);
-				bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
+			bgfx::setViewRect(viewId, left, top, right - left, bottom - top);
+			bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
 
-				bgfx::touch(viewId);
-				bgfx::dbgTextClear();
-				bgfx::setDebug(BGFX_DEBUG_TEXT);
+			bgfx::touch(viewId);
+			bgfx::dbgTextClear();
+			bgfx::setDebug(BGFX_DEBUG_TEXT);
 
-				if (!registry.all_of<Camera, Core::Spatial>(viewport.camera)) {
-					return;
-				}
+			if (!registry.all_of<Camera, Core::Spatial>(viewport.camera)) {
+				return;
+			}
 
-				//const auto& camera{ registry.get<Camera>(viewport.camera) };
-				const auto& spatial{ registry.get<Core::Spatial>(viewport.camera) };
+			// const auto& camera{ registry.get<Camera>(viewport.camera) };
+			const auto& spatial{ registry.get<Core::Spatial>(viewport.camera) };
 
-				float view[16];
-				bx::mtxIdentity(view);
-				bx::mtxTranslate(view, spatial.x, spatial.y, spatial.z);
+			float view[16];
+			bx::mtxIdentity(view);
+			bx::mtxTranslate(view, spatial.x, spatial.y, spatial.z);
 
-				float proj[16];
-				bx::mtxOrtho(
-					proj,
-					left,
-					right,
-					bottom,
-					top,
-					0.0f,
-					1000.0f,
-					0.0f,
-					bgfx::getCaps()->homogeneousDepth
-				);
-				bgfx::setViewTransform(viewId, view, proj);
+			float proj[16];
+			bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
+			bgfx::setViewTransform(viewId, view, proj);
 
-				renderPerMaterialBuffers(registry, materialBuffers);
-			});
+			renderPerMaterialBuffers(registry, materialBuffers);
+		});
 
 		registry.view<BGFXDrawCallback>().each(
-				[&registry](const BGFXDrawCallback& drawCallback) { drawCallback.drawCallback(registry); });
+			[&registry](const BGFXDrawCallback& drawCallback) { drawCallback.drawCallback(registry); });
 
 		bgfx::frame();
 
 		registry.view<BGFXContext>().each(
-				[this, &registry](BGFXContext& context) { _destroyDroppedTextures(registry, context); });
+			[this, &registry](BGFXContext& context) { _destroyDroppedTextures(registry, context); });
 	}
 
 	void BGFXSystem::_destroyDroppedTextures(const entt::registry& registry, BGFXContext& context) {
@@ -560,8 +541,9 @@ namespace Gfx {
 		context.trackedShaderProgramHandles.clear();
 	}
 
-	void BGFXSystem::_tryCreateShader(BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity,
-									  const Core::RawDataResource& rawDataResource) {
+	void BGFXSystem::_tryCreateShader(
+		BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity,
+		const Core::RawDataResource& rawDataResource) {
 		using namespace BGFXSystemInternal;
 
 		const bgfx::Memory* mem = bgfx::copy(rawDataResource.rawData.data(), rawDataResource.size);
@@ -574,12 +556,11 @@ namespace Gfx {
 		bgfxContext.trackedShaderHandles.emplace_back(entity, shaderHandle);
 	}
 
-	void BGFXSystem::_tryCreateShaderProgram(BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity,
-											 const ShaderProgram& shaderProgram) {
+	void BGFXSystem::_tryCreateShaderProgram(
+		BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
 		using namespace BGFXSystemInternal;
 
-		if (shaderProgram.vertexShader == entt::null ||
-			shaderProgram.fragmentShader == entt::null) {
+		if (shaderProgram.vertexShader == entt::null || shaderProgram.fragmentShader == entt::null) {
 			return;
 		}
 
@@ -588,8 +569,8 @@ namespace Gfx {
 			return;
 		}
 
-		const auto& vsResourceHandle{registry.get<Core::ResourceHandle>(shaderProgram.vertexShader)};
-		const auto& fsResourceHandle{registry.get<Core::ResourceHandle>(shaderProgram.fragmentShader)};
+		const auto& vsResourceHandle{ registry.get<Core::ResourceHandle>(shaderProgram.vertexShader) };
+		const auto& fsResourceHandle{ registry.get<Core::ResourceHandle>(shaderProgram.fragmentShader) };
 
 		if (!registry.all_of<BGFXShader>(vsResourceHandle.mResourceEntity) ||
 			!registry.all_of<BGFXShader>(fsResourceHandle.mResourceEntity)) {
@@ -613,8 +594,8 @@ namespace Gfx {
 		bgfxContext.trackedShaderProgramHandles.emplace_back(entity, program);
 	}
 
-	void BGFXSystem::_tryCreateVertexLayout(BGFXContext&,
-		entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
+	void BGFXSystem::_tryCreateVertexLayout(
+		BGFXContext&, entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
 
 		using namespace BGFXSystemInternal;
 		bgfx::VertexLayout vertexLayout{};
@@ -650,8 +631,8 @@ namespace Gfx {
 		registry.emplace<BGFXVertexLayout>(entity, vertexLayout);
 	}
 
-	void BGFXSystem::_tryCreateUniforms(BGFXContext&,
-		entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
+	void BGFXSystem::_tryCreateUniforms(
+		BGFXContext&, entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
 
 		using namespace BGFXSystemInternal;
 		BGFXUniforms bgfxUniforms{};
@@ -681,15 +662,14 @@ namespace Gfx {
 		registry.emplace<BGFXUniforms>(entity, std::move(bgfxUniforms));
 	}
 
-	void BGFXSystem::_tryCreateTexture(BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity,
-									   const Image& imageResource) {
+	void BGFXSystem::_tryCreateTexture(
+		BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity, const Image& imageResource) {
 		using namespace BGFXSystemInternal;
 
 		const bgfx::Memory* mem = bgfx::copy(imageResource.image.data(), imageResource.image.size());
 		bgfx::TextureHandle texture = bgfx::createTexture2D(
-				imageResource.width, imageResource.height, imageResource.numMips > 1, imageResource.numLayers,
-				static_cast<bgfx::TextureFormat::Enum>(imageResource.format), BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE,
-				mem);
+			imageResource.width, imageResource.height, imageResource.numMips > 1, imageResource.numLayers,
+			static_cast<bgfx::TextureFormat::Enum>(imageResource.format), BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, mem);
 
 		registry.emplace<BGFXTexture>(entity, texture);
 		bgfxContext.trackedTextureHandles.emplace_back(entity, texture);

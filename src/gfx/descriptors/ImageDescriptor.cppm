@@ -5,9 +5,9 @@ module;
 export module Gfx.ImageDescriptor;
 
 export namespace Gfx {
-	
+
 	struct ImageDescriptor {
 		std::string imageFilePath;
 	};
 
-} // Gfx
+} // namespace Gfx

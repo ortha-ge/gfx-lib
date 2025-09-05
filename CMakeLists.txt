@@ -1,7 +1,7 @@
  
 cmake_minimum_required(VERSION 3.31)
 
-set (gfx-lib-src
+set(gfx-lib-src
         src/gfx/systems/BGFXSystem.cpp
         src/gfx/systems/GfxSystems.cpp
         src/gfx/systems/ImageLoadSystem.cpp
@@ -9,7 +9,7 @@ set (gfx-lib-src
         src/gfx/systems/ShaderProgramLoadSystem.cpp
 )
 
-set (gfx-lib-modules
+set(gfx-lib-modules
         src/gfx/BGFXContext.cppm
         src/gfx/BGFXDrawCallback.cppm
         src/gfx/Camera.cppm
@@ -35,7 +35,7 @@ set (gfx-lib-modules
         src/gfx/systems/ShaderProgramLoadSystem.cppm
 )
 
-set (gfx-lib-reflection-modules
+set(gfx-lib-reflection-modules
         src/gfx-reflection/Camera.cppm
         src/gfx-reflection/Colour.cppm
         src/gfx-reflection/Material.cppm

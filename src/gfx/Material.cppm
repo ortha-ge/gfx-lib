@@ -12,13 +12,13 @@ import Gfx.TextureCoordinates;
 
 export namespace Gfx {
 
-    struct Material {
-        entt::entity shaderProgram{ entt::null };
-        entt::entity textureImage{ entt::null };
-        std::vector<TextureCoordinates> spriteFrames{};
-        std::optional<Colour> alphaColour{};
-        float width{};
-        float height{};
-    };
+	struct Material {
+		entt::entity shaderProgram{ entt::null };
+		entt::entity textureImage{ entt::null };
+		std::vector<TextureCoordinates> spriteFrames{};
+		std::optional<Colour> alphaColour{};
+		float width{};
+		float height{};
+	};
 
-} // Gfx
+} // namespace Gfx

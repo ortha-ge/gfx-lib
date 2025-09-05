@@ -10,11 +10,11 @@ import Gfx.ShaderProgramDescriptor;
 
 export namespace Gfx {
 
-    struct ShaderProgram {
+	struct ShaderProgram {
 		entt::entity vertexShader{};
 		entt::entity fragmentShader{};
 		std::vector<ShaderUniformDescriptor> uniforms;
 		ShaderVertexLayoutDescriptor vertexLayout{};
-    };
+	};
 
-} // Gfx
+} // namespace Gfx

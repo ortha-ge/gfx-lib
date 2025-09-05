@@ -8,8 +8,8 @@ export module Gfx.BGFXDrawCallback;
 
 export namespace Gfx {
 
-    struct BGFXDrawCallback {
-        std::function<void(entt::registry&)> drawCallback;
-    };
+	struct BGFXDrawCallback {
+		std::function<void(entt::registry&)> drawCallback;
+	};
 
-} // Gfx
+} // namespace Gfx

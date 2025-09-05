@@ -11,24 +11,21 @@ import Gfx.ShaderProgramLoadSystem;
 
 export namespace Gfx {
 
-    class GfxSystems {
-    public:
+	class GfxSystems {
+	public:
+		GfxSystems(Core::EnTTRegistry&, Core::Scheduler&);
 
-        GfxSystems(Core::EnTTRegistry&, Core::Scheduler&);
+		GfxSystems(GfxSystems&&) = delete;
+		GfxSystems& operator=(GfxSystems&&) noexcept = delete;
 
-        GfxSystems(GfxSystems&&) = delete;
-        GfxSystems& operator=(GfxSystems&&) noexcept = delete;
+		GfxSystems(const GfxSystems&) = delete;
+		GfxSystems& operator=(const GfxSystems&) = delete;
 
-        GfxSystems(const GfxSystems&) = delete;
-        GfxSystems& operator=(const GfxSystems&) = delete;
-
-    private:
-
-        BGFXSystem mBGFXSystem;
+	private:
+		BGFXSystem mBGFXSystem;
 		ImageLoadSystem mImageLoadSystem;
 		ShaderProgramLoadSystem mShaderProgramLoadSystem;
 		MaterialLoadSystem mMaterialLoadSystem;
+	};
 
-    };
-
-} // Gfx
+} // namespace Gfx

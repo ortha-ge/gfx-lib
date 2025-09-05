@@ -12,14 +12,12 @@ export namespace Gfx {
 
 	class ImageLoadSystem {
 	public:
-
 		ImageLoadSystem(Core::EnTTRegistry&, Core::Scheduler&);
 		~ImageLoadSystem();
 
 		static void tickSystem(entt::registry& registry);
 
 	private:
-
 		Core::EnTTRegistry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle{};
@@ -27,4 +25,4 @@ export namespace Gfx {
 		std::unique_ptr<bx::AllocatorI> mAllocator{};
 	};
 
-} // Core
+} // namespace Gfx
