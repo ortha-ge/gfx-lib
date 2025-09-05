@@ -180,8 +180,8 @@ namespace Gfx::BGFXSystemInternal {
 			return;
 		}
 
-		const float quadWidth = (frameCoords.x1 - frameCoords.x0) * 2.0f; // / materialResource.width;
-		const float quadHeight = (frameCoords.y1 - frameCoords.y0) * 2.0f; // / materialResource.height;
+		const float halfQuadWidth = (frameCoords.x1 - frameCoords.x0) * spatial.scaleX * 0.5f;
+		const float halfQuadHeight = (frameCoords.y1 - frameCoords.y0) * spatial.scaleY * 0.5f;
 
 		const TextureCoordinates factoredCoords{
 				frameCoords.x0 / materialResource.width, frameCoords.y0 / materialResource.height,
@@ -221,26 +221,26 @@ namespace Gfx::BGFXSystemInternal {
 			float* texCoordHead = reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::TexCoord0));
 
 			if (i == 0) {
-				positionHead[0] = spatial.x;
-				positionHead[1] = spatial.y;
+				positionHead[0] = spatial.x - halfQuadWidth;
+				positionHead[1] = spatial.y - halfQuadHeight;
 				positionHead[2] = spatial.z;
 				texCoordHead[0] = factoredCoords.x0;
 				texCoordHead[1] = factoredCoords.y0;
 			} else if (i == 1) {
-				positionHead[0] = spatial.x;
-				positionHead[1] = spatial.y + quadHeight;
+				positionHead[0] = spatial.x - halfQuadWidth;
+				positionHead[1] = spatial.y + halfQuadHeight;
 				positionHead[2] = spatial.z;
 				texCoordHead[0] = factoredCoords.x0;
 				texCoordHead[1] = factoredCoords.y1;
 			} else if (i == 2) {
-				positionHead[0] = spatial.x + quadWidth;
-				positionHead[1] = spatial.y + quadHeight;
+				positionHead[0] = spatial.x + halfQuadWidth;
+				positionHead[1] = spatial.y + halfQuadHeight;
 				positionHead[2] = spatial.z;
 				texCoordHead[0] = factoredCoords.x1;
 				texCoordHead[1] = factoredCoords.y1;
 			} else if (i == 3) {
-				positionHead[0] = spatial.x + quadWidth;
-				positionHead[1] = spatial.y;
+				positionHead[0] = spatial.x + halfQuadWidth;
+				positionHead[1] = spatial.y - halfQuadHeight;
 				positionHead[2] = spatial.z;
 				texCoordHead[0] = factoredCoords.x1;
 				texCoordHead[1] = factoredCoords.y0;
