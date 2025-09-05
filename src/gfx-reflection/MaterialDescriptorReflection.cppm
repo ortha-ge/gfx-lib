@@ -8,19 +8,22 @@ export module Gfx.Reflection.MaterialDescriptor;
 import Core.ClassReflection;
 import Core.ReflectionContext;
 import Core.TypeId;
-export import Gfx.MaterialDescriptor;
+import Gfx.MaterialDescriptor;
+import Gfx.Reflection.Colour;
+import Gfx.Reflection.TextureCoordinates;
 
 template<>
-void Core::reflect<Gfx::MaterialDescriptor>(ReflectionContext& context) {
+void Core::reflect<Gfx::MaterialDescriptor>(ReflectionContext& reflectionContext) {
     using namespace Gfx;
-    auto classReflection = ClassReflectionBuilder<MaterialDescriptor>("Material")
+	reflect<TextureCoordinates>(reflectionContext);
+	reflect<Colour>(reflectionContext);
+
+    reflectionContext.addClass<MaterialDescriptor>("Material")
         .property("shaderProgramFilePath", &MaterialDescriptor::shaderProgramFilePath)
         .property("textureImageFilePath", &MaterialDescriptor::textureImageFilePath)
         .property("width", &MaterialDescriptor::width)
         .property("height", &MaterialDescriptor::height)
         .property("spriteFrames", &MaterialDescriptor::spriteFrames)
         .property("alphaColour", &MaterialDescriptor::alphaColour)
-        .build();
-
-    context.addClass(TypeId::get<MaterialDescriptor>(), std::move(classReflection));
+    .build();
 }

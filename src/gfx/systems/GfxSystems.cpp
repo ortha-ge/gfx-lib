@@ -7,10 +7,6 @@ module;
 module Gfx.Systems;
 
 import Core.ReflectionContext;
-import Gfx.Reflection.Colour;
-import Gfx.Reflection.MaterialDescriptor;
-import Gfx.Reflection.ShaderProgramDescriptor;
-import Gfx.Reflection.TextureCoordinates;
 
 namespace Gfx {
 
@@ -18,11 +14,6 @@ namespace Gfx {
         : mRegistry{ registry }
         , mScheduler{ scheduler }
 		, mBGFXSystem{ registry } {
-
-        Core::reflect<Colour>(Core::getCurrentReflectionContext());
-        Core::reflect<TextureCoordinates>(Core::getCurrentReflectionContext());
-        Core::reflect<ShaderProgramDescriptor>(Core::getCurrentReflectionContext());
-        Core::reflect<MaterialDescriptor>(Core::getCurrentReflectionContext());
 
         mBGFXSystem.initSystem(mRegistry);
         mTickHandle = mScheduler.schedule([this]{

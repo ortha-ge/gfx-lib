@@ -14,6 +14,7 @@ import Core.TypeLoader;
 import Gfx.MaterialDescriptor;
 import Gfx.MaterialResource;
 import Gfx.ShaderProgramDescriptor;
+import Gfx.Reflection.ShaderProgramDescriptor;
 
 namespace Gfx {
 

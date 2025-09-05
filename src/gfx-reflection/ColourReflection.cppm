@@ -11,14 +11,12 @@ import Core.TypeId;
 export import Gfx.Colour;
 
 template<>
-void Core::reflect<Gfx::Colour>(ReflectionContext& context) {
+void Core::reflect<Gfx::Colour>(ReflectionContext& reflectionContext) {
     using namespace Gfx;
-    auto classReflection = ClassReflectionBuilder<Colour>("Colour")
+    reflectionContext.addClass<Colour>("Colour")
         .property("r", &Colour::r)
         .property("g", &Colour::g)
         .property("b", &Colour::b)
         .property("a", &Colour::a)
-        .build();
-
-    context.addClass(TypeId::get<Colour>(), std::move(classReflection));
+    .build();
 } // Gfx
