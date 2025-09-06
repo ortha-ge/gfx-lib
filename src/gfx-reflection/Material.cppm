@@ -23,6 +23,5 @@ void Core::reflect<Gfx::MaterialDescriptor>(ReflectionContext& reflectionContext
 		.property("height", &MaterialDescriptor::height)
 		.property("spriteFrames", &MaterialDescriptor::spriteFrames)
 		.property("alphaColour", &MaterialDescriptor::alphaColour)
-		.property("renderPass", &MaterialDescriptor::renderPass)
 		.build();
 }

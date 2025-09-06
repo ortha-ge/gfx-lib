@@ -18,7 +18,6 @@ export namespace Gfx {
 		entt::entity textureImage{ entt::null };
 		std::vector<TextureCoordinates> spriteFrames{};
 		std::optional<Colour> alphaColour{};
-		uint16_t renderPass{ 0u };
 		float width{};
 		float height{};
 	};
