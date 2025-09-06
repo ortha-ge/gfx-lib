@@ -52,10 +52,8 @@ namespace Gfx {
 						   imageResource,
 						   materialDescriptor.spriteFrames,
 						   materialDescriptor.alphaColour,
-							materialDescriptor.renderPass,
 						   materialDescriptor.width,
-						   materialDescriptor.height
-		};
+						   materialDescriptor.height };
 
 		registry.emplace<Material>(entity, std::move(material));
 
