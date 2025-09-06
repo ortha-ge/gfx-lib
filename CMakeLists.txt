@@ -2,11 +2,13 @@
 cmake_minimum_required(VERSION 3.31)
 
 set(gfx-lib-src
+        src/gfx/descriptors/ShaderProgramDescriptor.cpp
         src/gfx/systems/BGFXSystem.cpp
         src/gfx/systems/GfxSystems.cpp
         src/gfx/systems/ImageLoadSystem.cpp
         src/gfx/systems/MaterialLoadSystem.cpp
         src/gfx/systems/ShaderProgramLoadSystem.cpp
+        src/gfx/systems/SpriteRenderSystem.cpp
 )
 
 set(gfx-lib-modules
@@ -15,11 +17,15 @@ set(gfx-lib-modules
         src/gfx/Camera.cppm
         src/gfx/Colour.cppm
         src/gfx/Image.cppm
+        src/gfx/IndexBuffer.cppm
         src/gfx/Material.cppm
         src/gfx/Projection.cppm
+        src/gfx/RenderCommand.cppm
         src/gfx/RenderObject.cppm
         src/gfx/ShaderProgram.cppm
+        src/gfx/Sprite.cppm
         src/gfx/TextureCoordinates.cppm
+        src/gfx/VertexBuffer.cppm
         src/gfx/Viewport.cppm
         src/gfx/descriptors/CameraDescriptor.cppm
         src/gfx/descriptors/ImageDescriptor.cppm
@@ -33,6 +39,7 @@ set(gfx-lib-modules
         src/gfx/systems/ImageLoadSystem.cppm
         src/gfx/systems/MaterialLoadSystem.cppm
         src/gfx/systems/ShaderProgramLoadSystem.cppm
+        src/gfx/systems/SpriteRenderSystem.cppm
 )
 
 set(gfx-lib-reflection-modules

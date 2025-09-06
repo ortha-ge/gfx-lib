@@ -1,8 +1,15 @@
+module;
 
-export module Gfx.SpriteResource;
+#include <vector>
+
+export module Gfx.Sprite;
+
+import Gfx.TextureCoordinates;
 
 export namespace Gfx {
 
-	struct Sprite {};
+	struct Sprite {
+		std::vector<TextureCoordinates> frames{};
+	};
 
 } // namespace Gfx

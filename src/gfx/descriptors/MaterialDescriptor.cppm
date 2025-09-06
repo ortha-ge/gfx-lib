@@ -1,5 +1,6 @@
 module;
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
@@ -16,6 +17,7 @@ export namespace Gfx {
 		std::string textureImageFilePath{};
 		std::vector<TextureCoordinates> spriteFrames{};
 		std::optional<Colour> alphaColour{};
+		uint16_t renderPass{ 0u };
 		float width{};
 		float height{};
 	};

@@ -48,9 +48,16 @@ namespace Gfx {
 		registry.emplace<Core::ResourceLoadRequest>(
 			imageResource, Core::ResourceLoadRequest::create<ImageDescriptor>(materialDescriptor.textureImageFilePath));
 
-		registry.emplace<Material>(
-			entity, programResource, imageResource, materialDescriptor.spriteFrames, materialDescriptor.alphaColour,
-			materialDescriptor.width, materialDescriptor.height);
+		Material material{ programResource,
+						   imageResource,
+						   materialDescriptor.spriteFrames,
+						   materialDescriptor.alphaColour,
+							materialDescriptor.renderPass,
+						   materialDescriptor.width,
+						   materialDescriptor.height
+		};
+
+		registry.emplace<Material>(entity, std::move(material));
 
 		mTrackedMaterials.emplace_back(entity, programResource, imageResource);
 	}

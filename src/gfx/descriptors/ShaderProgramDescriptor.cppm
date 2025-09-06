@@ -39,4 +39,8 @@ export namespace Gfx {
 		ShaderVertexLayoutDescriptor vertexLayout{};
 	};
 
+	size_t getBufferSizeForVertexLayout(const ShaderVertexLayoutDescriptor&, size_t vertexCount);
+	size_t getStrideForVertexLayout(const ShaderVertexLayoutDescriptor&);
+	size_t getOffsetForVertexLayoutAttribute(const ShaderVertexLayoutDescriptor&, ShaderVertexLayoutAttributeId attributeId);
+
 } // namespace Gfx

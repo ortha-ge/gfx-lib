@@ -1,5 +1,7 @@
 module;
 
+#include <cstring>
+
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
 #include <entt/entt.hpp>
@@ -19,12 +21,15 @@ import Gfx.BGFXDrawCallback;
 import Gfx.Camera;
 import Gfx.Colour;
 import Gfx.Image;
+import Gfx.IndexBuffer;
 import Gfx.Material;
+import Gfx.RenderCommand;
 import Gfx.RenderObject;
 import Gfx.ShaderDescriptor;
 import Gfx.ShaderProgram;
 import Gfx.ShaderProgramDescriptor;
 import Gfx.TextureCoordinates;
+import Gfx.VertexBuffer;
 import Gfx.Viewport;
 
 namespace Gfx::BGFXSystemInternal {
@@ -41,12 +46,6 @@ namespace Gfx::BGFXSystemInternal {
 		bgfx::ProgramHandle programHandle{};
 	};
 
-	struct BGFXQuadMesh {
-		bgfx::VertexBufferHandle vertexBuffer{};
-		bgfx::IndexBufferHandle indexBuffer{};
-		bgfx::UniformHandle textureUniformHandle{};
-	};
-
 	struct BGFXVertexLayout {
 		bgfx::VertexLayout vertexLayout{};
 	};
@@ -55,293 +54,116 @@ namespace Gfx::BGFXSystemInternal {
 		std::unordered_map<std::string, bgfx::UniformHandle> uniforms{};
 	};
 
-	struct QuadBufferData {
+	void processRenderCommand(entt::registry& registry, const RenderCommand& renderCommand) {
+		if (!registry.all_of<Viewport>(renderCommand.viewportEntity)) {
+			return;
+		}
+
+		const Viewport& viewport{ registry.get<Viewport>(renderCommand.viewportEntity) };
+		if (!registry.all_of<Camera, Core::Spatial>(viewport.camera)) {
+			return;
+		}
+
+		// const auto& camera{ registry.get<Camera>(viewport.camera) };
+		const auto& spatial{ registry.get<Core::Spatial>(viewport.camera) };
+
+		constexpr float width = 1360.0f;
+		constexpr float height = 768.0f;
+
+		const float left = viewport.x * width;
+		const float right = viewport.width * width;
+		const float top = viewport.y * height;
+		const float bottom = viewport.height * height;
+
+		bgfx::setViewRect(renderCommand.renderPass, left, top, right - left, bottom - top);
+
+		float view[16];
+		bx::mtxIdentity(view);
+		bx::mtxTranslate(view, spatial.x, spatial.y, spatial.z);
+
+		float proj[16];
+		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
+		bgfx::setViewTransform(renderCommand.renderPass, view, proj);
+
+		if (!registry.all_of<VertexBuffer>(renderCommand.vertexBuffer) ||
+			!registry.all_of<IndexBuffer>(renderCommand.indexBuffer) ||
+			!registry.all_of<ShaderProgram>(renderCommand.shaderProgram) ||
+			!registry.all_of<Image>(renderCommand.texture)) {
+
+			return;
+		}
+
+		auto& vertexBuffer{ registry.get<VertexBuffer>(renderCommand.vertexBuffer) };
+		auto& indexBuffer{ registry.get<IndexBuffer>(renderCommand.indexBuffer) };
+
+		if (vertexBuffer.type != VertexBufferType::Transient ||
+			indexBuffer.type != IndexBufferType::Transient) {
+			return;
+		}
+
+		if (!registry.all_of<BGFXProgram, BGFXUniforms, BGFXVertexLayout>(renderCommand.shaderProgram)) {
+			return;
+		}
+
+		if (!registry.all_of<BGFXTexture>(renderCommand.texture)) {
+			return;
+		}
+
+		const auto& vertexLayout{ registry.get<BGFXVertexLayout>(renderCommand.shaderProgram) };
+
+		constexpr uint32_t maxVertices = (32 << 10);
+		constexpr uint32_t maxIndices = (32 << 10);
+
+		if (bgfx::getAvailTransientVertexBuffer(maxVertices, vertexLayout.vertexLayout) < maxVertices ||
+			bgfx::getAvailTransientIndexBuffer(maxIndices) < maxIndices) {
+			return;
+		}
+
 		bgfx::TransientVertexBuffer transientVertexBuffer{};
+		bgfx::allocTransientVertexBuffer(&transientVertexBuffer, maxVertices, vertexLayout.vertexLayout);
+
+		std::memcpy(transientVertexBuffer.data, vertexBuffer.data.data(), vertexBuffer.data.size());
+
 		bgfx::TransientIndexBuffer transientIndexBuffer{};
-		uint32_t quadCount{};
-		uint32_t maxVertexCount{};
-		uint32_t maxIndexCount{};
-	};
+		bgfx::allocTransientIndexBuffer(&transientIndexBuffer, maxIndices, indexBuffer.is32Bit);
 
-	std::optional<entt::entity>
-	getMaterialResourceIfReadyToRender(const entt::registry& registry, const entt::entity materialResourceHandle) {
-		if (materialResourceHandle == entt::null || !registry.all_of<Core::ResourceHandle>(materialResourceHandle)) {
-			return std::nullopt;
-		}
+		std::memcpy(transientIndexBuffer.data, indexBuffer.data.data(), indexBuffer.data.size());
 
-		const auto& resourceHandle = registry.get<Core::ResourceHandle>(materialResourceHandle);
+		const auto& bgfxProgram = registry.get<BGFXProgram>(renderCommand.shaderProgram);
+		const auto& bgfxUniforms = registry.get<BGFXUniforms>(renderCommand.shaderProgram);
+		const auto& bgfxTexture = registry.get<BGFXTexture>(renderCommand.texture);
 
-		const entt::entity materialResourceEntity = resourceHandle.mResourceEntity;
-		if (materialResourceEntity == entt::null || !registry.all_of<Material>(materialResourceEntity)) {
-			return std::nullopt;
-		}
-
-		const auto& materialResource = registry.get<Material>(materialResourceEntity);
-
-		if (materialResource.textureImage == entt::null ||
-			!registry.all_of<Core::ResourceHandle>(materialResource.textureImage)) {
-
-			return std::nullopt;
-		}
-
-		if (materialResource.shaderProgram == entt::null ||
-			!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgram)) {
-
-			return std::nullopt;
-		}
-
-		const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(materialResource.textureImage);
-
-		if (textureImageResourceHandle.mResourceEntity == entt::null ||
-			!registry.all_of<BGFXTexture>(textureImageResourceHandle.mResourceEntity)) {
-
-			return std::nullopt;
-		}
-
-		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
-
-		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-			!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity)) {
-
-			return std::nullopt;
-		}
-
-		return materialResourceEntity;
-	}
-
-	using PerMaterialBufferMap = std::unordered_map<entt::entity, QuadBufferData>;
-
-	PerMaterialBufferMap createPerMaterialBuffers(entt::registry& registry) {
-		PerMaterialBufferMap materialBuffers;
-
-		registry.view<RenderObject>().each([&registry, &materialBuffers](const RenderObject& renderObject) {
-			auto materialResourceEntity = getMaterialResourceIfReadyToRender(registry, renderObject.materialResource);
-			if (!materialResourceEntity) {
-				return;
-			}
-
-			const Material& materialResource = registry.get<Material>(*materialResourceEntity);
-			if (renderObject.currentSpriteFrame >= materialResource.spriteFrames.size()) {
-				return;
-			}
-
-			const auto& shaderProgramResourceHandle =
-				registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
-			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-				!registry.all_of<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity)) {
-				return;
-			}
-
-			const auto& vertexLayout{ registry.get<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity) };
-
-			constexpr uint32_t maxVertices = (32 << 10);
-			constexpr uint32_t maxIndices = (32 << 10);
-			if (!materialBuffers.contains(*materialResourceEntity)) {
-				if (bgfx::getAvailTransientVertexBuffer(maxVertices, vertexLayout.vertexLayout) < maxVertices ||
-					bgfx::getAvailTransientIndexBuffer(maxIndices) < maxIndices) {
-					return;
-				}
-
-				bgfx::TransientVertexBuffer transientVertexBuffer{};
-				bgfx::allocTransientVertexBuffer(&transientVertexBuffer, maxVertices, vertexLayout.vertexLayout);
-
-				bgfx::TransientIndexBuffer transientIndexBuffer{};
-				bgfx::allocTransientIndexBuffer(&transientIndexBuffer, maxIndices);
-
-				materialBuffers.emplace(
-					*materialResourceEntity,
-					QuadBufferData{ transientVertexBuffer, transientIndexBuffer, 0, maxVertices, maxIndices });
-			}
-		});
-
-		return materialBuffers;
-	}
-
-	void extractRenderObjectToMaterialBuffer(
-		entt::registry& registry, QuadBufferData& bufferData, const Core::Spatial& spatial,
-		const RenderObject& renderObject, const Material& materialResource) {
-
-		if (renderObject.currentSpriteFrame >= materialResource.spriteFrames.size()) {
+		if (!bgfxUniforms.uniforms.contains("s_texColour") || !bgfxUniforms.uniforms.contains("u_alphaColour")) {
 			return;
 		}
 
-		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
-		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-			!registry.all_of<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity)) {
-			return;
-		}
+		bgfx::UniformHandle textureColourUniform{ bgfxUniforms.uniforms.at("s_texColour") };
+		bgfx::UniformHandle alphaColourUniform{ bgfxUniforms.uniforms.at("u_alphaColour") };
 
-		const auto& vertexLayout{ registry.get<BGFXVertexLayout>(shaderProgramResourceHandle.mResourceEntity) };
+		float mtx[16];
+		bx::mtxIdentity(mtx);
+		bgfx::setTransform(mtx);
 
-		const auto& frameCoords{ materialResource.spriteFrames[renderObject.currentSpriteFrame] };
-		const uint32_t startVertex = bufferData.quadCount * 4;
-		const uint32_t startIndex = bufferData.quadCount * 6;
-		if (startVertex + 4 >= bufferData.maxVertexCount || startIndex + 6 >= bufferData.maxIndexCount) {
-			return;
-		}
+		bgfx::setVertexBuffer(0, &transientVertexBuffer, 0, renderCommand.vertexCount);
+		bgfx::setIndexBuffer(&transientIndexBuffer, 0, renderCommand.indexCount);
+		bgfx::setTexture(0, textureColourUniform, bgfxTexture.textureHandle);
 
-		const float halfQuadWidth = (frameCoords.x1 - frameCoords.x0) * spatial.scaleX * 0.5f;
-		const float halfQuadHeight = (frameCoords.y1 - frameCoords.y0) * spatial.scaleY * 0.5f;
+		const auto alphaColour = Colour{ 0.0f, 0.0f, 0.0f, 0.0f };
+		bgfx::setUniform(alphaColourUniform, &alphaColour);
 
-		const TextureCoordinates factoredCoords{ frameCoords.x0 / materialResource.width,
-												 frameCoords.y0 / materialResource.height,
-												 frameCoords.x1 / materialResource.width,
-												 frameCoords.y1 / materialResource.height };
+		// Set render states.
+		bgfx::setState(
+			0 | BGFX_STATE_WRITE_RGB |
+			BGFX_STATE_WRITE_A
+			//| BGFX_STATE_WRITE_Z
+			//| BGFX_STATE_DEPTH_TEST_LESS
+			| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA) |
+			BGFX_STATE_BLEND_EQUATION_ADD
+			//| BGFX_STATE_MSAA
+		);
 
-		using DecodedAttributes = std::tuple<uint8_t, bgfx::AttribType::Enum, bool, bool>;
-		DecodedAttributes posAttributes;
-		vertexLayout.vertexLayout.decode(
-			bgfx::Attrib::Position, std::get<0>(posAttributes), std::get<1>(posAttributes), std::get<2>(posAttributes),
-			std::get<3>(posAttributes));
-
-		DecodedAttributes texCoord0Attributes;
-		vertexLayout.vertexLayout.decode(
-			bgfx::Attrib::TexCoord0, std::get<0>(texCoord0Attributes), std::get<1>(texCoord0Attributes),
-			std::get<2>(texCoord0Attributes), std::get<3>(texCoord0Attributes));
-
-		auto&& [posCount, posType, _posNormalized, _posAsInt] = posAttributes;
-		auto&& [texCoord0Count, texCoord0Type, _texCoord0Normalized, _texCoord0AsInt] = texCoord0Attributes;
-
-		if (posCount != 3 || posType != bgfx::AttribType::Float) {
-			return;
-		}
-
-		if (texCoord0Count != 2 || texCoord0Type != bgfx::AttribType::Float) {
-			return;
-		}
-
-		for (size_t i = 0; i < 4; ++i) {
-			uint8_t* vertexHead =
-				bufferData.transientVertexBuffer.data + vertexLayout.vertexLayout.getStride() * (startVertex + i);
-			float* positionHead =
-				reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::Position));
-			float* texCoordHead =
-				reinterpret_cast<float*>(vertexHead + vertexLayout.vertexLayout.getOffset(bgfx::Attrib::TexCoord0));
-
-			if (i == 0) {
-				positionHead[0] = spatial.x - halfQuadWidth;
-				positionHead[1] = spatial.y - halfQuadHeight;
-				positionHead[2] = spatial.z;
-				texCoordHead[0] = factoredCoords.x0;
-				texCoordHead[1] = factoredCoords.y0;
-			} else if (i == 1) {
-				positionHead[0] = spatial.x - halfQuadWidth;
-				positionHead[1] = spatial.y + halfQuadHeight;
-				positionHead[2] = spatial.z;
-				texCoordHead[0] = factoredCoords.x0;
-				texCoordHead[1] = factoredCoords.y1;
-			} else if (i == 2) {
-				positionHead[0] = spatial.x + halfQuadWidth;
-				positionHead[1] = spatial.y + halfQuadHeight;
-				positionHead[2] = spatial.z;
-				texCoordHead[0] = factoredCoords.x1;
-				texCoordHead[1] = factoredCoords.y1;
-			} else if (i == 3) {
-				positionHead[0] = spatial.x + halfQuadWidth;
-				positionHead[1] = spatial.y - halfQuadHeight;
-				positionHead[2] = spatial.z;
-				texCoordHead[0] = factoredCoords.x1;
-				texCoordHead[1] = factoredCoords.y0;
-			} else {
-				assert(false);
-			}
-		}
-
-		uint16_t* indexHead = reinterpret_cast<uint16_t*>(bufferData.transientIndexBuffer.data) + startIndex;
-
-		// 0, 1, 3,
-		indexHead[0] = startVertex;
-		indexHead[1] = startVertex + 1;
-		indexHead[2] = startVertex + 3;
-		// 3, 1, 2
-		indexHead[3] = startVertex + 3;
-		indexHead[4] = startVertex + 1;
-		indexHead[5] = startVertex + 2;
-
-		++bufferData.quadCount;
-	}
-
-	void extractRenderObjectsToPerMaterialBuffers(entt::registry& registry, PerMaterialBufferMap& materialBuffers) {
-		registry.view<Core::Spatial, RenderObject>().each([&registry,
-														   &materialBuffers](auto& spatial, auto& renderObject) {
-			auto materialResourceEntity = getMaterialResourceIfReadyToRender(registry, renderObject.materialResource);
-			if (!materialResourceEntity) {
-				return;
-			}
-
-			if (!materialBuffers.contains(*materialResourceEntity)) {
-				return;
-			}
-
-			auto& quadBufferData{ materialBuffers[*materialResourceEntity] };
-			const Material& materialResource = registry.get<Material>(*materialResourceEntity);
-			extractRenderObjectToMaterialBuffer(registry, quadBufferData, spatial, renderObject, materialResource);
-		});
-	}
-
-	void renderPerMaterialBuffers(entt::registry& registry, const PerMaterialBufferMap& materialBuffers) {
-
-		for (const auto& [materialEntity, transientBufferData] : materialBuffers) {
-			if (materialEntity == entt::null || !registry.all_of<Material>(materialEntity)) {
-				continue;
-			}
-
-			const Material& materialResource = registry.get<Material>(materialEntity);
-			if (!registry.all_of<Core::ResourceHandle>(materialResource.textureImage) ||
-				!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgram)) {
-				return;
-			}
-
-			const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(materialResource.textureImage);
-			if (textureImageResourceHandle.mResourceEntity == entt::null ||
-				!registry.all_of<BGFXTexture>(textureImageResourceHandle.mResourceEntity)) {
-				return;
-			}
-
-			const auto& shaderProgramResourceHandle =
-				registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
-			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-				!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity) ||
-				!registry.all_of<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity)) {
-				return;
-			}
-
-			const auto& bgfxProgram = registry.get<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity);
-			const auto& bgfxUniforms = registry.get<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity);
-			const auto& bgfxTexture = registry.get<BGFXTexture>(textureImageResourceHandle.mResourceEntity);
-
-			if (!bgfxUniforms.uniforms.contains("s_texColour") || !bgfxUniforms.uniforms.contains("u_alphaColour")) {
-				return;
-			}
-
-			bgfx::UniformHandle textureColourUniform{ bgfxUniforms.uniforms.at("s_texColour") };
-			bgfx::UniformHandle alphaColourUniform{ bgfxUniforms.uniforms.at("u_alphaColour") };
-
-			float mtx[16];
-			bx::mtxIdentity(mtx);
-			bgfx::setTransform(mtx);
-
-			bgfx::setVertexBuffer(0, &transientBufferData.transientVertexBuffer, 0, transientBufferData.quadCount * 4);
-			bgfx::setIndexBuffer(&transientBufferData.transientIndexBuffer, 0, transientBufferData.quadCount * 6);
-			bgfx::setTexture(0, textureColourUniform, bgfxTexture.textureHandle);
-
-			const auto& alphaColour = materialResource.alphaColour.value_or(Colour{ 255.0f, 255.0f, 255.0f, 255.0f });
-			bgfx::setUniform(alphaColourUniform, &alphaColour);
-
-			// Set render states.
-			bgfx::setState(
-				0 | BGFX_STATE_WRITE_RGB |
-				BGFX_STATE_WRITE_A
-				//| BGFX_STATE_WRITE_Z
-				//| BGFX_STATE_DEPTH_TEST_LESS
-				| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA) |
-				BGFX_STATE_BLEND_EQUATION_ADD
-				//| BGFX_STATE_MSAA
-			);
-
-			// Submit primitive for rendering to view 0.
-			bgfx::submit(0, bgfxProgram.programHandle);
-		}
+		// Submit primitive for rendering to view 0.
+		bgfx::submit(renderCommand.renderPass, bgfxProgram.programHandle);
 	}
 
 } // namespace Gfx::BGFXSystemInternal
@@ -438,13 +260,8 @@ namespace Gfx {
 				_tryCreateTexture(bgfxContext, registry, entity, image);
 			});
 
-		// TODO: pre-sort render objects by material and THEN create and submit buffers one by one.
-		using namespace BGFXSystemInternal;
-		auto materialBuffers = createPerMaterialBuffers(registry);
-		extractRenderObjectsToPerMaterialBuffers(registry, materialBuffers);
-
 		bgfx::ViewId currentViewId{ 0 };
-		registry.view<Viewport>().each([&currentViewId, &registry, &materialBuffers](const Viewport& viewport) {
+		registry.view<Viewport>().each([&currentViewId, &registry](const Viewport& viewport) {
 			const bgfx::ViewId viewId = currentViewId++;
 			constexpr float width = 1360.0f;
 			constexpr float height = 768.0f;
@@ -454,30 +271,28 @@ namespace Gfx {
 			const float top = viewport.y * height;
 			const float bottom = viewport.height * height;
 
-			bgfx::setViewRect(viewId, left, top, right - left, bottom - top);
-			bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
+			bgfx::setViewRect(0, left, top, right - left, bottom - top);
+			bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
 
 			bgfx::touch(viewId);
 			bgfx::dbgTextClear();
 			bgfx::setDebug(BGFX_DEBUG_TEXT);
-
-			if (!registry.all_of<Camera, Core::Spatial>(viewport.camera)) {
-				return;
-			}
-
-			// const auto& camera{ registry.get<Camera>(viewport.camera) };
-			const auto& spatial{ registry.get<Core::Spatial>(viewport.camera) };
-
-			float view[16];
-			bx::mtxIdentity(view);
-			bx::mtxTranslate(view, spatial.x, spatial.y, spatial.z);
-
-			float proj[16];
-			bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
-			bgfx::setViewTransform(viewId, view, proj);
-
-			renderPerMaterialBuffers(registry, materialBuffers);
 		});
+
+		std::unordered_map<bgfx::ViewId, std::vector<RenderCommand>> commandBuckets;
+		registry.view<RenderCommand>().each([&commandBuckets, &registry](const RenderCommand& renderCommand) {
+			commandBuckets[renderCommand.renderPass].emplace_back(renderCommand);
+		});
+
+		for (auto&& [viewId, renderCommands] : commandBuckets) {
+			for (auto&& renderCommand : renderCommands) {
+				processRenderCommand(registry, renderCommand);
+			}
+		}
+
+		registry.clear<RenderCommand>();
+		registry.clear<VertexBuffer>();
+		registry.clear<IndexBuffer>();
 
 		registry.view<BGFXDrawCallback>().each(
 			[&registry](const BGFXDrawCallback& drawCallback) { drawCallback.drawCallback(registry); });

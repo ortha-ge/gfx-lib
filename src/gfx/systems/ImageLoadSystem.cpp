@@ -28,11 +28,11 @@ namespace Gfx {
 
 	void ImageLoadSystem::tickSystem(entt::registry& registry) {
 		using namespace Core;
-		auto imageResourceView =
-			registry.view<const ImageDescriptor, const RawDataResource>(entt::exclude<FileLoadRequest, Image>);
-		imageResourceView.each(
-			[&registry](
-				entt::entity entity, const ImageDescriptor& imageDescriptor, const RawDataResource& rawDataResource) {
+
+		registry.view<const ImageDescriptor, const RawDataResource>(entt::exclude<FileLoadRequest, Image>)
+			.each([&registry](
+					  entt::entity entity, const ImageDescriptor& imageDescriptor,
+					  const RawDataResource& rawDataResource) {
 				bx::DefaultAllocator allocator{};
 				bx::Error error{};
 				bimg::ImageContainer* image = bimg::imageParse(

@@ -8,6 +8,7 @@ import Gfx.BGFXSystem;
 import Gfx.ImageLoadSystem;
 import Gfx.MaterialLoadSystem;
 import Gfx.ShaderProgramLoadSystem;
+import Gfx.SpriteRenderSystem;
 
 export namespace Gfx {
 
@@ -26,6 +27,7 @@ export namespace Gfx {
 		ImageLoadSystem mImageLoadSystem;
 		ShaderProgramLoadSystem mShaderProgramLoadSystem;
 		MaterialLoadSystem mMaterialLoadSystem;
+		SpriteRenderSystem mSpriteRenderSystem;
 	};
 
 } // namespace Gfx

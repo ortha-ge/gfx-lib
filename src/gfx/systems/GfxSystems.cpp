@@ -14,6 +14,7 @@ namespace Gfx {
 		: mBGFXSystem{ registry, scheduler }
 		, mImageLoadSystem(registry, scheduler)
 		, mShaderProgramLoadSystem(registry, scheduler)
-		, mMaterialLoadSystem(registry, scheduler) {}
+		, mMaterialLoadSystem(registry, scheduler)
+		, mSpriteRenderSystem(registry, scheduler) {}
 
 } // namespace Gfx
