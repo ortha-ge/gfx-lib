@@ -17,6 +17,7 @@ import Core.Window;
 import Gfx.BGFXContext;
 import Gfx.BGFXDrawCallback;
 import Gfx.Camera;
+import Gfx.Colour;
 import Gfx.Image;
 import Gfx.Material;
 import Gfx.RenderObject;
@@ -324,7 +325,7 @@ namespace Gfx::BGFXSystemInternal {
 			bgfx::setIndexBuffer(&transientBufferData.transientIndexBuffer, 0, transientBufferData.quadCount * 6);
 			bgfx::setTexture(0, textureColourUniform, bgfxTexture.textureHandle);
 
-			const auto& alphaColour = materialResource.alphaColour.value_or({ 255.0f, 255.0f, 255.0f, 255.0f });
+			const auto& alphaColour = materialResource.alphaColour.value_or(Colour{ 255.0f, 255.0f, 255.0f, 255.0f });
 			bgfx::setUniform(alphaColourUniform, &alphaColour);
 
 			// Set render states.
