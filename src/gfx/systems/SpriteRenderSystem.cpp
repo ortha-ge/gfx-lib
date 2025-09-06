@@ -28,123 +28,39 @@ namespace Gfx::SpriteRenderSystemInternal {
 		size_t quadCount{};
 	};
 
-	using PerMaterialBuffersMap = std::unordered_map<entt::entity, MaterialBuffers>;
+	using MaterialBuffersMap = std::unordered_map<entt::entity, MaterialBuffers>;
 
-	std::optional<entt::entity>
-		getMaterialResourceIfReadyToRender(const entt::registry& registry, const entt::entity materialResourceHandle) {
-		if (materialResourceHandle == entt::null || !registry.all_of<Core::ResourceHandle>(materialResourceHandle)) {
-			return std::nullopt;
-		}
+	struct ZMaterialBucket {
+		MaterialBuffersMap materialBuffers;
+	};
 
-		const auto& resourceHandle = registry.get<Core::ResourceHandle>(materialResourceHandle);
+	using ZMaterialBucketMap = std::map<float, ZMaterialBucket>;
 
-		const entt::entity materialResourceEntity = resourceHandle.mResourceEntity;
-		if (materialResourceEntity == entt::null || !registry.all_of<Material>(materialResourceEntity)) {
-			return std::nullopt;
-		}
+	MaterialBuffers createMaterialBuffers(const ShaderVertexLayoutDescriptor& vertexLayout) {
+		constexpr uint32_t maxVertices = (32 << 10);
+		constexpr uint32_t maxIndices = (32 << 10);
+		VertexBuffer vertexBuffer;
+		vertexBuffer.type = VertexBufferType::Transient;
+		vertexBuffer.data.resize(getBufferSizeForVertexLayout(vertexLayout, maxVertices));
 
-		const auto& materialResource = registry.get<Material>(materialResourceEntity);
+		IndexBuffer indexBuffer;
+		indexBuffer.is32Bit = maxVertices > std::numeric_limits<uint16_t>::max();
 
-		if (materialResource.textureImage == entt::null ||
-			!registry.all_of<Core::ResourceHandle>(materialResource.textureImage)) {
+		const size_t indexElementSize = indexBuffer.is32Bit ? sizeof(uint32_t) : sizeof(uint16_t);
+		indexBuffer.data.resize(indexElementSize * maxIndices);
 
-			return std::nullopt;
-			}
-
-		if (materialResource.shaderProgram == entt::null ||
-			!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgram)) {
-
-			return std::nullopt;
-		}
-
-		// const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(materialResource.textureImage);
-		//
-		// if (textureImageResourceHandle.mResourceEntity == entt::null ||
-		// 	!registry.all_of<BGFXTexture>(textureImageResourceHandle.mResourceEntity)) {
-		//
-		// 	return std::nullopt;
-		// 	}
-		//
-		// const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
-		//
-		// if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-		// 	!registry.all_of<BGFXProgram>(shaderProgramResourceHandle.mResourceEntity)) {
-		//
-		// 	return std::nullopt;
-		// 	}
-
-		return materialResourceEntity;
+		return MaterialBuffers{ std::move(vertexBuffer), std::move(indexBuffer), maxVertices, maxIndices };
 	}
 
-	PerMaterialBuffersMap createPerMaterialBuffers(entt::registry& registry) {
-		PerMaterialBuffersMap perMaterialBuffers;
+	void pushSpriteToMaterialBuffers(
+		MaterialBuffers& materialBuffers, const Core::Spatial& spatial, const RenderObject& renderObject,
+		const Material& material, const ShaderVertexLayoutDescriptor& vertexLayout) {
 
-		registry.view<RenderObject, Sprite>().each([&registry, &perMaterialBuffers](const RenderObject& renderObject, const Sprite&) {
-			auto materialResourceEntity = getMaterialResourceIfReadyToRender(registry, renderObject.materialResource);
-			if (!materialResourceEntity) {
-				return;
-			}
-
-			const Material& materialResource = registry.get<Material>(*materialResourceEntity);
-			if (renderObject.currentSpriteFrame >= materialResource.spriteFrames.size()) {
-				return;
-			}
-
-			const auto& shaderProgramResourceHandle =
-				registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
-			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-				!registry.all_of<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity)) {
-				return;
-			}
-
-			const auto& shaderProgram{ registry.get<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity) };
-			const auto& vertexLayout{ shaderProgram.vertexLayout };
-
-			constexpr uint32_t maxVertices = (32 << 10);
-			constexpr uint32_t maxIndices = (32 << 10);
-			if (!perMaterialBuffers.contains(*materialResourceEntity)) {
-				VertexBuffer vertexBuffer;
-				vertexBuffer.type = VertexBufferType::Transient;
-				vertexBuffer.data.resize(getBufferSizeForVertexLayout(shaderProgram.vertexLayout, maxVertices));
-
-				IndexBuffer indexBuffer;
-				indexBuffer.is32Bit = false;
-
-				const size_t indexElementSize = indexBuffer.is32Bit ? sizeof(uint32_t) : sizeof(uint16_t);
-				indexBuffer.data.resize(indexElementSize * maxIndices);
-
-				MaterialBuffers materialBuffers{
-					std::move(vertexBuffer),
-					std::move(indexBuffer),
-					maxVertices,
-					maxIndices
-				};
-
-				perMaterialBuffers.emplace(*materialResourceEntity, std::move(materialBuffers));
-			}
-		});
-
-		return perMaterialBuffers;
-	}
-
-	void extractRenderObjectToMaterialBuffer(
-		entt::registry& registry, MaterialBuffers& materialBuffers, const Core::Spatial& spatial,
-		const RenderObject& renderObject, const Material& materialResource) {
-
-		if (renderObject.currentSpriteFrame >= materialResource.spriteFrames.size()) {
+		if (renderObject.currentSpriteFrame >= material.spriteFrames.size()) {
 			return;
 		}
 
-		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
-		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-			!registry.all_of<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity)) {
-			return;
-		}
-
-		const auto& shaderProgram{ registry.get<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity) };
-		const auto& vertexLayout{ shaderProgram.vertexLayout };
-
-		const auto& [x0, y0, x1, y1]{ materialResource.spriteFrames[renderObject.currentSpriteFrame] };
+		const auto& [x0, y0, x1, y1]{ material.spriteFrames[renderObject.currentSpriteFrame] };
 		const uint32_t startVertex = materialBuffers.quadCount * 4;
 		const uint32_t startIndex = materialBuffers.quadCount * 6;
 		if (startVertex + 4 >= materialBuffers.maxVertexCount || startIndex + 6 >= materialBuffers.maxIndexCount) {
@@ -154,18 +70,16 @@ namespace Gfx::SpriteRenderSystemInternal {
 		const float halfQuadWidth = (x1 - x0) * spatial.scaleX * 0.5f;
 		const float halfQuadHeight = (y1 - y0) * spatial.scaleY * 0.5f;
 
-		const TextureCoordinates factoredCoords{ x0 / materialResource.width,
-												 y0 / materialResource.height,
-												 x1 / materialResource.width,
-												 y1 / materialResource.height };
+		const TextureCoordinates factoredCoords{ x0 / material.width, y0 / material.height, x1 / material.width,
+												 y1 / material.height };
 
 		for (size_t i = 0; i < 4; ++i) {
 			uint8_t* vertexHead =
 				materialBuffers.vertexBuffer.data.data() + getStrideForVertexLayout(vertexLayout) * (startVertex + i);
-			auto* positionHead =
-				reinterpret_cast<float*>(vertexHead + getOffsetForVertexLayoutAttribute(vertexLayout, ShaderVertexLayoutAttributeId::Position));
-			auto* texCoordHead =
-				reinterpret_cast<float*>(vertexHead + getOffsetForVertexLayoutAttribute(vertexLayout, ShaderVertexLayoutAttributeId::TexCoord0));
+			auto* positionHead = reinterpret_cast<float*>(
+				vertexHead + getOffsetForVertexLayoutAttribute(vertexLayout, ShaderVertexLayoutAttributeId::Position));
+			auto* texCoordHead = reinterpret_cast<float*>(
+				vertexHead + getOffsetForVertexLayoutAttribute(vertexLayout, ShaderVertexLayoutAttributeId::TexCoord0));
 
 			if (i == 0) {
 				positionHead[0] = spatial.x - halfQuadWidth;
@@ -210,106 +124,154 @@ namespace Gfx::SpriteRenderSystemInternal {
 		++materialBuffers.quadCount;
 	}
 
-	void extractRenderObjectsToPerMaterialBuffers(entt::registry& registry, PerMaterialBuffersMap& materialBuffers) {
-		registry.view<Core::Spatial, RenderObject, Sprite>().each([&registry,
-														   &materialBuffers](auto& spatial, auto& renderObject, auto& sprite) {
-			auto materialResourceEntity = getMaterialResourceIfReadyToRender(registry, renderObject.materialResource);
-			if (!materialResourceEntity) {
-				return;
-			}
+	void pushSpriteToZBucket(
+		entt::registry& registry, ZMaterialBucket& zBucket, const Core::Spatial& spatial,
+		const RenderObject& renderObject, const entt::entity materialEntity, const Material& material,
+		const ShaderProgram& shaderProgram) {
 
-			if (!materialBuffers.contains(*materialResourceEntity)) {
-				return;
-			}
+		if (!zBucket.materialBuffers.contains(materialEntity)) {
+			zBucket.materialBuffers.emplace(materialEntity, createMaterialBuffers(shaderProgram.vertexLayout));
+		}
 
-			auto& quadBufferData{ materialBuffers[*materialResourceEntity] };
-			const Material& materialResource = registry.get<Material>(*materialResourceEntity);
-			extractRenderObjectToMaterialBuffer(registry, quadBufferData, spatial, renderObject, materialResource);
-		});
+		auto& materialBuffers{ zBucket.materialBuffers[materialEntity] };
+		pushSpriteToMaterialBuffers(materialBuffers, spatial, renderObject, material, shaderProgram.vertexLayout);
 	}
 
-	void renderPerMaterialBuffers(entt::entity viewportEntity, entt::registry& registry, PerMaterialBuffersMap& materialBuffers) {
-		for (auto& [materialEntity, materialBuffers] : materialBuffers) {
-			if (materialEntity == entt::null || !registry.all_of<Material>(materialEntity)) {
-				continue;
-			}
+	void pushSpriteToZBucketMap(
+		entt::registry& registry, ZMaterialBucketMap& zBucketMap, const Core::Spatial& spatial,
+		const RenderObject& renderObject) {
 
-			const Material& materialResource = registry.get<Material>(materialEntity);
-			if (!registry.all_of<Core::ResourceHandle>(materialResource.textureImage) ||
-				!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgram)) {
-				return;
-			}
+		if (!registry.all_of<Core::ResourceHandle>(renderObject.materialResource)) {
+			return;
+		}
 
-			const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(materialResource.textureImage);
-			if (textureImageResourceHandle.mResourceEntity == entt::null ||
-				!registry.all_of<Image>(textureImageResourceHandle.mResourceEntity)) {
-				return;
-			}
+		const auto& materialResourceHandle{ registry.get<Core::ResourceHandle>(renderObject.materialResource) };
+		if (!registry.all_of<Material>(materialResourceHandle.mResourceEntity)) {
+			return;
+		}
 
-			const auto& shaderProgramResourceHandle =
-				registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
-			if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-				!registry.all_of<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity)) {
-				return;
-			}
+		const auto& material{ registry.get<Material>(materialResourceHandle.mResourceEntity) };
+		if (!registry.all_of<Core::ResourceHandle>(material.shaderProgram)) {
+			return;
+		}
 
-			// const auto& bgfxUniforms = registry.get<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity);
+		const auto& shaderProgramResourceHandle{ registry.get<Core::ResourceHandle>(material.shaderProgram) };
+		if (!registry.all_of<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity)) {
+			return;
+		}
 
-			// if (!bgfxUniforms.uniforms.contains("s_texColour") || !bgfxUniforms.uniforms.contains("u_alphaColour")) {
-			// 	return;
-			// }
+		const auto& shaderProgram{ registry.get<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity) };
 
-			// bgfx::UniformHandle textureColourUniform{ bgfxUniforms.uniforms.at("s_texColour") };
-			// bgfx::UniformHandle alphaColourUniform{ bgfxUniforms.uniforms.at("u_alphaColour") };
+		if (!zBucketMap.contains(spatial.z)) {
+			zBucketMap.emplace(spatial.z, ZMaterialBucket{});
+		}
 
-			RenderCommand renderCommand;
-			renderCommand.viewportEntity = viewportEntity;
-			renderCommand.shaderProgram = shaderProgramResourceHandle.mResourceEntity;
+		pushSpriteToZBucket(
+			registry, zBucketMap[spatial.z], spatial, renderObject, materialResourceHandle.mResourceEntity, material,
+			shaderProgram);
+	}
 
-			renderCommand.vertexBuffer = registry.create();
-			renderCommand.vertexCount = materialBuffers.quadCount * 4;
-			registry.emplace<VertexBuffer>(renderCommand.vertexBuffer, std::move(materialBuffers.vertexBuffer));
+	ZMaterialBucketMap prepareSpriteZBucketMap(entt::registry& registry) {
+		ZMaterialBucketMap zBucketMap;
 
-			renderCommand.indexBuffer = registry.create();
-			renderCommand.indexCount = materialBuffers.quadCount * 6;
-			registry.emplace<IndexBuffer>(renderCommand.indexBuffer, std::move(materialBuffers.indexBuffer));
+		registry.view<Core::Spatial, RenderObject, Sprite>().each(
+			[&registry, &zBucketMap](auto& spatial, auto renderObject, auto& sprite) {
+				pushSpriteToZBucketMap(registry, zBucketMap, spatial, renderObject);
+			});
 
-			renderCommand.renderPass = materialResource.renderPass;
+		return zBucketMap;
+	}
 
-			renderCommand.texture = textureImageResourceHandle.mResourceEntity;
+	void renderMaterialBuffers(
+		entt::registry& registry, entt::entity viewportEntity, entt::entity materialEntity,
+		const MaterialBuffers& materialBuffers, uint16_t renderPass) {
 
-			entt::entity renderCommandEntity = registry.create();
-			registry.emplace<RenderCommand>(renderCommandEntity, std::move(renderCommand));
-			// bgfx::setTexture(0, textureColourUniform, bgfxTexture.textureHandle);
+		if (materialEntity == entt::null || !registry.all_of<Material>(materialEntity)) {
+			return;
+			;
+		}
+
+		const Material& materialResource = registry.get<Material>(materialEntity);
+		if (!registry.all_of<Core::ResourceHandle>(materialResource.textureImage) ||
+			!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgram)) {
+			return;
+		}
+
+		const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(materialResource.textureImage);
+		if (textureImageResourceHandle.mResourceEntity == entt::null ||
+			!registry.all_of<Image>(textureImageResourceHandle.mResourceEntity)) {
+			return;
+		}
+
+		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
+		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
+			!registry.all_of<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity)) {
+			return;
+		}
+
+		// const auto& bgfxUniforms = registry.get<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity);
+
+		// if (!bgfxUniforms.uniforms.contains("s_texColour") || !bgfxUniforms.uniforms.contains("u_alphaColour")) {
+		// 	return;
+		// }
+
+		// bgfx::UniformHandle textureColourUniform{ bgfxUniforms.uniforms.at("s_texColour") };
+		// bgfx::UniformHandle alphaColourUniform{ bgfxUniforms.uniforms.at("u_alphaColour") };
+
+		RenderCommand renderCommand;
+		renderCommand.viewportEntity = viewportEntity;
+		renderCommand.shaderProgram = shaderProgramResourceHandle.mResourceEntity;
+
+		renderCommand.vertexBuffer = registry.create();
+		renderCommand.vertexCount = materialBuffers.quadCount * 4;
+		registry.emplace<VertexBuffer>(renderCommand.vertexBuffer, materialBuffers.vertexBuffer);
+
+		renderCommand.indexBuffer = registry.create();
+		renderCommand.indexCount = materialBuffers.quadCount * 6;
+		registry.emplace<IndexBuffer>(renderCommand.indexBuffer, materialBuffers.indexBuffer);
+
+		renderCommand.renderPass = renderPass;
+
+		renderCommand.texture = textureImageResourceHandle.mResourceEntity;
+
+		entt::entity renderCommandEntity = registry.create();
+		registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);
+	}
+
+	void renderSpriteZBucket(
+		entt::registry& registry, entt::entity viewportEntity, const ZMaterialBucket& zBucket, uint16_t& renderPass) {
+		for (auto&& [materialEntity, materialBuffers] : zBucket.materialBuffers) {
+			renderMaterialBuffers(registry, viewportEntity, materialEntity, materialBuffers, renderPass++);
 		}
 	}
 
-} // namespace SpriteRenderSystemInternal
+	void renderSpriteZBucketMap(
+		entt::registry& registry, entt::entity viewportEntity, const ZMaterialBucketMap& zBucketMap) {
+		uint16_t renderPass{ 0u };
+		for (auto&& [z, zBucket] : zBucketMap) {
+			renderSpriteZBucket(registry, viewportEntity, zBucket, renderPass);
+		}
+	}
+
+} // namespace Gfx::SpriteRenderSystemInternal
 
 namespace Gfx {
 
-
-
 	SpriteRenderSystem::SpriteRenderSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
-		, mScheduler{ scheduler} {
+		, mScheduler{ scheduler } {
 
-		mTickHandle = mScheduler.schedule([this]() {
-			tickSystem(mRegistry);
-		});
+		mTickHandle = mScheduler.schedule([this]() { tickSystem(mRegistry); });
 	}
 
-	SpriteRenderSystem::~SpriteRenderSystem() {
-		mScheduler.unschedule(std::move(mTickHandle));
-	}
+	SpriteRenderSystem::~SpriteRenderSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void SpriteRenderSystem::tickSystem(entt::registry& registry) {
 		using namespace SpriteRenderSystemInternal;
-		auto materialBuffers = createPerMaterialBuffers(registry);
-		extractRenderObjectsToPerMaterialBuffers(registry, materialBuffers);
+		ZMaterialBucketMap zBucketMap{ prepareSpriteZBucketMap(registry) };
 
-		registry.view<Viewport>().each([&registry, &materialBuffers](entt::entity entity, const Viewport& viewport) {
-			renderPerMaterialBuffers(entity, registry, materialBuffers);
+		registry.view<Viewport>().each([&registry, &zBucketMap](entt::entity entity, const Viewport& viewport) {
+			renderSpriteZBucketMap(registry, entity, zBucketMap);
 		});
 	}
 
