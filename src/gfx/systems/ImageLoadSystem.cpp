@@ -10,6 +10,7 @@ module Gfx.ImageLoadSystem;
 
 import Core.FileLoadRequest;
 import Core.Log;
+import Core.ProcessError;
 import Core.RawDataResource;
 import Gfx.Image;
 import Gfx.ImageDescriptor;
@@ -30,7 +31,7 @@ namespace Gfx {
 	void ImageLoadSystem::tickSystem(entt::registry& registry) {
 		using namespace Core;
 
-		registry.view<const ImageDescriptor, const RawDataResource>(entt::exclude<FileLoadRequest, Image>)
+		registry.view<const ImageDescriptor, const RawDataResource>(entt::exclude<FileLoadRequest, ProcessError, Image>)
 			.each([&registry](
 					  entt::entity entity, const ImageDescriptor& imageDescriptor,
 					  const RawDataResource& rawDataResource) {
@@ -49,7 +50,7 @@ namespace Gfx {
 					bimg::imageFree(image);
 					image = nullptr;
 				} else {
-					logEntry(registry, entity, "ImageLoadSystem parsing error: {}\n", error.getMessage().getCPtr());
+					addProcessError(registry, entity, "ImageLoadSystem parsing error: {}", error.getMessage().getCPtr());
 				}
 			});
 	}
