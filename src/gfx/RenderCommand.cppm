@@ -1,10 +1,14 @@
 module;
 
-#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <unordered_map>
 
 #include <entt/entity/entity.hpp>
 
 export module Gfx.RenderCommand;
+
+import Core.Any;
 
 export namespace Gfx {
 
@@ -16,9 +20,7 @@ export namespace Gfx {
 		size_t vertexCount{ 0zu };
 		size_t indexCount{ 0zu };
 		uint16_t renderPass{ 0u };
-
-		// TEMP
-		entt::entity texture{ entt::null };
+		std::unordered_map<std::string, Core::Any> uniformData;
 
 	};
 

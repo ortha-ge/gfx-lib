@@ -4,8 +4,10 @@ module;
 
 module Gfx.SpriteRenderSystem;
 
+import Core.Any;
 import Core.ResourceHandle;
 import Core.Spatial;
+import Gfx.Colour;
 import Gfx.Image;
 import Gfx.IndexBuffer;
 import Gfx.Material;
@@ -191,19 +193,19 @@ namespace Gfx::SpriteRenderSystemInternal {
 			;
 		}
 
-		const Material& materialResource = registry.get<Material>(materialEntity);
-		if (!registry.all_of<Core::ResourceHandle>(materialResource.textureImage) ||
-			!registry.all_of<Core::ResourceHandle>(materialResource.shaderProgram)) {
+		const Material& material = registry.get<Material>(materialEntity);
+		if (!registry.all_of<Core::ResourceHandle>(material.textureImage) ||
+			!registry.all_of<Core::ResourceHandle>(material.shaderProgram)) {
 			return;
 		}
 
-		const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(materialResource.textureImage);
+		const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(material.textureImage);
 		if (textureImageResourceHandle.mResourceEntity == entt::null ||
 			!registry.all_of<Image>(textureImageResourceHandle.mResourceEntity)) {
 			return;
 		}
 
-		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(materialResource.shaderProgram);
+		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(material.shaderProgram);
 		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
 			!registry.all_of<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity)) {
 			return;
@@ -232,7 +234,8 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 		renderCommand.renderPass = renderPass;
 
-		renderCommand.texture = textureImageResourceHandle.mResourceEntity;
+		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ textureImageResourceHandle.mResourceEntity });
+		renderCommand.uniformData["u_alphaColour"] = Core::Any(material.alphaColour.value_or(Colour{ 0.0f, 0.0f, 0.0f, 0.0f }));
 
 		entt::entity renderCommandEntity = registry.create();
 		registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);

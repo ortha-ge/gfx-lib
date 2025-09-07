@@ -87,8 +87,7 @@ namespace Gfx::BGFXSystemInternal {
 
 		if (!registry.all_of<VertexBuffer>(renderCommand.vertexBuffer) ||
 			!registry.all_of<IndexBuffer>(renderCommand.indexBuffer) ||
-			!registry.all_of<ShaderProgram>(renderCommand.shaderProgram) ||
-			!registry.all_of<Image>(renderCommand.texture)) {
+			!registry.all_of<ShaderProgram>(renderCommand.shaderProgram)) {
 
 			return;
 		}
@@ -102,10 +101,6 @@ namespace Gfx::BGFXSystemInternal {
 		}
 
 		if (!registry.all_of<BGFXProgram, BGFXUniforms, BGFXVertexLayout>(renderCommand.shaderProgram)) {
-			return;
-		}
-
-		if (!registry.all_of<BGFXTexture>(renderCommand.texture)) {
 			return;
 		}
 
@@ -131,14 +126,31 @@ namespace Gfx::BGFXSystemInternal {
 
 		const auto& bgfxProgram = registry.get<BGFXProgram>(renderCommand.shaderProgram);
 		const auto& bgfxUniforms = registry.get<BGFXUniforms>(renderCommand.shaderProgram);
-		const auto& bgfxTexture = registry.get<BGFXTexture>(renderCommand.texture);
 
-		if (!bgfxUniforms.uniforms.contains("s_texColour") || !bgfxUniforms.uniforms.contains("u_alphaColour")) {
-			return;
+		for (auto&& [uniformName, uniformValueAny] : renderCommand.uniformData) {
+			if (!bgfxUniforms.uniforms.contains(uniformName)) {
+				return;
+			}
+
+			bgfx::UniformHandle uniformHandle = bgfxUniforms.uniforms.at(uniformName);
+
+			const auto& uniformTypeId{ uniformValueAny.getTypeId() };
+			if (uniformTypeId == Core::TypeId::get<entt::entity>()) {
+				entt::entity uniformValueEntity = *static_cast<entt::entity*>(uniformValueAny.getInstance());
+				if (registry.all_of<BGFXTexture>(uniformValueEntity)) {
+					BGFXTexture& texture{ registry.get<BGFXTexture>(uniformValueEntity) };
+					bgfx::setTexture(0, uniformHandle, texture.textureHandle);
+				} else {
+					assert(false);
+				}
+
+			} else if (uniformTypeId == Core::TypeId::get<Colour>()) {
+				Colour* uniformColour = static_cast<Colour*>(uniformValueAny.getInstance());
+				bgfx::setUniform(uniformHandle, uniformColour);
+			} else {
+				assert(false);
+			}
 		}
-
-		bgfx::UniformHandle textureColourUniform{ bgfxUniforms.uniforms.at("s_texColour") };
-		bgfx::UniformHandle alphaColourUniform{ bgfxUniforms.uniforms.at("u_alphaColour") };
 
 		float mtx[16];
 		bx::mtxIdentity(mtx);
@@ -146,10 +158,6 @@ namespace Gfx::BGFXSystemInternal {
 
 		bgfx::setVertexBuffer(0, &transientVertexBuffer, 0, renderCommand.vertexCount);
 		bgfx::setIndexBuffer(&transientIndexBuffer, 0, renderCommand.indexCount);
-		bgfx::setTexture(0, textureColourUniform, bgfxTexture.textureHandle);
-
-		const auto alphaColour = Colour{ 0.0f, 0.0f, 0.0f, 0.0f };
-		bgfx::setUniform(alphaColourUniform, &alphaColour);
 
 		// Set render states.
 		bgfx::setState(
