@@ -384,32 +384,19 @@ namespace Gfx {
 		BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
 		using namespace BGFXSystemInternal;
 
-		if (shaderProgram.vertexShader == entt::null || shaderProgram.fragmentShader == entt::null) {
+		const auto* vertexShader = Core::getResource<BGFXShader>(registry, shaderProgram.vertexShader);
+		const auto* fragmentShader = Core::getResource<BGFXShader>(registry, shaderProgram.fragmentShader);
+
+		if (!vertexShader || !fragmentShader) {
 			return;
 		}
 
-		if (!registry.all_of<Core::ResourceHandle>(shaderProgram.vertexShader) ||
-			!registry.all_of<Core::ResourceHandle>(shaderProgram.fragmentShader)) {
+		if (vertexShader->shaderHandle.idx == bgfx::kInvalidHandle ||
+			fragmentShader->shaderHandle.idx == bgfx::kInvalidHandle) {
 			return;
 		}
 
-		const auto& vsResourceHandle{ registry.get<Core::ResourceHandle>(shaderProgram.vertexShader) };
-		const auto& fsResourceHandle{ registry.get<Core::ResourceHandle>(shaderProgram.fragmentShader) };
-
-		if (!registry.all_of<BGFXShader>(vsResourceHandle.mResourceEntity) ||
-			!registry.all_of<BGFXShader>(fsResourceHandle.mResourceEntity)) {
-			return;
-		}
-
-		const auto& vertexShader = registry.get<BGFXShader>(vsResourceHandle.mResourceEntity);
-		const auto& fragmentShader = registry.get<BGFXShader>(fsResourceHandle.mResourceEntity);
-
-		if (vertexShader.shaderHandle.idx == bgfx::kInvalidHandle ||
-			fragmentShader.shaderHandle.idx == bgfx::kInvalidHandle) {
-			return;
-		}
-
-		bgfx::ProgramHandle program = bgfx::createProgram(vertexShader.shaderHandle, fragmentShader.shaderHandle);
+		bgfx::ProgramHandle program = bgfx::createProgram(vertexShader->shaderHandle, fragmentShader->shaderHandle);
 		if (program.idx == bgfx::kInvalidHandle) {
 			return;
 		}

@@ -147,30 +147,23 @@ namespace Gfx::SpriteRenderSystemInternal {
 			return;
 		}
 
-		const auto& materialResourceHandle{ registry.get<Core::ResourceHandle>(renderObject.materialResource) };
-		if (!registry.all_of<Material>(materialResourceHandle.mResourceEntity)) {
+		const auto&& [materialEntity, material] = Core::getResourceAndEntity<Material>(registry, renderObject.materialResource);
+		if (!material) {
 			return;
 		}
 
-		const auto& material{ registry.get<Material>(materialResourceHandle.mResourceEntity) };
-		if (!registry.all_of<Core::ResourceHandle>(material.shaderProgram)) {
+		const auto* shaderProgram = Core::getResource<ShaderProgram>(registry, material->shaderProgram);
+		if (!shaderProgram) {
 			return;
 		}
-
-		const auto& shaderProgramResourceHandle{ registry.get<Core::ResourceHandle>(material.shaderProgram) };
-		if (!registry.all_of<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity)) {
-			return;
-		}
-
-		const auto& shaderProgram{ registry.get<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity) };
 
 		if (!zBucketMap.contains(spatial.z)) {
 			zBucketMap.emplace(spatial.z, ZMaterialBucket{});
 		}
 
 		pushSpriteToZBucket(
-			registry, zBucketMap[spatial.z], spatial, renderObject, materialResourceHandle.mResourceEntity, material,
-			shaderProgram);
+			registry, zBucketMap[spatial.z], spatial, renderObject, materialEntity, *material,
+			*shaderProgram);
 	}
 
 	ZMaterialBucketMap prepareSpriteZBucketMap(entt::registry& registry) {
@@ -199,30 +192,19 @@ namespace Gfx::SpriteRenderSystemInternal {
 			return;
 		}
 
-		const auto& textureImageResourceHandle = registry.get<Core::ResourceHandle>(material.textureImage);
-		if (textureImageResourceHandle.mResourceEntity == entt::null ||
-			!registry.all_of<Image>(textureImageResourceHandle.mResourceEntity)) {
+		const auto&& [textureEntity, texture] = Core::getResourceAndEntity<Image>(registry, material.textureImage);
+		if (!texture) {
 			return;
 		}
 
-		const auto& shaderProgramResourceHandle = registry.get<Core::ResourceHandle>(material.shaderProgram);
-		if (shaderProgramResourceHandle.mResourceEntity == entt::null ||
-			!registry.all_of<ShaderProgram>(shaderProgramResourceHandle.mResourceEntity)) {
+		const auto&& [shaderProgramEntity, shaderProgram] = Core::getResourceAndEntity<ShaderProgram>(registry, material.shaderProgram);
+		if (!shaderProgram) {
 			return;
 		}
-
-		// const auto& bgfxUniforms = registry.get<BGFXUniforms>(shaderProgramResourceHandle.mResourceEntity);
-
-		// if (!bgfxUniforms.uniforms.contains("s_texColour") || !bgfxUniforms.uniforms.contains("u_alphaColour")) {
-		// 	return;
-		// }
-
-		// bgfx::UniformHandle textureColourUniform{ bgfxUniforms.uniforms.at("s_texColour") };
-		// bgfx::UniformHandle alphaColourUniform{ bgfxUniforms.uniforms.at("u_alphaColour") };
 
 		RenderCommand renderCommand;
 		renderCommand.viewportEntity = viewportEntity;
-		renderCommand.shaderProgram = shaderProgramResourceHandle.mResourceEntity;
+		renderCommand.shaderProgram = shaderProgramEntity;
 
 		renderCommand.vertexBuffer = registry.create();
 		renderCommand.vertexCount = materialBuffers.quadCount * 4;
@@ -234,7 +216,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 		renderCommand.renderPass = renderPass;
 
-		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ textureImageResourceHandle.mResourceEntity });
+		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ textureEntity });
 		renderCommand.uniformData["u_alphaColour"] = Core::Any(material.alphaColour.value_or(Colour{ 0.0f, 0.0f, 0.0f, 0.0f }));
 
 		entt::entity renderCommandEntity = registry.create();
