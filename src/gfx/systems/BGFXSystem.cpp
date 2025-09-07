@@ -10,6 +10,7 @@ module Gfx.BGFXSystem;
 
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
+import Core.Log;
 import Core.NativeWindowHandles;
 import Core.RawDataResource;
 import Core.ResourceHandle;
@@ -52,6 +53,102 @@ namespace Gfx::BGFXSystemInternal {
 
 	struct BGFXUniforms {
 		std::unordered_map<std::string, bgfx::UniformHandle> uniforms{};
+	};
+
+	struct BGFXCallbacks : bgfx::CallbackI {
+
+		BGFXCallbacks(entt::registry& registry, entt::entity entity)
+			: registry(registry)
+			, entity(entity) {
+		}
+
+		void trace(const char* _filePath, uint16_t _line, const char* _format, ...) {
+			va_list argList;
+			va_start(argList, _format);
+
+			traceVargs(_filePath, _line, _format, argList);
+
+			va_end(argList);
+		}
+
+		void fatal(const char* _filePath, uint16_t _line, bgfx::Fatal::Enum _code, const char* _str) override {
+			trace(_filePath, _line, "BGFX FATAL 0x%08x: %s\n", _code, _str);
+
+			if (bgfx::Fatal::DebugCheck == _code) {
+				bx::debugBreak();
+			}
+			else {
+				abort();
+			}
+		}
+
+		void traceVargs(const char* _filePath, uint16_t _line, const char* _format, va_list _argList) override {
+			char temp[2048];
+			char* out = temp;
+			va_list argListCopy;
+			va_copy(argListCopy, _argList);
+			int32_t len = snprintf(out, sizeof(temp), "%s (%d): ", _filePath, _line);
+			int32_t total = len + vsnprintf(out + len, sizeof(temp)-len, _format, argListCopy);
+			va_end(argListCopy);
+			if ( (int32_t)sizeof(temp) < total) {
+				out = (char*)BX_STACK_ALLOC(total+1);
+				bx::memCopy(out, temp, len);
+				vsnprintf(out + len, total-len, _format, _argList);
+			}
+			out[total - 1] = '\0';
+
+			Core::logEntry(registry, entity, out);
+		}
+
+		void profilerBegin(const char* _name, uint32_t _abgr, const char* _filePath, uint16_t _line) override {
+
+		}
+
+		void profilerBeginLiteral(const char* _name, uint32_t _abgr, const char* _filePath, uint16_t _line) override {
+
+		}
+
+		void profilerEnd() override {
+
+		}
+
+		uint32_t cacheReadSize(uint64_t _id) override {
+			return 0u;
+		}
+
+		bool cacheRead(uint64_t _id, void* _data, uint32_t _size) override {
+			return false;
+		}
+
+		void cacheWrite(uint64_t _id, const void* _data, uint32_t _size) override {
+
+		}
+
+		void screenShot(
+			const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data,
+			uint32_t _size, bool _yflip) override {
+
+		}
+
+		void captureBegin(
+			uint32_t _width, uint32_t _height, uint32_t _pitch, bgfx::TextureFormat::Enum _format,
+			bool _yflip) override {
+
+		}
+
+		void captureEnd() override {
+
+		}
+
+		void captureFrame(const void* _data, uint32_t _size) override {
+
+		}
+
+	private:
+
+		entt::registry& registry;
+		entt::entity entity;
+
 	};
 
 	void processRenderCommand(entt::registry& registry, const RenderCommand& renderCommand) {
@@ -189,18 +286,24 @@ namespace Gfx {
 			return;
 		}
 
+		using namespace BGFXSystemInternal;
+
+		entt::entity contextEntity = registry.create();
+		registry.emplace<BGFXContext>(contextEntity);
+		auto& callbacks = registry.emplace<BGFXCallbacks>(contextEntity, registry, contextEntity);
+
 		bgfx::Init initData;
 		initData.platformData.nwh = nativeWindowHandles.windowHandle;
 		initData.platformData.ndt = nativeWindowHandles.displayHandle;
 		initData.resolution.width = window.width;
 		initData.resolution.height = window.height;
+		initData.callback = &callbacks;
 
 		if (!bgfx::init(initData)) {
 			return;
 		}
 
-		entt::entity contextEntity = registry.create();
-		registry.emplace<BGFXContext>(contextEntity);
+
 	}
 
 	BGFXSystem::BGFXSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
@@ -298,9 +401,24 @@ namespace Gfx {
 			}
 		}
 
-		registry.clear<RenderCommand>();
-		registry.clear<VertexBuffer>();
-		registry.clear<IndexBuffer>();
+		registry.view<RenderCommand>()
+			.each([&registry](entt::entity entity, const RenderCommand&) {
+				registry.destroy(entity);
+			});
+
+		registry.view<VertexBuffer>()
+			.each([&registry](entt::entity entity, const VertexBuffer& vertexBuffer) {
+				if (vertexBuffer.type == VertexBufferType::Transient) {
+					registry.destroy(entity);
+				}
+			});
+
+		registry.view<IndexBuffer>()
+			.each([&registry](entt::entity entity, const IndexBuffer& indexBuffer) {
+				if (indexBuffer.type == IndexBufferType::Transient) {
+					registry.destroy(entity);
+				}
+			});
 
 		registry.view<BGFXDrawCallback>().each(
 			[&registry](const BGFXDrawCallback& drawCallback) { drawCallback.drawCallback(registry); });
@@ -430,7 +548,7 @@ namespace Gfx {
 			if (inputAttribute.typeId == Core::TypeId::get<float>()) {
 				attributeType = bgfx::AttribType::Float;
 			} else {
-				printf("Unhandled attribute type.\n");
+				Core::logEntry(registry, entity, "Unhandled attribute type.");
 				vertexLayout.end();
 				return;
 			}
@@ -449,7 +567,7 @@ namespace Gfx {
 		BGFXUniforms bgfxUniforms{};
 		for (auto&& uniform : shaderProgram.uniforms) {
 			if (bgfxUniforms.uniforms.contains(uniform.name)) {
-				printf("Uniform with duplicate name encountered.\n");
+				Core::logEntry(registry, entity, "Uniform with duplicate name encountered.");
 				return;
 			}
 
@@ -462,7 +580,7 @@ namespace Gfx {
 					uniformType = bgfx::UniformType::Vec4;
 					break;
 				default:
-					printf("Unhandled uniform type.\n");
+					Core::logEntry(registry, entity, "Unhandled uniform type.");
 					return;
 			}
 

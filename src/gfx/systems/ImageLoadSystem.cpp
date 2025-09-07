@@ -9,6 +9,7 @@ module;
 module Gfx.ImageLoadSystem;
 
 import Core.FileLoadRequest;
+import Core.Log;
 import Core.RawDataResource;
 import Gfx.Image;
 import Gfx.ImageDescriptor;
@@ -48,7 +49,7 @@ namespace Gfx {
 					bimg::imageFree(image);
 					image = nullptr;
 				} else {
-					printf("Error: %s\n", error.getMessage().getCPtr());
+					logEntry(registry, entity, "ImageLoadSystem parsing error: {}\n", error.getMessage().getCPtr());
 				}
 			});
 	}
