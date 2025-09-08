@@ -12,6 +12,7 @@ import Core.FileDescriptor;
 import Core.FileLoadRequest;
 import Core.Log;
 import Core.NativeWindowHandles;
+import Core.ProcessError;
 import Core.RawDataResource;
 import Core.ResourceHandle;
 import Core.Spatial;
@@ -345,28 +346,28 @@ namespace Gfx {
 		auto bgfxContextEntity{ bgfxContextView.front() };
 		auto& bgfxContext{ registry.get<BGFXContext>(bgfxContextEntity) };
 
-		registry.view<const ShaderProgram>(entt::exclude<BGFXUniforms>)
+		registry.view<const ShaderProgram>(entt::exclude<BGFXUniforms, Core::ProcessError>)
 			.each([&registry, &bgfxContext](entt::entity entity, const ShaderProgram& shaderProgram) {
 				_tryCreateUniforms(bgfxContext, registry, entity, shaderProgram);
 			});
 
 		registry
-			.view<const ShaderDescriptor, const Core::RawDataResource>(entt::exclude<Core::FileLoadRequest, BGFXShader>)
+			.view<const ShaderDescriptor, const Core::RawDataResource>(entt::exclude<Core::FileLoadRequest, Core::ProcessError, BGFXShader>)
 			.each([&registry, &bgfxContext](entt::entity entity, const Core::RawDataResource& rawDataResource) {
 				_tryCreateShader(bgfxContext, registry, entity, rawDataResource);
 			});
 
-		registry.view<const ShaderProgram>(entt::exclude<BGFXProgram>)
+		registry.view<const ShaderProgram>(entt::exclude<BGFXProgram, Core::ProcessError>)
 			.each([&registry, &bgfxContext](entt::entity entity, const ShaderProgram& shaderProgram) {
 				_tryCreateShaderProgram(bgfxContext, registry, entity, shaderProgram);
 			});
 
-		registry.view<const ShaderProgram>(entt::exclude<BGFXVertexLayout>)
+		registry.view<const ShaderProgram>(entt::exclude<BGFXVertexLayout, Core::ProcessError>)
 			.each([&registry, &bgfxContext](entt::entity entity, const ShaderProgram& shaderProgram) {
 				_tryCreateVertexLayout(bgfxContext, registry, entity, shaderProgram);
 			});
 
-		registry.view<const Image>(entt::exclude<BGFXTexture>)
+		registry.view<const Image>(entt::exclude<BGFXTexture, Core::ProcessError>)
 			.each([&registry, &bgfxContext](entt::entity entity, const Image& image) {
 				_tryCreateTexture(bgfxContext, registry, entity, image);
 			});
@@ -490,7 +491,8 @@ namespace Gfx {
 
 		const bgfx::Memory* mem = bgfx::copy(rawDataResource.rawData.data(), rawDataResource.size);
 		const bgfx::ShaderHandle shaderHandle = bgfx::createShader(mem);
-		if (shaderHandle.idx == bgfx::kInvalidHandle) {
+		if (!bgfx::isValid(shaderHandle)) {
+			Core::addProcessError(registry, entity, "Failed to create shader.");
 			return;
 		}
 
@@ -502,20 +504,27 @@ namespace Gfx {
 		BGFXContext& bgfxContext, entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
 		using namespace BGFXSystemInternal;
 
-		const auto* vertexShader = Core::getResource<BGFXShader>(registry, shaderProgram.vertexShader);
-		const auto* fragmentShader = Core::getResource<BGFXShader>(registry, shaderProgram.fragmentShader);
+		const auto& [ vertexShaderEntity, vertexShader] = Core::getResourceAndEntity<BGFXShader>(registry, shaderProgram.vertexShader);
+		const auto& [ fragmentShaderEntity, fragmentShader] = Core::getResourceAndEntity<BGFXShader>(registry, shaderProgram.fragmentShader);
 
 		if (!vertexShader || !fragmentShader) {
+			const bool shouldRetry = !Core::hasHaltedProcessError(registry, vertexShaderEntity) &&
+									 !Core::hasHaltedProcessError(registry, fragmentShaderEntity);
+
+			Core::addProcessError(registry, entity, shouldRetry);
+
 			return;
 		}
 
-		if (vertexShader->shaderHandle.idx == bgfx::kInvalidHandle ||
-			fragmentShader->shaderHandle.idx == bgfx::kInvalidHandle) {
+		if (!bgfx::isValid(vertexShader->shaderHandle) ||
+			!bgfx::isValid(fragmentShader->shaderHandle)) {
+			Core::addProcessError(registry, entity, "Invalid shader handles passed to program creation.");
 			return;
 		}
 
 		bgfx::ProgramHandle program = bgfx::createProgram(vertexShader->shaderHandle, fragmentShader->shaderHandle);
-		if (program.idx == bgfx::kInvalidHandle) {
+		if (!bgfx::isValid(program)) {
+			Core::addProcessError(registry, entity, "Failed to create shader program handle.");
 			return;
 		}
 
@@ -540,6 +549,7 @@ namespace Gfx {
 					attribute = bgfx::Attrib::TexCoord0;
 					break;
 				default:
+					Core::addProcessError(registry, entity, "Unhandled vertex attribute type.");
 					vertexLayout.end();
 					return;
 			}
@@ -548,7 +558,7 @@ namespace Gfx {
 			if (inputAttribute.typeId == Core::TypeId::get<float>()) {
 				attributeType = bgfx::AttribType::Float;
 			} else {
-				Core::logEntry(registry, entity, "Unhandled attribute type.");
+				Core::addProcessError(registry, entity, "Unhandled attribute type.");
 				vertexLayout.end();
 				return;
 			}
@@ -557,6 +567,7 @@ namespace Gfx {
 		}
 
 		vertexLayout.end();
+
 		registry.emplace<BGFXVertexLayout>(entity, vertexLayout);
 	}
 
@@ -567,7 +578,7 @@ namespace Gfx {
 		BGFXUniforms bgfxUniforms{};
 		for (auto&& uniform : shaderProgram.uniforms) {
 			if (bgfxUniforms.uniforms.contains(uniform.name)) {
-				Core::logEntry(registry, entity, "Uniform with duplicate name encountered.");
+				Core::addProcessError(registry, entity, "Uniform with duplicate name '{}' encountered.", uniform.name);
 				return;
 			}
 
@@ -580,11 +591,16 @@ namespace Gfx {
 					uniformType = bgfx::UniformType::Vec4;
 					break;
 				default:
-					Core::logEntry(registry, entity, "Unhandled uniform type.");
+					Core::addProcessError(registry, entity, "Unhandled type for uniform '{}'.", uniform.name);
 					return;
 			}
 
 			bgfx::UniformHandle uniformHandle{ bgfx::createUniform(uniform.name.c_str(), uniformType) };
+			if (!bgfx::isValid(uniformHandle)) {
+				Core::addProcessError(registry, entity, "Failed to create BGFX uniform '{}'.", uniform.name);
+				return;
+			}
+
 			bgfxUniforms.uniforms.emplace(uniform.name, uniformHandle);
 		}
 
@@ -599,6 +615,10 @@ namespace Gfx {
 		bgfx::TextureHandle texture = bgfx::createTexture2D(
 			imageResource.width, imageResource.height, imageResource.numMips > 1, imageResource.numLayers,
 			static_cast<bgfx::TextureFormat::Enum>(imageResource.format), BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, mem);
+
+		if (!bgfx::isValid(texture)) {
+			Core::addProcessError(registry, entity, "Failed to create BGFX texture.");
+		}
 
 		registry.emplace<BGFXTexture>(entity, texture);
 		bgfxContext.trackedTextureHandles.emplace_back(entity, texture);
