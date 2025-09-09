@@ -11,7 +11,6 @@ import Core.ClassReflection;
 import Core.ReflectionContext;
 import Core.TypeId;
 import Gfx.Reflection.Colour;
-import Gfx.Reflection.TextureCoordinates;
 
 template<>
 void Core::reflect<Gfx::MaterialDescriptor>(ReflectionContext& reflectionContext) {
@@ -21,7 +20,6 @@ void Core::reflect<Gfx::MaterialDescriptor>(ReflectionContext& reflectionContext
 		.property("textureImageFilePath", &MaterialDescriptor::textureImageFilePath)
 		.property("width", &MaterialDescriptor::width)
 		.property("height", &MaterialDescriptor::height)
-		.property("spriteFrames", &MaterialDescriptor::spriteFrames)
 		.property("alphaColour", &MaterialDescriptor::alphaColour)
 		.build();
 }

@@ -50,7 +50,6 @@ namespace Gfx {
 
 		Material material{ programResource,
 						   imageResource,
-						   materialDescriptor.spriteFrames,
 						   materialDescriptor.alphaColour,
 						   materialDescriptor.width,
 						   materialDescriptor.height };

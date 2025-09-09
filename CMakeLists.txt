@@ -8,6 +8,8 @@ set(gfx-lib-src
         src/gfx/systems/ImageLoadSystem.cpp
         src/gfx/systems/MaterialLoadSystem.cpp
         src/gfx/systems/ShaderProgramLoadSystem.cpp
+        src/gfx/systems/SpriteAnimationSystem.cpp
+        src/gfx/systems/SpriteLoadSystem.cpp
         src/gfx/systems/SpriteRenderSystem.cpp
 )
 
@@ -24,6 +26,7 @@ set(gfx-lib-modules
         src/gfx/RenderObject.cppm
         src/gfx/ShaderProgram.cppm
         src/gfx/Sprite.cppm
+        src/gfx/SpriteObject.cppm
         src/gfx/TextureCoordinates.cppm
         src/gfx/VertexBuffer.cppm
         src/gfx/Viewport.cppm
@@ -33,12 +36,15 @@ set(gfx-lib-modules
         src/gfx/descriptors/MaterialDescriptor.cppm
         src/gfx/descriptors/ShaderDescriptor.cppm
         src/gfx/descriptors/ShaderProgramDescriptor.cppm
+        src/gfx/descriptors/SpriteDescriptor.cppm
         src/gfx/services/GfxSystemsService.cppm
         src/gfx/systems/BGFXSystem.cppm
         src/gfx/systems/GfxSystems.cppm
         src/gfx/systems/ImageLoadSystem.cppm
         src/gfx/systems/MaterialLoadSystem.cppm
         src/gfx/systems/ShaderProgramLoadSystem.cppm
+        src/gfx/systems/SpriteAnimationSystem.cppm
+        src/gfx/systems/SpriteLoadSystem.cppm
         src/gfx/systems/SpriteRenderSystem.cppm
 )
 
@@ -48,6 +54,7 @@ set(gfx-lib-reflection-modules
         src/gfx-reflection/Material.cppm
         src/gfx-reflection/Projection.cppm
         src/gfx-reflection/ShaderProgram.cppm
+        src/gfx-reflection/Sprite.cppm
         src/gfx-reflection/TextureCoordinates.cppm
         src/gfx-reflection/Viewport.cppm
 )

@@ -15,6 +15,8 @@ namespace Gfx {
 		, mImageLoadSystem(registry, scheduler)
 		, mShaderProgramLoadSystem(registry, scheduler)
 		, mMaterialLoadSystem(registry, scheduler)
+		, mSpriteAnimationSystem(registry, scheduler)
+		, mSpriteLoadSystem(registry, scheduler)
 		, mSpriteRenderSystem(registry, scheduler) {}
 
 } // namespace Gfx

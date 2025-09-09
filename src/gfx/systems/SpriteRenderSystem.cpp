@@ -18,6 +18,7 @@ import Gfx.RenderObject;
 import Gfx.ShaderProgram;
 import Gfx.ShaderProgramDescriptor;
 import Gfx.Sprite;
+import Gfx.SpriteObject;
 import Gfx.TextureCoordinates;
 import Gfx.VertexBuffer;
 import Gfx.Viewport;
@@ -73,13 +74,14 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 	void pushSpriteToMaterialBuffers(
 		MaterialBuffers& materialBuffers, const Core::Spatial& spatial, const RenderObject& renderObject,
-		const Material& material, const ShaderVertexLayoutDescriptor& vertexLayout) {
+		const SpriteObject& spriteObject, const Material& material, const Sprite& sprite,
+		const ShaderVertexLayoutDescriptor& vertexLayout) {
 
-		if (renderObject.currentSpriteFrame >= material.spriteFrames.size()) {
+		if (spriteObject.currentFrame >= sprite.frames.size()) {
 			return;
 		}
 
-		const auto& [x0, y0, x1, y1]{ material.spriteFrames[renderObject.currentSpriteFrame] };
+		const auto& [x0, y0, x1, y1]{ sprite.frames[spriteObject.currentFrame] };
 		const uint32_t startVertex = materialBuffers.quadCount * 4;
 		const uint32_t startIndex = materialBuffers.quadCount * 6;
 		if (startVertex + 4 >= materialBuffers.maxVertexCount || startIndex + 6 >= materialBuffers.maxIndexCount) {
@@ -128,26 +130,28 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 	void pushSpriteToZBucket(
 		entt::registry& registry, ZMaterialBucket& zBucket, const Core::Spatial& spatial,
-		const RenderObject& renderObject, const entt::entity materialEntity, const Material& material,
-		const ShaderProgram& shaderProgram) {
+		const RenderObject& renderObject, const SpriteObject& spriteObject, const entt::entity materialEntity,
+		const Material& material, const Sprite& sprite, const ShaderProgram& shaderProgram) {
 
 		if (!zBucket.materialBuffers.contains(materialEntity)) {
 			zBucket.materialBuffers.emplace(materialEntity, createMaterialBuffers(shaderProgram.vertexLayout));
 		}
 
 		auto& materialBuffers{ zBucket.materialBuffers[materialEntity] };
-		pushSpriteToMaterialBuffers(materialBuffers, spatial, renderObject, material, shaderProgram.vertexLayout);
+		pushSpriteToMaterialBuffers(
+			materialBuffers, spatial, renderObject, spriteObject, material, sprite, shaderProgram.vertexLayout);
 	}
 
 	void pushSpriteToZBucketMap(
 		entt::registry& registry, ZMaterialBucketMap& zBucketMap, const Core::Spatial& spatial,
-		const RenderObject& renderObject) {
+		const RenderObject& renderObject, const SpriteObject& spriteObject) {
 
 		if (!registry.all_of<Core::ResourceHandle>(renderObject.materialResource)) {
 			return;
 		}
 
-		const auto&& [materialEntity, material] = Core::getResourceAndEntity<Material>(registry, renderObject.materialResource);
+		const auto&& [materialEntity, material] =
+			Core::getResourceAndEntity<Material>(registry, renderObject.materialResource);
 		if (!material) {
 			return;
 		}
@@ -157,21 +161,26 @@ namespace Gfx::SpriteRenderSystemInternal {
 			return;
 		}
 
+		const auto&& [spriteEntity, sprite] = Core::getResourceAndEntity<Sprite>(registry, spriteObject.spriteResource);
+		if (!sprite) {
+			return;
+		}
+
 		if (!zBucketMap.contains(spatial.position.z)) {
 			zBucketMap.emplace(spatial.position.z, ZMaterialBucket{});
 		}
 
 		pushSpriteToZBucket(
-			registry, zBucketMap[spatial.position.z], spatial, renderObject, materialEntity, *material,
-			*shaderProgram);
+			registry, zBucketMap[spatial.position.z], spatial, renderObject, spriteObject, materialEntity, *material,
+			*sprite, *shaderProgram);
 	}
 
 	ZMaterialBucketMap prepareSpriteZBucketMap(entt::registry& registry) {
 		ZMaterialBucketMap zBucketMap;
 
-		registry.view<Core::Spatial, RenderObject, Sprite>().each(
-			[&registry, &zBucketMap](auto& spatial, auto renderObject, auto& sprite) {
-				pushSpriteToZBucketMap(registry, zBucketMap, spatial, renderObject);
+		registry.view<Core::Spatial, RenderObject, SpriteObject>().each(
+			[&registry, &zBucketMap](auto& spatial, auto renderObject, auto& spriteObject) {
+				pushSpriteToZBucketMap(registry, zBucketMap, spatial, renderObject, spriteObject);
 			});
 
 		return zBucketMap;
