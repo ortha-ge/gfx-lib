@@ -1,6 +1,8 @@
 module;
 
 #include <entt/entt.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 module Gfx.SpriteRenderSystem;
 
@@ -54,6 +56,21 @@ namespace Gfx::SpriteRenderSystemInternal {
 		return MaterialBuffers{ std::move(vertexBuffer), std::move(indexBuffer), maxVertices, maxIndices };
 	}
 
+	void pushQuadVertexToVertexBuffer(
+		uint8_t* vertexBuffer, uint32_t bufferIndex, const ShaderVertexLayoutDescriptor& vertexLayout,
+		const glm::vec2& quadVertex, const glm::vec3& position, const glm::fquat& rotation, const glm::vec2& texCoord) {
+
+		uint8_t* vertexHead = vertexBuffer + getStrideForVertexLayout(vertexLayout) * bufferIndex;
+		auto* positionHead = reinterpret_cast<glm::vec3*>(
+			vertexHead + getOffsetForVertexLayoutAttribute(vertexLayout, ShaderVertexLayoutAttributeId::Position));
+		auto* texCoordHead = reinterpret_cast<glm::vec2*>(
+			vertexHead + getOffsetForVertexLayoutAttribute(vertexLayout, ShaderVertexLayoutAttributeId::TexCoord0));
+
+		glm::vec3 rotatedVertex = rotation * glm::vec3{ quadVertex.x, quadVertex.y, 0.0f };
+		*positionHead = position + rotatedVertex;
+		*texCoordHead = texCoord;
+	}
+
 	void pushSpriteToMaterialBuffers(
 		MaterialBuffers& materialBuffers, const Core::Spatial& spatial, const RenderObject& renderObject,
 		const Material& material, const ShaderVertexLayoutDescriptor& vertexLayout) {
@@ -69,48 +86,31 @@ namespace Gfx::SpriteRenderSystemInternal {
 			return;
 		}
 
-		const float halfQuadWidth = (x1 - x0) * spatial.scaleX * 0.5f;
-		const float halfQuadHeight = (y1 - y0) * spatial.scaleY * 0.5f;
+		const float halfQuadWidth = (x1 - x0) * spatial.scale.x * 0.5f;
+		const float halfQuadHeight = (y1 - y0) * spatial.scale.y * 0.5f;
 
 		const TextureCoordinates factoredCoords{ x0 / material.width, y0 / material.height, x1 / material.width,
 												 y1 / material.height };
 
-		for (size_t i = 0; i < 4; ++i) {
-			uint8_t* vertexHead =
-				materialBuffers.vertexBuffer.data.data() + getStrideForVertexLayout(vertexLayout) * (startVertex + i);
-			auto* positionHead = reinterpret_cast<float*>(
-				vertexHead + getOffsetForVertexLayoutAttribute(vertexLayout, ShaderVertexLayoutAttributeId::Position));
-			auto* texCoordHead = reinterpret_cast<float*>(
-				vertexHead + getOffsetForVertexLayoutAttribute(vertexLayout, ShaderVertexLayoutAttributeId::TexCoord0));
+		// Top-Left
+		pushQuadVertexToVertexBuffer(
+			materialBuffers.vertexBuffer.data.data(), startVertex, vertexLayout, { -halfQuadWidth, -halfQuadHeight },
+			spatial.position, spatial.rotation, { factoredCoords.x0, factoredCoords.y0 });
 
-			if (i == 0) {
-				positionHead[0] = spatial.x - halfQuadWidth;
-				positionHead[1] = spatial.y - halfQuadHeight;
-				positionHead[2] = spatial.z;
-				texCoordHead[0] = factoredCoords.x0;
-				texCoordHead[1] = factoredCoords.y0;
-			} else if (i == 1) {
-				positionHead[0] = spatial.x - halfQuadWidth;
-				positionHead[1] = spatial.y + halfQuadHeight;
-				positionHead[2] = spatial.z;
-				texCoordHead[0] = factoredCoords.x0;
-				texCoordHead[1] = factoredCoords.y1;
-			} else if (i == 2) {
-				positionHead[0] = spatial.x + halfQuadWidth;
-				positionHead[1] = spatial.y + halfQuadHeight;
-				positionHead[2] = spatial.z;
-				texCoordHead[0] = factoredCoords.x1;
-				texCoordHead[1] = factoredCoords.y1;
-			} else if (i == 3) {
-				positionHead[0] = spatial.x + halfQuadWidth;
-				positionHead[1] = spatial.y - halfQuadHeight;
-				positionHead[2] = spatial.z;
-				texCoordHead[0] = factoredCoords.x1;
-				texCoordHead[1] = factoredCoords.y0;
-			} else {
-				assert(false);
-			}
-		}
+		// Bottom-Left
+		pushQuadVertexToVertexBuffer(
+			materialBuffers.vertexBuffer.data.data(), startVertex + 1, vertexLayout, { -halfQuadWidth, halfQuadHeight },
+			spatial.position, spatial.rotation, { factoredCoords.x0, factoredCoords.y1 });
+
+		// Bottom-Right
+		pushQuadVertexToVertexBuffer(
+			materialBuffers.vertexBuffer.data.data(), startVertex + 2, vertexLayout, { halfQuadWidth, halfQuadHeight },
+			spatial.position, spatial.rotation, { factoredCoords.x1, factoredCoords.y1 });
+
+		// Top-Right
+		pushQuadVertexToVertexBuffer(
+			materialBuffers.vertexBuffer.data.data(), startVertex + 3, vertexLayout, { halfQuadWidth, -halfQuadHeight },
+			spatial.position, spatial.rotation, { factoredCoords.x1, factoredCoords.y0 });
 
 		uint16_t* indexHead = reinterpret_cast<uint16_t*>(materialBuffers.indexBuffer.data.data()) + startIndex;
 
@@ -157,12 +157,12 @@ namespace Gfx::SpriteRenderSystemInternal {
 			return;
 		}
 
-		if (!zBucketMap.contains(spatial.z)) {
-			zBucketMap.emplace(spatial.z, ZMaterialBucket{});
+		if (!zBucketMap.contains(spatial.position.z)) {
+			zBucketMap.emplace(spatial.position.z, ZMaterialBucket{});
 		}
 
 		pushSpriteToZBucket(
-			registry, zBucketMap[spatial.z], spatial, renderObject, materialEntity, *material,
+			registry, zBucketMap[spatial.position.z], spatial, renderObject, materialEntity, *material,
 			*shaderProgram);
 	}
 

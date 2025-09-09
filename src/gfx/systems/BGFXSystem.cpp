@@ -177,7 +177,7 @@ namespace Gfx::BGFXSystemInternal {
 
 		float view[16];
 		bx::mtxIdentity(view);
-		bx::mtxTranslate(view, spatial.x, spatial.y, spatial.z);
+		bx::mtxTranslate(view, spatial.position.x, spatial.position.y, spatial.position.z);
 
 		float proj[16];
 		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
