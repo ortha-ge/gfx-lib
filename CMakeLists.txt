@@ -1,6 +1,8 @@
  
 cmake_minimum_required(VERSION 3.31)
 
+find_package(bgfx CONFIG REQUIRED)
+
 set(gfx-lib-src
         src/gfx/descriptors/ShaderProgramDescriptor.cpp
         src/gfx/systems/BGFXSystem.cpp
@@ -63,7 +65,7 @@ add_library(gfx-lib STATIC ${gfx-lib-src} ${gfx-lib-modules} ${gfx-lib-reflectio
 
 target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES ${gfx-lib-modules} ${gfx-lib-reflection-modules})
 target_compile_features(gfx-lib PUBLIC cxx_std_23)
-target_link_libraries(gfx-lib PUBLIC core-lib bx bimg_decode bgfx)
+target_link_libraries(gfx-lib PUBLIC core-lib bgfx::bx bgfx::bimg_decode bgfx::bgfx)
 target_include_directories(gfx-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 #add_subdirectory(tests)
