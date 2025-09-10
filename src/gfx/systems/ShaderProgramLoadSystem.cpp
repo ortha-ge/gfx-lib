@@ -37,14 +37,11 @@ namespace Gfx {
 	void ShaderProgramLoadSystem::_tryCreateShaderProgramResource(
 		entt::registry& registry, entt::entity entity, const ShaderProgramDescriptor& shaderProgramDescriptor) {
 
-		auto vsResource = Core::ResourceHandle::create<ShaderDescriptor>(shaderProgramDescriptor.vertexShaderFilePath);
-		auto fsResource = Core::ResourceHandle::create<ShaderDescriptor>(shaderProgramDescriptor.fragmentShaderFilePath);
+		auto vsResource =
+			Core::ResourceLoadRequest::create<ShaderDescriptor>(registry, shaderProgramDescriptor.vertexShaderFilePath);
 
-		auto loadRequest = registry.create();
-		registry.emplace<Core::ResourceLoadRequest>(loadRequest, vsResource);
-
-		loadRequest = registry.create();
-		registry.emplace<Core::ResourceLoadRequest>(loadRequest, fsResource);
+		auto fsResource = Core::ResourceLoadRequest::create<ShaderDescriptor>(
+			registry, shaderProgramDescriptor.fragmentShaderFilePath);
 
 		registry.emplace<ShaderProgram>(
 			entity, vsResource, fsResource, shaderProgramDescriptor.uniforms, shaderProgramDescriptor.vertexLayout);

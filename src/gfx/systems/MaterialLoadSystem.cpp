@@ -39,17 +39,12 @@ namespace Gfx {
 	void MaterialLoadSystem::_tryCreateMaterialResource(
 		entt::registry& registry, entt::entity entity, const MaterialDescriptor& materialDescriptor) {
 
-		auto programResource = Core::ResourceHandle::create<Core::TypeLoader>(
-								 materialDescriptor.shaderProgramFilePath,
-								 std::make_shared<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>());
+		auto programResource = Core::ResourceLoadRequest::create<Core::TypeLoader>(
+			registry, materialDescriptor.shaderProgramFilePath,
+			std::make_shared<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>());
 
-		auto imageResource = Core::ResourceHandle::create<ImageDescriptor>(materialDescriptor.textureImageFilePath);
-
-		auto loadRequest = registry.create();
-		registry.emplace<Core::ResourceLoadRequest>(loadRequest, programResource);
-
-		loadRequest = registry.create();
-		registry.emplace<Core::ResourceLoadRequest>(loadRequest, imageResource);
+		auto imageResource =
+			Core::ResourceLoadRequest::create<ImageDescriptor>(registry, materialDescriptor.textureImageFilePath);
 
 		Material material{ programResource,
 						   imageResource,
