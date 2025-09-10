@@ -8,6 +8,7 @@ module Gfx.SpriteRenderSystem;
 
 import Core.Any;
 import Core.ResourceHandle;
+import Core.ResourceHandleUtils;
 import Core.Spatial;
 import Gfx.Colour;
 import Gfx.Image;

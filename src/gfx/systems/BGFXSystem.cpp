@@ -15,6 +15,7 @@ import Core.NativeWindowHandles;
 import Core.ProcessError;
 import Core.RawDataResource;
 import Core.ResourceHandle;
+import Core.ResourceHandleUtils;
 import Core.Spatial;
 import Core.TypeId;
 import Core.Window;

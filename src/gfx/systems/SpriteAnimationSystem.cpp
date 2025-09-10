@@ -8,6 +8,7 @@ module;
 module Gfx.SpriteAnimationSystem;
 
 import Core.ResourceHandle;
+import Core.ResourceHandleUtils;
 import Gfx.SpriteObject;
 
 namespace Gfx {
