@@ -7,6 +7,7 @@ module Gfx.ShaderProgramLoadSystem;
 import Core.EnTTRegistry;
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
+import Core.ResourceHandle;
 import Core.ResourceLoadRequest;
 import Gfx.ShaderDescriptor;
 import Gfx.ShaderProgram;
@@ -36,20 +37,19 @@ namespace Gfx {
 	void ShaderProgramLoadSystem::_tryCreateShaderProgramResource(
 		entt::registry& registry, entt::entity entity, const ShaderProgramDescriptor& shaderProgramDescriptor) {
 
-		const auto vsResource = registry.create();
-		registry.emplace<Core::ResourceLoadRequest>(
-			vsResource,
-			Core::ResourceLoadRequest::create<ShaderDescriptor>(shaderProgramDescriptor.vertexShaderFilePath));
+		auto vsResource = Core::ResourceHandle::create<ShaderDescriptor>(shaderProgramDescriptor.vertexShaderFilePath);
+		auto fsResource = Core::ResourceHandle::create<ShaderDescriptor>(shaderProgramDescriptor.fragmentShaderFilePath);
 
-		const auto fsResource = registry.create();
-		registry.emplace<Core::ResourceLoadRequest>(
-			fsResource,
-			Core::ResourceLoadRequest::create<ShaderDescriptor>(shaderProgramDescriptor.fragmentShaderFilePath));
+		auto loadRequest = registry.create();
+		registry.emplace<Core::ResourceLoadRequest>(loadRequest, vsResource);
+
+		loadRequest = registry.create();
+		registry.emplace<Core::ResourceLoadRequest>(loadRequest, fsResource);
 
 		registry.emplace<ShaderProgram>(
 			entity, vsResource, fsResource, shaderProgramDescriptor.uniforms, shaderProgramDescriptor.vertexLayout);
 
-		mTrackedShaderPrograms.emplace_back(entity, vsResource, fsResource);
+		//mTrackedShaderPrograms.emplace_back(entity, vsResource, fsResource);
 	}
 
 	void ShaderProgramLoadSystem::_tryCleanupTrackedShaderProgramResources(entt::registry& registry) {

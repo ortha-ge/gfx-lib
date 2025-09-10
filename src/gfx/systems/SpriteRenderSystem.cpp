@@ -146,10 +146,6 @@ namespace Gfx::SpriteRenderSystemInternal {
 		entt::registry& registry, ZMaterialBucketMap& zBucketMap, const Core::Spatial& spatial,
 		const RenderObject& renderObject, const SpriteObject& spriteObject) {
 
-		if (!registry.all_of<Core::ResourceHandle>(renderObject.materialResource)) {
-			return;
-		}
-
 		const auto&& [materialEntity, material] =
 			Core::getResourceAndEntity<Material>(registry, renderObject.materialResource);
 		if (!material) {
@@ -196,8 +192,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 		}
 
 		const Material& material = registry.get<Material>(materialEntity);
-		if (!registry.all_of<Core::ResourceHandle>(material.textureImage) ||
-			!registry.all_of<Core::ResourceHandle>(material.shaderProgram)) {
+		if (!material.textureImage || !material.shaderProgram) {
 			return;
 		}
 

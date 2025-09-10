@@ -1,13 +1,15 @@
 module;
 
-#include <entt/entity/entity.hpp>
+#include <memory>
 
 export module Gfx.RenderObject;
+
+import Core.ResourceHandle;
 
 export namespace Gfx {
 
 	struct RenderObject {
-		entt::entity materialResource{ entt::null };
+		std::shared_ptr<Core::ResourceHandle> materialResource{};
 	};
 
 } // namespace Gfx

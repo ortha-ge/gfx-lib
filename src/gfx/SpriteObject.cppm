@@ -2,15 +2,16 @@ module;
 
 #include <chrono>
 #include <cstdint>
-
-#include <entt/entity/entity.hpp>
+#include <memory>
 
 export module Gfx.SpriteObject;
+
+import Core.ResourceHandle;
 
 export namespace Gfx {
 
 	struct SpriteObject {
-		entt::entity spriteResource{ entt::null };
+		std::shared_ptr<Core::ResourceHandle> spriteResource{};
 		uint16_t currentFrame{ 0 };
 		std::chrono::time_point<std::chrono::steady_clock> lastAnimUpdateTime{};
 	};

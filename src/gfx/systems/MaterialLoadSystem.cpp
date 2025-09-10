@@ -8,6 +8,7 @@ import Core.EnTTRegistry;
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
 import Core.JsonTypeLoaderAdapter;
+import Core.ResourceHandle;
 import Core.ResourceLoadRequest;
 import Core.TypeLoader;
 import Gfx.ImageDescriptor;
@@ -38,15 +39,17 @@ namespace Gfx {
 	void MaterialLoadSystem::_tryCreateMaterialResource(
 		entt::registry& registry, entt::entity entity, const MaterialDescriptor& materialDescriptor) {
 
-		const auto programResource = registry.create();
-		registry.emplace<Core::ResourceLoadRequest>(
-			programResource, Core::ResourceLoadRequest::create<Core::TypeLoader>(
+		auto programResource = Core::ResourceHandle::create<Core::TypeLoader>(
 								 materialDescriptor.shaderProgramFilePath,
-								 std::make_shared<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>()));
+								 std::make_shared<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>());
 
-		const auto imageResource = registry.create();
-		registry.emplace<Core::ResourceLoadRequest>(
-			imageResource, Core::ResourceLoadRequest::create<ImageDescriptor>(materialDescriptor.textureImageFilePath));
+		auto imageResource = Core::ResourceHandle::create<ImageDescriptor>(materialDescriptor.textureImageFilePath);
+
+		auto loadRequest = registry.create();
+		registry.emplace<Core::ResourceLoadRequest>(loadRequest, programResource);
+
+		loadRequest = registry.create();
+		registry.emplace<Core::ResourceLoadRequest>(loadRequest, imageResource);
 
 		Material material{ programResource,
 						   imageResource,
@@ -56,7 +59,7 @@ namespace Gfx {
 
 		registry.emplace<Material>(entity, std::move(material));
 
-		mTrackedMaterials.emplace_back(entity, programResource, imageResource);
+		//mTrackedMaterials.emplace_back(entity, programResource, imageResource);
 	}
 
 	void MaterialLoadSystem::_tryCleanupTrackedMaterialResources(entt::registry& registry) {
