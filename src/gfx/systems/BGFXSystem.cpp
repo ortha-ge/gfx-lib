@@ -240,14 +240,14 @@ namespace Gfx::BGFXSystemInternal {
 					BGFXTexture& texture{ registry.get<BGFXTexture>(uniformValueEntity) };
 					bgfx::setTexture(0, uniformHandle, texture.textureHandle);
 				} else {
-					assert(false);
+					return;
 				}
 
 			} else if (uniformTypeId == Core::TypeId::get<Colour>()) {
 				Colour* uniformColour = static_cast<Colour*>(uniformValueAny.getInstance());
 				bgfx::setUniform(uniformHandle, uniformColour);
 			} else {
-				assert(false);
+				return;
 			}
 		}
 
