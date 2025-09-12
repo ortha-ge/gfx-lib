@@ -32,8 +32,6 @@ namespace Gfx {
 			.each([this, &registry](entt::entity entity, const MaterialDescriptor& materialDescriptor) {
 				_tryCreateMaterialResource(registry, entity, materialDescriptor);
 			});
-
-		_tryCleanupTrackedMaterialResources(registry);
 	}
 
 	void MaterialLoadSystem::_tryCreateMaterialResource(
@@ -48,33 +46,9 @@ namespace Gfx {
 
 		Material material{ programResource,
 						   imageResource,
-						   materialDescriptor.alphaColour,
-						   materialDescriptor.width,
-						   materialDescriptor.height };
+						   materialDescriptor.alphaColour};
 
 		registry.emplace<Material>(entity, std::move(material));
-
-		//mTrackedMaterials.emplace_back(entity, programResource, imageResource);
-	}
-
-	void MaterialLoadSystem::_tryCleanupTrackedMaterialResources(entt::registry& registry) {
-		for (auto it = mTrackedMaterials.begin(); it != mTrackedMaterials.end();) {
-			auto currentIt = it++;
-
-			if (registry.valid(currentIt->entity) && registry.all_of<Material>(currentIt->entity)) {
-				continue;
-			}
-
-			if (registry.valid(currentIt->textureEntity)) {
-				registry.destroy(currentIt->textureEntity);
-			}
-
-			if (registry.valid(currentIt->shaderProgramEntity)) {
-				registry.destroy(currentIt->shaderProgramEntity);
-			}
-
-			mTrackedMaterials.erase(currentIt);
-		}
 	}
 
 } // namespace Gfx

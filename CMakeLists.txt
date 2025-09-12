@@ -19,7 +19,6 @@ set(gfx-lib-modules
         src/gfx/BGFXContext.cppm
         src/gfx/BGFXDrawCallback.cppm
         src/gfx/Camera.cppm
-        src/gfx/Colour.cppm
         src/gfx/Image.cppm
         src/gfx/IndexBuffer.cppm
         src/gfx/Material.cppm
@@ -53,7 +52,6 @@ set(gfx-lib-modules
 
 set(gfx-lib-reflection-modules
         src/gfx-reflection/Camera.cppm
-        src/gfx-reflection/Colour.cppm
         src/gfx-reflection/Material.cppm
         src/gfx-reflection/Projection.cppm
         src/gfx-reflection/ShaderProgram.cppm

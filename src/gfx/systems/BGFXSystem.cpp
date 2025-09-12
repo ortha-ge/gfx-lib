@@ -5,6 +5,9 @@ module;
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
 #include <entt/entt.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 module Gfx.BGFXSystem;
 
@@ -22,7 +25,6 @@ import Core.Window;
 import Gfx.BGFXContext;
 import Gfx.BGFXDrawCallback;
 import Gfx.Camera;
-import Gfx.Colour;
 import Gfx.Image;
 import Gfx.IndexBuffer;
 import Gfx.Material;
@@ -166,6 +168,11 @@ namespace Gfx::BGFXSystemInternal {
 
 		// const auto& camera{ registry.get<Camera>(viewport.camera) };
 		const auto& spatial{ registry.get<Core::Spatial>(viewport.camera) };
+		glm::mat4 translation = glm::translate(glm::mat4(1.0f), spatial.position);
+		glm::mat4 rotation = glm::mat4_cast(spatial.rotation);
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), spatial.scale);
+
+		glm::mat4 viewMatrix = glm::inverse(translation * rotation * scale);
 
 		constexpr float width = 1360.0f;
 		constexpr float height = 768.0f;
@@ -177,13 +184,9 @@ namespace Gfx::BGFXSystemInternal {
 
 		bgfx::setViewRect(renderCommand.renderPass, left, top, right - left, bottom - top);
 
-		float view[16];
-		bx::mtxIdentity(view);
-		bx::mtxTranslate(view, spatial.position.x, spatial.position.y, spatial.position.z);
-
 		float proj[16];
 		bx::mtxOrtho(proj, left, right, bottom, top, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
-		bgfx::setViewTransform(renderCommand.renderPass, view, proj);
+		bgfx::setViewTransform(renderCommand.renderPass, &viewMatrix, proj);
 
 		if (!registry.all_of<VertexBuffer>(renderCommand.vertexBuffer) ||
 			!registry.all_of<IndexBuffer>(renderCommand.indexBuffer) ||
@@ -244,8 +247,8 @@ namespace Gfx::BGFXSystemInternal {
 					return;
 				}
 
-			} else if (uniformTypeId == Core::TypeId::get<Colour>()) {
-				Colour* uniformColour = static_cast<Colour*>(uniformValueAny.getInstance());
+			} else if (uniformTypeId == Core::TypeId::get<glm::vec4>()) {
+				glm::vec4* uniformColour = static_cast<glm::vec4*>(uniformValueAny.getInstance());
 				bgfx::setUniform(uniformHandle, uniformColour);
 			} else {
 				return;
@@ -295,6 +298,50 @@ namespace Gfx::BGFXSystemInternal {
 		return shaderPlatformInfo;
 	}
 
+	void destroyTexture(entt::registry& registry, const entt::entity entity) {
+		if (!registry.all_of<BGFXTexture>(entity)) {
+			return;
+		}
+
+		auto& texture{ registry.get<BGFXTexture>(entity) };
+		if (!bgfx::isValid(texture.textureHandle)) {
+			return;
+		}
+
+		bgfx::destroy(texture.textureHandle);
+		texture.textureHandle = BGFX_INVALID_HANDLE;
+	}
+
+	void destroyShader(entt::registry& registry, const entt::entity entity) {
+		if (!registry.all_of<BGFXShader>(entity)) {
+			return;
+		}
+
+		auto& shader{ registry.get<BGFXShader>(entity) };
+		if (!bgfx::isValid(shader.shaderHandle)) {
+			return;
+		}
+
+		bgfx::destroy(shader.shaderHandle);
+		shader.shaderHandle = BGFX_INVALID_HANDLE;
+	}
+
+	void destroyShaderProgram(entt::registry& registry, const entt::entity entity) {
+		if (!registry.all_of<BGFXProgram>(entity)) {
+			return;
+		}
+
+		auto& program{ registry.get<BGFXProgram>(entity) };
+		if (!bgfx::isValid(program.programHandle)) {
+			return;
+		}
+
+		bgfx::destroy(program.programHandle);
+		program.programHandle = BGFX_INVALID_HANDLE;
+	}
+
+
+
 } // namespace Gfx::BGFXSystemInternal
 
 namespace Gfx {
@@ -329,6 +376,16 @@ namespace Gfx {
 		}
 
 		registry.emplace<ShaderPlatformInfo>(contextEntity, getShaderPlatformInfo());
+
+
+		registry.on_destroy<Image>()
+			.connect<&destroyTexture>();
+
+		registry.on_destroy<ShaderDescriptor>()
+			.connect<&destroyShader>();
+
+		registry.on_destroy<ShaderProgram>()
+			.connect<&destroyShaderProgram>();
 	}
 
 	BGFXSystem::BGFXSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
@@ -455,57 +512,11 @@ namespace Gfx {
 	}
 
 	void BGFXSystem::_destroyDroppedTextures(const entt::registry& registry, BGFXContext& context) {
-		using namespace BGFXSystemInternal;
-		for (auto it = context.trackedTextureHandles.begin(); it != context.trackedTextureHandles.end();) {
-			auto currentIt = it++;
-			if (registry.valid(currentIt->first) && registry.all_of<BGFXTexture>(currentIt->first)) {
-				continue;
-			}
 
-			bgfx::destroy(currentIt->second);
-
-			context.trackedTextureHandles.erase(currentIt);
-		}
-
-		for (auto it = context.trackedShaderHandles.begin(); it != context.trackedShaderHandles.end();) {
-			auto currentIt = it++;
-			if (registry.valid(currentIt->first) && registry.all_of<BGFXShader>(currentIt->first)) {
-				continue;
-			}
-
-			bgfx::destroy(currentIt->second);
-
-			context.trackedShaderHandles.erase(currentIt);
-		}
-
-		for (auto it = context.trackedShaderProgramHandles.begin(); it != context.trackedShaderProgramHandles.end();) {
-			auto currentIt = it++;
-			if (registry.valid(currentIt->first) && registry.all_of<BGFXProgram>(currentIt->first)) {
-				continue;
-			}
-
-			bgfx::destroy(currentIt->second);
-
-			context.trackedShaderProgramHandles.erase(currentIt);
-		}
 	}
 
 	void BGFXSystem::_destroyTrackedTextures(BGFXContext& context) const {
-		for (const auto textureHandle : context.trackedTextureHandles | std::views::values) {
-			bgfx::destroy(textureHandle);
-		}
 
-		for (const auto shaderHandle : context.trackedShaderHandles | std::views::values) {
-			bgfx::destroy(shaderHandle);
-		}
-
-		for (const auto shaderProgramHandle : context.trackedShaderProgramHandles | std::views::values) {
-			bgfx::destroy(shaderProgramHandle);
-		}
-
-		context.trackedTextureHandles.clear();
-		context.trackedShaderHandles.clear();
-		context.trackedShaderProgramHandles.clear();
 	}
 
 	void BGFXSystem::_tryCreateShader(
@@ -521,7 +532,6 @@ namespace Gfx {
 		}
 
 		registry.emplace<BGFXShader>(entity, shaderHandle);
-		bgfxContext.trackedShaderHandles.emplace_back(entity, shaderHandle);
 	}
 
 	void BGFXSystem::_tryCreateShaderProgram(
@@ -553,7 +563,6 @@ namespace Gfx {
 		}
 
 		registry.emplace<BGFXProgram>(entity, program);
-		bgfxContext.trackedShaderProgramHandles.emplace_back(entity, program);
 	}
 
 	void BGFXSystem::_tryCreateVertexLayout(
@@ -645,7 +654,6 @@ namespace Gfx {
 		}
 
 		registry.emplace<BGFXTexture>(entity, texture);
-		bgfxContext.trackedTextureHandles.emplace_back(entity, texture);
 	}
 
 } // namespace Gfx

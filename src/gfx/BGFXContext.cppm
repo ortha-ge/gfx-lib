@@ -11,9 +11,7 @@ export module Gfx.BGFXContext;
 export namespace Gfx {
 
 	struct BGFXContext {
-		std::list<std::pair<entt::entity, bgfx::TextureHandle>> trackedTextureHandles{};
-		std::list<std::pair<entt::entity, bgfx::ProgramHandle>> trackedShaderProgramHandles{};
-		std::list<std::pair<entt::entity, bgfx::ShaderHandle>> trackedShaderHandles{};
+		bool placeholder{};
 	};
 
 } // namespace Gfx

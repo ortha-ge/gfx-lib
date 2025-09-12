@@ -10,7 +10,6 @@ import Core.Any;
 import Core.ResourceHandle;
 import Core.ResourceHandleUtils;
 import Core.Spatial;
-import Gfx.Colour;
 import Gfx.Image;
 import Gfx.IndexBuffer;
 import Gfx.Material;
@@ -75,45 +74,47 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 	void pushSpriteToMaterialBuffers(
 		MaterialBuffers& materialBuffers, const Core::Spatial& spatial, const RenderObject& renderObject,
-		const SpriteObject& spriteObject, const Material& material, const Sprite& sprite,
+		const SpriteObject& spriteObject, const Material& material, const Image& textureImage, const Sprite& sprite,
 		const ShaderVertexLayoutDescriptor& vertexLayout) {
 
 		if (spriteObject.currentFrame >= sprite.frames.size()) {
 			return;
 		}
 
-		const auto& [x0, y0, x1, y1]{ sprite.frames[spriteObject.currentFrame] };
+		const auto& [bottomLeft, topRight]{ sprite.frames[spriteObject.currentFrame] };
 		const uint32_t startVertex = materialBuffers.quadCount * 4;
 		const uint32_t startIndex = materialBuffers.quadCount * 6;
 		if (startVertex + 4 >= materialBuffers.maxVertexCount || startIndex + 6 >= materialBuffers.maxIndexCount) {
 			return;
 		}
 
-		const float halfQuadWidth = (x1 - x0) * spatial.scale.x * 0.5f;
-		const float halfQuadHeight = (y1 - y0) * spatial.scale.y * 0.5f;
+		const float halfQuadWidth = (topRight.x - bottomLeft.x) * spatial.scale.x * 0.5f;
+		const float halfQuadHeight = (topRight.y - bottomLeft.y) * spatial.scale.y * 0.5f;
 
-		const TextureCoordinates factoredCoords{ x0 / material.width, y0 / material.height, x1 / material.width,
-												 y1 / material.height };
+		const TextureCoordinates factoredCoords{
+			{ bottomLeft.x / textureImage.width, bottomLeft.y / textureImage.height},
+			{ topRight.x / textureImage.width, topRight.y / textureImage.height }
+		};
 
 		// Top-Left
 		pushQuadVertexToVertexBuffer(
 			materialBuffers.vertexBuffer.data.data(), startVertex, vertexLayout, { -halfQuadWidth, -halfQuadHeight },
-			spatial.position, spatial.rotation, { factoredCoords.x0, factoredCoords.y0 });
+			spatial.position, spatial.rotation, { factoredCoords.bottomLeft.x, factoredCoords.bottomLeft.y });
 
 		// Bottom-Left
 		pushQuadVertexToVertexBuffer(
 			materialBuffers.vertexBuffer.data.data(), startVertex + 1, vertexLayout, { -halfQuadWidth, halfQuadHeight },
-			spatial.position, spatial.rotation, { factoredCoords.x0, factoredCoords.y1 });
+			spatial.position, spatial.rotation, { factoredCoords.bottomLeft.x, factoredCoords.topRight.y });
 
 		// Bottom-Right
 		pushQuadVertexToVertexBuffer(
 			materialBuffers.vertexBuffer.data.data(), startVertex + 2, vertexLayout, { halfQuadWidth, halfQuadHeight },
-			spatial.position, spatial.rotation, { factoredCoords.x1, factoredCoords.y1 });
+			spatial.position, spatial.rotation, { factoredCoords.topRight.x, factoredCoords.topRight.y });
 
 		// Top-Right
 		pushQuadVertexToVertexBuffer(
 			materialBuffers.vertexBuffer.data.data(), startVertex + 3, vertexLayout, { halfQuadWidth, -halfQuadHeight },
-			spatial.position, spatial.rotation, { factoredCoords.x1, factoredCoords.y0 });
+			spatial.position, spatial.rotation, { factoredCoords.topRight.x, factoredCoords.bottomLeft.y });
 
 		uint16_t* indexHead = reinterpret_cast<uint16_t*>(materialBuffers.indexBuffer.data.data()) + startIndex;
 
@@ -132,7 +133,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 	void pushSpriteToZBucket(
 		entt::registry& registry, ZMaterialBucket& zBucket, const Core::Spatial& spatial,
 		const RenderObject& renderObject, const SpriteObject& spriteObject, const entt::entity materialEntity,
-		const Material& material, const Sprite& sprite, const ShaderProgram& shaderProgram) {
+		const Material& material, const Image& textureImage, const Sprite& sprite, const ShaderProgram& shaderProgram) {
 
 		if (!zBucket.materialBuffers.contains(materialEntity)) {
 			zBucket.materialBuffers.emplace(materialEntity, createMaterialBuffers(shaderProgram.vertexLayout));
@@ -140,7 +141,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 		auto& materialBuffers{ zBucket.materialBuffers[materialEntity] };
 		pushSpriteToMaterialBuffers(
-			materialBuffers, spatial, renderObject, spriteObject, material, sprite, shaderProgram.vertexLayout);
+			materialBuffers, spatial, renderObject, spriteObject, material, textureImage, sprite, shaderProgram.vertexLayout);
 	}
 
 	void pushSpriteToZBucketMap(
@@ -158,7 +159,19 @@ namespace Gfx::SpriteRenderSystemInternal {
 			return;
 		}
 
-		const auto&& [spriteEntity, sprite] = Core::getResourceAndEntity<Sprite>(registry, spriteObject.spriteResource);
+		const auto&& [textureEntity, texture] = Core::getResourceAndEntity<Image>(registry, material->textureImage);
+		if (!texture) {
+			return;
+		}
+
+		const Sprite* sprite = nullptr;
+		if (std::holds_alternative<std::shared_ptr<Core::ResourceHandle>>(spriteObject.spriteResource)) {
+			const auto& spriteResource{ std::get<std::shared_ptr<Core::ResourceHandle>>(spriteObject.spriteResource) };
+			sprite = Core::getResource<Sprite>(registry, spriteResource);
+		} else {
+			sprite = &std::get<Sprite>(spriteObject.spriteResource);
+		}
+
 		if (!sprite) {
 			return;
 		}
@@ -168,7 +181,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 		}
 
 		pushSpriteToZBucket(
-			registry, zBucketMap[spatial.position.z], spatial, renderObject, spriteObject, materialEntity, *material,
+			registry, zBucketMap[spatial.position.z], spatial, renderObject, spriteObject, materialEntity, *material, *texture,
 			*sprite, *shaderProgram);
 	}
 
@@ -222,7 +235,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 		renderCommand.renderPass = renderPass;
 
 		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ textureEntity });
-		renderCommand.uniformData["u_alphaColour"] = Core::Any(material.alphaColour.value_or(Colour{ 0.0f, 0.0f, 0.0f, 0.0f }));
+		renderCommand.uniformData["u_alphaColour"] = Core::Any(material.alphaColour.value_or(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }));
 
 		entt::entity renderCommandEntity = registry.create();
 		registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);

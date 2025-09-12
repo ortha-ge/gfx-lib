@@ -34,7 +34,14 @@ namespace Gfx {
 		entt::registry& registry, const entt::entity entity, SpriteObject& spriteObject,
 		std::chrono::steady_clock::time_point clockNow) {
 
-		const auto* sprite = Core::getResource<Sprite>(registry, spriteObject.spriteResource);
+		const Sprite* sprite = nullptr;
+		if (std::holds_alternative<std::shared_ptr<Core::ResourceHandle>>(spriteObject.spriteResource)) {
+			const auto& spriteResource{ std::get<std::shared_ptr<Core::ResourceHandle>>(spriteObject.spriteResource) };
+			sprite = Core::getResource<Sprite>(registry, spriteResource);
+		} else {
+			sprite = &std::get<Sprite>(spriteObject.spriteResource);
+		}
+
 		if (!sprite) {
 			return;
 		}

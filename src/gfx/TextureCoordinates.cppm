@@ -1,13 +1,14 @@
+module;
+
+#include <glm/vec2.hpp>
 
 export module Gfx.TextureCoordinates;
 
 export namespace Gfx {
 
 	struct TextureCoordinates {
-		float x0{};
-		float y0{};
-		float x1{};
-		float y1{};
+		glm::vec2 bottomLeft{ 0.0f, 0.0f };
+		glm::vec2 topRight{ 1.0f, 1.0f };
 	};
 
 } // namespace Gfx

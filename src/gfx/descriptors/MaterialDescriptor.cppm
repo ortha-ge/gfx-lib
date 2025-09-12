@@ -1,22 +1,18 @@
 module;
 
-#include <cstdint>
 #include <optional>
 #include <string>
-#include <vector>
+
+#include <glm/vec4.hpp>
 
 export module Gfx.MaterialDescriptor;
-
-import Gfx.Colour;
 
 export namespace Gfx {
 
 	struct MaterialDescriptor {
 		std::string shaderProgramFilePath{};
 		std::string textureImageFilePath{};
-		std::optional<Colour> alphaColour{};
-		float width{};
-		float height{};
+		std::optional<glm::vec4> alphaColour{};
 	};
 
 } // namespace Gfx
