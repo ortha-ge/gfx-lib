@@ -177,10 +177,10 @@ namespace Gfx::BGFXSystemInternal {
 		constexpr float width = 1360.0f;
 		constexpr float height = 768.0f;
 
-		const float left = viewport.x * width;
-		const float right = viewport.width * width;
-		const float top = viewport.y * height;
-		const float bottom = viewport.height * height;
+		const float left = viewport.offset.x * width;
+		const float right = viewport.dimensions.x * width;
+		const float top = viewport.offset.y * height;
+		const float bottom = viewport.dimensions.y * height;
 
 		bgfx::setViewRect(renderCommand.renderPass, left, top, right - left, bottom - top);
 
@@ -454,15 +454,15 @@ namespace Gfx {
 			});
 
 		bgfx::ViewId currentViewId{ 0 };
-		registry.view<Viewport>().each([&currentViewId, &registry](const Viewport& viewport) {
+		registry.view<Viewport>().each([&currentViewId, this](const Viewport& viewport) {
 			const bgfx::ViewId viewId = currentViewId++;
 			constexpr float width = 1360.0f;
 			constexpr float height = 768.0f;
 
-			const float left = viewport.x * width;
-			const float right = viewport.width * width;
-			const float top = viewport.y * height;
-			const float bottom = viewport.height * height;
+			const float left = viewport.offset.x * width;
+			const float right = viewport.dimensions.x * width;
+			const float top = viewport.offset.y * height;
+			const float bottom = viewport.dimensions.y * height;
 
 			bgfx::setViewRect(0, left, top, right - left, bottom - top);
 			bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);

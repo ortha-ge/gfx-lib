@@ -2,16 +2,14 @@ export module Gfx.Reflection.Viewport;
 
 export import Gfx.ViewportDescriptor;
 
-import Core.ClassReflection;
 import Core.ReflectionContext;
+import Glm.Reflection.Vec2;
 
 template<>
 void Core::reflect<Gfx::ViewportDescriptor>(ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 	reflectionContext.addClass<Gfx::ViewportDescriptor>("Viewport")
-		.property("x", &ViewportDescriptor::x)
-		.property("y", &ViewportDescriptor::y)
-		.property("width", &ViewportDescriptor::width)
-		.property("height", &ViewportDescriptor::height)
+		.property("offset", &ViewportDescriptor::offset)
+		.property("dimensions", &ViewportDescriptor::dimensions)
 		.build();
 }
