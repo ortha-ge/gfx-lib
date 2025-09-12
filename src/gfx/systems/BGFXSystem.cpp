@@ -29,6 +29,7 @@ import Gfx.Material;
 import Gfx.RenderCommand;
 import Gfx.RenderObject;
 import Gfx.ShaderDescriptor;
+import Gfx.ShaderPlatformInfo;
 import Gfx.ShaderProgram;
 import Gfx.ShaderProgramDescriptor;
 import Gfx.TextureCoordinates;
@@ -273,6 +274,27 @@ namespace Gfx::BGFXSystemInternal {
 		bgfx::submit(renderCommand.renderPass, bgfxProgram.programHandle);
 	}
 
+	std::optional<std::string> getPlatformShaderFolder(bgfx::RendererType::Enum rendererType) {
+		switch (rendererType) {
+			case bgfx::RendererType::Direct3D11:
+				return "dx11";
+			case bgfx::RendererType::OpenGLES:
+				return "essl";
+			case bgfx::RendererType::OpenGL:
+				return "glsl";
+			case bgfx::RendererType::Vulkan:
+				return "spirv";
+			default:
+				return std::nullopt;
+		}
+	}
+
+	ShaderPlatformInfo getShaderPlatformInfo() {
+		ShaderPlatformInfo shaderPlatformInfo{};
+		shaderPlatformInfo.shadersFolderName = getPlatformShaderFolder(bgfx::getRendererType());
+		return shaderPlatformInfo;
+	}
+
 } // namespace Gfx::BGFXSystemInternal
 
 namespace Gfx {
@@ -302,10 +324,11 @@ namespace Gfx {
 		initData.callback = &callbacks;
 
 		if (!bgfx::init(initData)) {
+			registry.destroy(contextEntity);
 			return;
 		}
 
-
+		registry.emplace<ShaderPlatformInfo>(contextEntity, getShaderPlatformInfo());
 	}
 
 	BGFXSystem::BGFXSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)

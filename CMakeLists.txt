@@ -26,6 +26,7 @@ set(gfx-lib-modules
         src/gfx/Projection.cppm
         src/gfx/RenderCommand.cppm
         src/gfx/RenderObject.cppm
+        src/gfx/ShaderPlatformInfo.cppm
         src/gfx/ShaderProgram.cppm
         src/gfx/Sprite.cppm
         src/gfx/SpriteObject.cppm

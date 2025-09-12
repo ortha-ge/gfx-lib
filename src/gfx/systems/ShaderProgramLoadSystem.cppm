@@ -9,6 +9,7 @@ export module Gfx.ShaderProgramLoadSystem;
 
 import Core.EnTTRegistry;
 import Core.Scheduler;
+import Gfx.ShaderPlatformInfo;
 import Gfx.ShaderProgramDescriptor;
 
 export namespace Gfx {
@@ -21,7 +22,7 @@ export namespace Gfx {
 		void tickSystem(entt::registry&);
 
 	private:
-		void _tryCreateShaderProgramResource(entt::registry&, entt::entity, const ShaderProgramDescriptor&);
+		void _tryCreateShaderProgramResource(entt::registry&, entt::entity, const ShaderPlatformInfo&, const ShaderProgramDescriptor&);
 		void _tryCleanupTrackedShaderProgramResources(entt::registry&);
 
 		struct TrackedShaderProgramResources {
