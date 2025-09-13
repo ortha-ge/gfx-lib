@@ -10,6 +10,7 @@ export module Gfx.MaterialDescriptor;
 export namespace Gfx {
 
 	struct MaterialDescriptor {
+		bool operator==(const MaterialDescriptor&) const = default;
 		std::string shaderProgramFilePath{};
 		std::string textureImageFilePath{};
 		std::optional<glm::vec4> alphaColour{};

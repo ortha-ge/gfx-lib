@@ -13,6 +13,7 @@ import Core.Spatial;
 import Gfx.Image;
 import Gfx.IndexBuffer;
 import Gfx.Material;
+import Gfx.MaterialDescriptor;
 import Gfx.RenderCommand;
 import Gfx.RenderObject;
 import Gfx.ShaderProgram;
@@ -77,11 +78,11 @@ namespace Gfx::SpriteRenderSystemInternal {
 		const SpriteObject& spriteObject, const Material& material, const Image& textureImage, const Sprite& sprite,
 		const ShaderVertexLayoutDescriptor& vertexLayout) {
 
-		if (spriteObject.currentFrame >= sprite.frames.size()) {
+		if (spriteObject.currentFrame >= sprite.descriptor.frames.size()) {
 			return;
 		}
 
-		const auto& [bottomLeft, topRight]{ sprite.frames[spriteObject.currentFrame] };
+		const auto& [bottomLeft, topRight]{ sprite.descriptor.frames[spriteObject.currentFrame] };
 		const uint32_t startVertex = materialBuffers.quadCount * 4;
 		const uint32_t startIndex = materialBuffers.quadCount * 6;
 		if (startVertex + 4 >= materialBuffers.maxVertexCount || startIndex + 6 >= materialBuffers.maxIndexCount) {
@@ -145,12 +146,22 @@ namespace Gfx::SpriteRenderSystemInternal {
 	}
 
 	void pushSpriteToZBucketMap(
-		entt::registry& registry, ZMaterialBucketMap& zBucketMap, const Core::Spatial& spatial,
+		entt::registry& registry, ZMaterialBucketMap& zBucketMap, const entt::entity entity, const Core::Spatial& spatial,
 		const RenderObject& renderObject, const SpriteObject& spriteObject) {
 
-		const auto&& [materialEntity, material] =
-			Core::getResourceAndEntity<Material>(registry, renderObject.materialResource);
-		if (!material) {
+		entt::entity materialEntity = entt::null;
+		const Material* material = nullptr;
+		if (std::holds_alternative<std::shared_ptr<Core::ResourceHandle>>(renderObject.materialResource)) {
+			auto& resourceHandle{ std::get<std::shared_ptr<Core::ResourceHandle>>(renderObject.materialResource) };
+			auto&& [_materialEntity, _material] = Core::getResourceAndEntity<Material>(registry, resourceHandle);
+			material = _material;
+			materialEntity = _materialEntity;
+		} else if (std::holds_alternative<MaterialDescriptor>(renderObject.materialResource)) {
+			material = registry.try_get<Material>(entity);
+			materialEntity = entity;
+		}
+
+		if (!material || materialEntity == entt::null) {
 			return;
 		}
 
@@ -189,8 +200,8 @@ namespace Gfx::SpriteRenderSystemInternal {
 		ZMaterialBucketMap zBucketMap;
 
 		registry.view<Core::Spatial, RenderObject, SpriteObject>().each(
-			[&registry, &zBucketMap](auto& spatial, auto renderObject, auto& spriteObject) {
-				pushSpriteToZBucketMap(registry, zBucketMap, spatial, renderObject, spriteObject);
+			[&registry, &zBucketMap](const entt::entity entity, auto& spatial, auto& renderObject, auto& spriteObject) {
+				pushSpriteToZBucketMap(registry, zBucketMap, entity, spatial, renderObject, spriteObject);
 			});
 
 		return zBucketMap;
@@ -270,6 +281,15 @@ namespace Gfx {
 	SpriteRenderSystem::~SpriteRenderSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void SpriteRenderSystem::tickSystem(entt::registry& registry) {
+		registry.view<RenderObject>(entt::exclude<Material, MaterialDescriptor>)
+			.each([&registry](const entt::entity entity, const RenderObject& renderObject) {
+				if (!std::holds_alternative<MaterialDescriptor>(renderObject.materialResource)) {
+					return;
+				}
+
+				registry.emplace<MaterialDescriptor>(entity, std::get<MaterialDescriptor>(renderObject.materialResource));
+			});
+
 		using namespace SpriteRenderSystemInternal;
 		ZMaterialBucketMap zBucketMap{ prepareSpriteZBucketMap(registry) };
 

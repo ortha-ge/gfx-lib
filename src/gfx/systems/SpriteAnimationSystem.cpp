@@ -55,7 +55,7 @@ namespace Gfx {
 		const bool canTickAnimation = (clockNow - spriteObject.lastAnimUpdateTime) > std::chrono::milliseconds(500);
 		if (canTickAnimation) {
 			spriteObject.currentFrame++;
-			if (spriteObject.currentFrame >= sprite.frames.size()) {
+			if (spriteObject.currentFrame >= sprite.descriptor.frames.size()) {
 				spriteObject.currentFrame = 0;
 			}
 

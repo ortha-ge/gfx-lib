@@ -37,9 +37,7 @@ namespace Gfx {
 			return;
 		}
 
-		Sprite sprite;
-		sprite.frames = spriteDescriptor.frames;
-		registry.emplace<Sprite>(entity, std::move(sprite));
+		registry.emplace<Sprite>(entity, spriteDescriptor);
 	}
 
 } // namespace Gfx
