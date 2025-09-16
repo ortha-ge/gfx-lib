@@ -8,6 +8,7 @@ module;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <tracy/Tracy.hpp>
 
 module Gfx.BGFXSystem;
 
@@ -417,6 +418,7 @@ namespace Gfx {
 	}
 
 	void BGFXSystem::tickSystem(entt::registry& registry) {
+		ZoneScopedN("BGFXSystem::tickSystem");
 		using namespace BGFXSystemInternal;
 
 		auto bgfxContextView = registry.view<BGFXContext>();

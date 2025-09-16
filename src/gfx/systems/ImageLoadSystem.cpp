@@ -5,6 +5,7 @@ module;
 #include <bimg/decode.h>
 #include <bx/error.h>
 #include <entt/entt.hpp>
+#include <tracy/Tracy.hpp>
 
 module Gfx.ImageLoadSystem;
 
@@ -29,6 +30,7 @@ namespace Gfx {
 
 
 	void ImageLoadSystem::tickSystem(entt::registry& registry) {
+		ZoneScopedN("ImageLoadSystem::tickSystem");
 		using namespace Core;
 
 		registry.view<const ImageDescriptor, const RawDataResource>(entt::exclude<FileLoadRequest, ProcessError, Image>)

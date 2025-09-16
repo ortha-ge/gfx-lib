@@ -4,6 +4,7 @@ module;
 #include <utility>
 
 #include <entt/entt.hpp>
+#include <tracy/Tracy.hpp>
 
 module Gfx.SpriteAnimationSystem;
 
@@ -23,6 +24,8 @@ namespace Gfx {
 	SpriteAnimationSystem::~SpriteAnimationSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void SpriteAnimationSystem::tickSystem(entt::registry& registry) {
+		ZoneScopedN("SpriteAnimationSystem::tickSystem");
+
 		const auto clockNow = std::chrono::steady_clock::now();
 		registry.view<SpriteObject>().each(
 			[&registry, clockNow](const entt::entity entity, SpriteObject& spriteObject) {

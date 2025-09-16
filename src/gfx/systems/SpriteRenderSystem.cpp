@@ -5,10 +5,12 @@ module;
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <tracy/Tracy.hpp>
 
 module Gfx.SpriteRenderSystem;
 
 import Core.Any;
+import Core.GlobalSpatial;
 import Core.ResourceHandle;
 import Core.ResourceHandleUtils;
 import Core.Spatial;
@@ -76,7 +78,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 	}
 
 	void pushSpriteToMaterialBuffers(
-		MaterialBuffers& materialBuffers, const Core::Spatial& spatial, const RenderObject& renderObject,
+		MaterialBuffers& materialBuffers, const Core::GlobalSpatial& spatial, const RenderObject& renderObject,
 		const SpriteObject& spriteObject, const Material& material, const Image& textureImage, const Sprite& sprite,
 		const ShaderVertexLayoutDescriptor& vertexLayout) {
 
@@ -134,7 +136,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 	}
 
 	void pushSpriteToZBucket(
-		entt::registry& registry, ZMaterialBucket& zBucket, const Core::Spatial& spatial,
+		entt::registry& registry, ZMaterialBucket& zBucket, const Core::GlobalSpatial& spatial,
 		const RenderObject& renderObject, const SpriteObject& spriteObject, const entt::entity materialEntity,
 		const Material& material, const Image& textureImage, const Sprite& sprite, const ShaderProgram& shaderProgram) {
 
@@ -148,7 +150,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 	}
 
 	void pushSpriteToZBucketMap(
-		entt::registry& registry, ZMaterialBucketMap& zBucketMap, const entt::entity entity, const Core::Spatial& spatial,
+		entt::registry& registry, ZMaterialBucketMap& zBucketMap, const entt::entity entity, const Core::GlobalSpatial& spatial,
 		const RenderObject& renderObject, const SpriteObject& spriteObject) {
 
 		entt::entity materialEntity = entt::null;
@@ -201,7 +203,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 	ZMaterialBucketMap prepareSpriteZBucketMap(entt::registry& registry) {
 		ZMaterialBucketMap zBucketMap;
 
-		registry.view<Core::Spatial, RenderObject, SpriteObject>().each(
+		registry.view<Core::GlobalSpatial, RenderObject, SpriteObject>().each(
 			[&registry, &zBucketMap](const entt::entity entity, auto& spatial, auto& renderObject, auto& spriteObject) {
 				pushSpriteToZBucketMap(registry, zBucketMap, entity, spatial, renderObject, spriteObject);
 			});
@@ -283,6 +285,7 @@ namespace Gfx {
 	SpriteRenderSystem::~SpriteRenderSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void SpriteRenderSystem::tickSystem(entt::registry& registry) {
+		ZoneScopedN("SpriteRenderSystem::tickSystem");
 		registry.view<RenderObject>(entt::exclude<Material, MaterialDescriptor>)
 			.each([&registry](const entt::entity entity, const RenderObject& renderObject) {
 				if (!std::holds_alternative<MaterialDescriptor>(renderObject.materialResource)) {
