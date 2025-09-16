@@ -2,6 +2,7 @@ module;
 
 #include <chrono>
 #include <utility>
+#include <variant>
 
 #include <entt/entt.hpp>
 #include <tracy/Tracy.hpp>
