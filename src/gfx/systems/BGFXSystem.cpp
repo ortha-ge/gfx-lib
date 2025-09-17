@@ -372,9 +372,12 @@ namespace Gfx {
 		initData.callback = &callbacks;
 
 		if (!bgfx::init(initData)) {
+			Core::logEntry(registry, "Failed to initialize BGFX.");
 			registry.destroy(contextEntity);
 			return;
 		}
+
+		Core::logEntry(registry, "BGFX initialized.");
 
 		registry.emplace<ShaderPlatformInfo>(contextEntity, getShaderPlatformInfo());
 
@@ -404,6 +407,7 @@ namespace Gfx {
 	}
 
 	void BGFXSystem::initSystem(entt::registry& registry) {
+		Core::logEntry(registry, "BGFX waiting for window handle...");
 		registry.on_construct<Core::NativeWindowHandles>().connect<&BGFXSystem::onWindowInternalCreated>(this);
 	}
 
