@@ -8,7 +8,10 @@ export import Gfx.Systems;
 
 export namespace Gfx {
 
-	class GfxSystemsService
-		: public kgr::single_service<GfxSystems, kgr::dependency<Core::EnTTRegistryService, Core::SchedulerService>> {};
+	void initGfxSubSystems(GfxSystems&, kgr::container&);
+
+	struct GfxSystemsService
+		: kgr::single_service<GfxSystems>
+		, kgr::autocall<kgr::invoke_method<initGfxSubSystems>>{};
 
 } // namespace Gfx

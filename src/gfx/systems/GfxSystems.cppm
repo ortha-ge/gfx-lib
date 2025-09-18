@@ -4,19 +4,13 @@ export module Gfx.Systems;
 
 import Core.EnTTRegistry;
 import Core.Scheduler;
-import Gfx.BGFXSystem;
-import Gfx.ImageLoadSystem;
-import Gfx.MaterialLoadSystem;
-import Gfx.ShaderProgramLoadSystem;
-import Gfx.SpriteAnimationSystem;
-import Gfx.SpriteLoadSystem;
-import Gfx.SpriteRenderSystem;
+
 
 export namespace Gfx {
 
 	class GfxSystems {
 	public:
-		GfxSystems(Core::EnTTRegistry&, Core::Scheduler&);
+		GfxSystems();
 
 		GfxSystems(GfxSystems&&) = delete;
 		GfxSystems& operator=(GfxSystems&&) noexcept = delete;
@@ -24,14 +18,6 @@ export namespace Gfx {
 		GfxSystems(const GfxSystems&) = delete;
 		GfxSystems& operator=(const GfxSystems&) = delete;
 
-	private:
-		BGFXSystem mBGFXSystem;
-		ImageLoadSystem mImageLoadSystem;
-		ShaderProgramLoadSystem mShaderProgramLoadSystem;
-		MaterialLoadSystem mMaterialLoadSystem;
-		SpriteAnimationSystem mSpriteAnimationSystem;
-		SpriteLoadSystem mSpriteLoadSystem;
-		SpriteRenderSystem mSpriteRenderSystem;
 	};
 
 } // namespace Gfx

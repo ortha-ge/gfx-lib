@@ -10,13 +10,6 @@ import Core.ReflectionContext;
 
 namespace Gfx {
 
-	GfxSystems::GfxSystems(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
-		: mBGFXSystem{ registry, scheduler }
-		, mImageLoadSystem(registry, scheduler)
-		, mShaderProgramLoadSystem(registry, scheduler)
-		, mMaterialLoadSystem(registry, scheduler)
-		, mSpriteAnimationSystem(registry, scheduler)
-		, mSpriteLoadSystem(registry, scheduler)
-		, mSpriteRenderSystem(registry, scheduler) {}
+	GfxSystems::GfxSystems() = default;
 
 } // namespace Gfx

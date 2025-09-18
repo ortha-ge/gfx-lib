@@ -5,6 +5,7 @@ find_package(bgfx CONFIG REQUIRED)
 
 set(gfx-lib-src
         src/gfx/descriptors/ShaderProgramDescriptor.cpp
+        src/gfx/services/GfxSystemsService.cpp
         src/gfx/systems/BGFXSystem.cpp
         src/gfx/systems/GfxSystems.cpp
         src/gfx/systems/ImageLoadSystem.cpp
@@ -39,7 +40,14 @@ set(gfx-lib-modules
         src/gfx/descriptors/ShaderDescriptor.cppm
         src/gfx/descriptors/ShaderProgramDescriptor.cppm
         src/gfx/descriptors/SpriteDescriptor.cppm
+        src/gfx/services/BGFXSystemService.cppm
         src/gfx/services/GfxSystemsService.cppm
+        src/gfx/services/ImageLoadSystemService.cppm
+        src/gfx/services/MaterialLoadSystemService.cppm
+        src/gfx/services/ShaderProgramLoadSystemService.cppm
+        src/gfx/services/SpriteAnimationSystemService.cppm
+        src/gfx/services/SpriteLoadSystemService.cppm
+        src/gfx/services/SpriteRenderSystemService.cppm
         src/gfx/systems/BGFXSystem.cppm
         src/gfx/systems/GfxSystems.cppm
         src/gfx/systems/ImageLoadSystem.cppm
