@@ -233,6 +233,7 @@ namespace Gfx::BGFXSystemInternal {
 
 		for (auto&& [uniformName, uniformValueAny] : renderCommand.uniformData) {
 			if (!bgfxUniforms.uniforms.contains(uniformName)) {
+				Core::logEntry(registry, "Render command missing uniform '{}'", uniformName);
 				return;
 			}
 
