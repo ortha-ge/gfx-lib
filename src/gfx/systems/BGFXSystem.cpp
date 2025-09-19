@@ -587,6 +587,9 @@ namespace Gfx {
 				case ShaderVertexLayoutAttributeId::TexCoord0:
 					attribute = bgfx::Attrib::TexCoord0;
 					break;
+				case ShaderVertexLayoutAttributeId::Colour0:
+					attribute = bgfx::Attrib::Color0;
+					break;
 				default:
 					Core::addProcessError(registry, entity, "Unhandled vertex attribute type.");
 					vertexLayout.end();

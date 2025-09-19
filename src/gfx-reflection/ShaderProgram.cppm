@@ -18,6 +18,7 @@ void Core::reflect<Gfx::ShaderVertexLayoutAttributeId>(ReflectionContext& reflec
 	reflectionContext.addEnum<ShaderVertexLayoutAttributeId>("ShaderVertexLayoutAttributeId")
 		.constant("Position", ShaderVertexLayoutAttributeId::Position)
 		.constant("TexCoord0", ShaderVertexLayoutAttributeId::TexCoord0)
+		.constant("Colour0", ShaderVertexLayoutAttributeId::Colour0)
 		.build();
 }
 

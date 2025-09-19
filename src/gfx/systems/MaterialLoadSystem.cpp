@@ -39,7 +39,7 @@ namespace Gfx {
 
 		auto programResource = Core::ResourceLoadRequest::create<Core::TypeLoader>(
 			registry, materialDescriptor.shaderProgramFilePath,
-			std::make_shared<Core::JsonTypeLoaderAdapter<Gfx::ShaderProgramDescriptor>>());
+			std::make_shared<Core::JsonTypeLoaderAdapter<ShaderProgramDescriptor>>());
 
 		auto imageResource =
 			Core::ResourceLoadRequest::create<ImageDescriptor>(registry, materialDescriptor.textureImageFilePath);

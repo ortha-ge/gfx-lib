@@ -13,7 +13,7 @@ export namespace Gfx {
 	// Vertex Layout
 	// Uniform Descriptors
 
-	enum class ShaderVertexLayoutAttributeId : uint8_t { Position, TexCoord0 };
+	enum class ShaderVertexLayoutAttributeId : uint8_t { Position, TexCoord0, Colour0 };
 
 	struct ShaderVertexLayoutAttribute {
 		ShaderVertexLayoutAttributeId attributeId{};

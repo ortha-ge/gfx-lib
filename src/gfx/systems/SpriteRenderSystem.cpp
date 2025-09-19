@@ -217,7 +217,6 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 		if (materialEntity == entt::null || !registry.all_of<Material>(materialEntity)) {
 			return;
-			;
 		}
 
 		const Material& material = registry.get<Material>(materialEntity);
