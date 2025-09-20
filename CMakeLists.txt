@@ -2,9 +2,12 @@
 cmake_minimum_required(VERSION 3.31)
 
 find_package(bgfx CONFIG REQUIRED)
+find_package(Stb REQUIRED)
 
 set(gfx-lib-src
         src/gfx/descriptors/ShaderProgramDescriptor.cpp
+        src/gfx/font/systems/FontLoadSystem.cpp
+        src/gfx/font/systems/FontRenderSystem.cpp
         src/gfx/services/GfxSystemsService.cpp
         src/gfx/systems/BGFXSystem.cpp
         src/gfx/systems/GfxSystems.cpp
@@ -40,6 +43,13 @@ set(gfx-lib-modules
         src/gfx/descriptors/ShaderDescriptor.cppm
         src/gfx/descriptors/ShaderProgramDescriptor.cppm
         src/gfx/descriptors/SpriteDescriptor.cppm
+        src/gfx/font/Font.cppm
+        src/gfx/font/FontDescriptor.cppm
+        src/gfx/font/FontObject.cppm
+        src/gfx/font/services/FontLoadSystemService.cppm
+        src/gfx/font/services/FontRenderSystemService.cppm
+        src/gfx/font/systems/FontLoadSystem.cppm
+        src/gfx/font/systems/FontRenderSystem.cppm
         src/gfx/services/BGFXSystemService.cppm
         src/gfx/services/GfxSystemsService.cppm
         src/gfx/services/ImageLoadSystemService.cppm
@@ -73,6 +83,6 @@ add_library(gfx-lib STATIC ${gfx-lib-src} ${gfx-lib-modules} ${gfx-lib-reflectio
 target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES ${gfx-lib-modules} ${gfx-lib-reflection-modules})
 target_compile_features(gfx-lib PUBLIC cxx_std_23)
 target_link_libraries(gfx-lib PUBLIC core-lib bgfx::bx bgfx::bimg_decode bgfx::bgfx)
-target_include_directories(gfx-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(gfx-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src PRIVATE ${Stb_INCLUDE_DIR})
 
 #add_subdirectory(tests)

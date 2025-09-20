@@ -5,6 +5,8 @@ module;
 module Gfx.SystemsService;
 
 import Gfx.BGFXSystemService;
+import Gfx.FontLoadSystemService;
+import Gfx.FontRenderSystemService;
 import Gfx.ImageLoadSystemService;
 import Gfx.MaterialLoadSystemService;
 import Gfx.ShaderProgramLoadSystemService;
@@ -20,6 +22,10 @@ namespace Gfx {
 		container.emplace<MaterialLoadSystemService>();
 		container.emplace<ShaderProgramLoadSystemService>();
 		container.emplace<ImageLoadSystemService>();
+
+		// Font
+		container.emplace<FontLoadSystemService>();
+		container.emplace<FontRenderSystemService>();
 
 		// Sprite
 		container.emplace<SpriteAnimationSystemService>();
