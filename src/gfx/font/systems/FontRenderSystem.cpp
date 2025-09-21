@@ -43,23 +43,38 @@ namespace Gfx::FontRenderSystemInternal {
 		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ imageEntity });
 		renderCommand.uniformData["u_alphaColour"] = Core::Any(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f });
 
+		size_t vertexCount = std::ranges::count_if(fontObject.text, [](auto&& character) {
+			return character != '\n';
+		});
+
 		VertexBuffer vertexBuffer;
-		vertexBuffer.data.resize(sizeof(FontVertex) * 4 * fontObject.text.size());
+		vertexBuffer.data.resize(sizeof(FontVertex) * 4 * vertexCount);
 		vertexBuffer.type = VertexBufferType::Transient;
 
 		IndexBuffer indexBuffer;
-		indexBuffer.data.resize(sizeof(uint16_t) * 6 * fontObject.text.size());
+		indexBuffer.data.resize(sizeof(uint16_t) * 6 * vertexCount);
 		indexBuffer.is32Bit = false;
 
 		glm::vec3 glyphWritePosition = spatial.position;
-		for (size_t i = 0; i < fontObject.text.size(); ++i) {
+		for (size_t i = 0, quadIndex = 0; i < fontObject.text.size(); ++i) {
 			wchar_t codepoint = fontObject.text[i];
+			if (codepoint == L'\n') {
+				glyphWritePosition.x = spatial.position.x;
+				glyphWritePosition.y += static_cast<float>(font.verticalAscent) * font.pixelScale;
+
+				continue;
+			}
 
 			// Kerning
 			if (i > 0) {
 				wchar_t previousCodepoint = fontObject.text[i - 1];
-				const int kerning = font.glyphKerningMap.at(previousCodepoint).at(codepoint);
-				glyphWritePosition.x += static_cast<float>(kerning);
+				if (font.glyphKerningMap.contains(previousCodepoint)) {
+					const auto& glyphKerningMap{ font.glyphKerningMap.at(previousCodepoint) };
+					if (glyphKerningMap.contains(codepoint)) {
+						const int kerning = glyphKerningMap.at(codepoint);
+						glyphWritePosition.x += static_cast<float>(kerning);
+					}
+				}
 			}
 
 			// Glyph offset
@@ -70,14 +85,14 @@ namespace Gfx::FontRenderSystemInternal {
 			const auto& bottomLeftTexCoord{ glyph.bottomLeftTexCoord };
 			const auto& topRightTexCoord{ glyph.topRightTexCoord };
 
-			const size_t startVertex = i * 4;
+			const size_t startVertex = quadIndex * 4;
 			auto* vertexHead = reinterpret_cast<FontVertex*>(&vertexBuffer.data[sizeof(FontVertex) * startVertex]);
 			vertexHead[0] = { currentGlyphPosition + glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec2{ bottomLeftTexCoord.x, bottomLeftTexCoord.y }, glm::vec3{ 1.0f, 1.0f, 1.0f } };
 			vertexHead[1] = { currentGlyphPosition + glm::vec3{ 0.0f, glyph.dimensions.y, 0.0f }, glm::vec2{ bottomLeftTexCoord.x, topRightTexCoord.y }, glm::vec3{ 1.0f, 1.0f, 1.0f } };
 			vertexHead[2] = { currentGlyphPosition + glm::vec3{ glyph.dimensions.x, glyph.dimensions.y, 0.0f }, glm::vec2{ topRightTexCoord.x, topRightTexCoord.y }, glm::vec3{ 1.0f, 1.0f, 1.0f } };
 			vertexHead[3] = { currentGlyphPosition + glm::vec3{ glyph.dimensions.x, 0.0f, 0.0f }, glm::vec2{ topRightTexCoord.x, bottomLeftTexCoord.y }, glm::vec3{ 1.0f, 1.0f, 1.0f } };
 
-			const size_t startIndex = i * 6;
+			const size_t startIndex = quadIndex * 6;
 			auto* indexHead = reinterpret_cast<uint16_t*>(&indexBuffer.data[sizeof(uint16_t) * startIndex]);
 			indexHead[0] = startVertex;
 			indexHead[1] = startVertex + 1;
@@ -88,6 +103,7 @@ namespace Gfx::FontRenderSystemInternal {
 			indexHead[5] = startVertex + 2;
 
 			glyphWritePosition.x += static_cast<float>(glyph.horizontalAdvanceWidth) * font.pixelScale;
+			++quadIndex;
 		}
 
 		const entt::entity vertexBufferEntity = registry.create();
@@ -150,13 +166,17 @@ namespace Gfx {
 				// Validate text
 				for (size_t i = 0; i < fontObject.text.size(); ++i) {
 					wchar_t codepoint = fontObject.text[i];
+					if (codepoint == '\n') {
+						continue;
+					}
+
 					if (!font->glyphMap.contains(codepoint)) {
 						return;
 					}
 
 					if (i > 0) {
 						wchar_t previousCodepoint = fontObject.text[i - 1];
-						if (!font->glyphKerningMap.contains(previousCodepoint)) {
+						if (font->glyphKerningMap.contains(previousCodepoint)) {
 							if (!font->glyphKerningMap.at(previousCodepoint).contains(codepoint)) {
 								return;
 							}
