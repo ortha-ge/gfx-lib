@@ -58,7 +58,8 @@ namespace Gfx::FontRenderSystemInternal {
 			// Kerning
 			if (i > 0) {
 				wchar_t previousCodepoint = fontObject.text[i - 1];
-				glyphWritePosition.x += font.glyphKerningMap.at(previousCodepoint).at(codepoint);
+				const int kerning = font.glyphKerningMap.at(previousCodepoint).at(codepoint);
+				glyphWritePosition.x += static_cast<float>(kerning);
 			}
 
 			// Glyph offset
@@ -77,7 +78,7 @@ namespace Gfx::FontRenderSystemInternal {
 			vertexHead[3] = { currentGlyphPosition + glm::vec3{ glyph.dimensions.x, 0.0f, 0.0f }, glm::vec2{ topRightTexCoord.x, bottomLeftTexCoord.y }, glm::vec3{ 1.0f, 1.0f, 1.0f } };
 
 			const size_t startIndex = i * 6;
-			uint16_t* indexHead = reinterpret_cast<uint16_t*>(&indexBuffer.data[sizeof(uint16_t) * startIndex]);
+			auto* indexHead = reinterpret_cast<uint16_t*>(&indexBuffer.data[sizeof(uint16_t) * startIndex]);
 			indexHead[0] = startVertex;
 			indexHead[1] = startVertex + 1;
 			indexHead[2] = startVertex + 3;
@@ -86,7 +87,7 @@ namespace Gfx::FontRenderSystemInternal {
 			indexHead[4] = startVertex + 1;
 			indexHead[5] = startVertex + 2;
 
-			glyphWritePosition += glm::vec3{ glyph.dimensions.x, 0.0f, 0.0f };
+			glyphWritePosition.x += static_cast<float>(glyph.horizontalAdvanceWidth) * font.pixelScale;
 		}
 
 		const entt::entity vertexBufferEntity = registry.create();
@@ -134,7 +135,7 @@ namespace Gfx {
 		const entt::entity viewportEntity = viewportView.front();
 
 		registry.view<FontObject, GlobalSpatial>()
-			.each([this, &registry, viewportEntity](const entt::entity entity, const FontObject& fontObject, const GlobalSpatial& spatial) {
+			.each([this, &registry, viewportEntity](const FontObject& fontObject, const GlobalSpatial& spatial) {
 
 				auto&& [imageEntity, image] = getResourceAndEntity<Image>(registry, fontObject.font);
 				if (!image) {
@@ -171,7 +172,7 @@ namespace Gfx {
 				RenderCommand renderCommand = createFontObjectRenderCommand(registry, fontObject, *font, viewportEntity, shaderProgramEntity, imageEntity, spatial);
 
 				const entt::entity renderCommandEntity = registry.create();
-				registry.emplace<RenderCommand>(renderCommandEntity, std::move(renderCommand));
+				registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);
 			});
 	}
 

@@ -22,6 +22,7 @@ export namespace Gfx {
 		int verticalAscent{};
 		int verticalDescent{};
 		int verticalLineGap{};
+		float pixelScale{};
 
 		std::unordered_map<wchar_t, FontGlyph> glyphMap;
 		std::unordered_map<wchar_t, std::unordered_map<wchar_t, int>> glyphKerningMap;

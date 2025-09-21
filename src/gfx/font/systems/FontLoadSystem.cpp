@@ -54,7 +54,7 @@ namespace Gfx::FontLoadSystemInternal {
 		font.verticalDescent = verticalDescent;
 		font.verticalLineGap = verticalLineGap;
 
-		font.pixelScale = stbtt_ScaleForMappingEmToPixels(&info, 128.0f);
+		font.pixelScale = stbtt_ScaleForMappingEmToPixels(&info, 45.0f);
 		font.fontInfo = info;
 
 		registry.emplace<StbFont>(entity, font);
@@ -85,15 +85,15 @@ namespace Gfx::FontLoadSystemInternal {
 		stbtt_MakeGlyphBitmap(
 			&fontInfo, bitmapData.data(), dimensions.x, dimensions.y, dimensions.x * bpp, pixelScale, pixelScale, glyphIndex);
 
-		return StbGlyph {
-			unicodeCodepoint,
-			glyphIndex,
-			std::move(bitmapData),
-			bottomLeft,
-			dimensions,
-			advanceWidth,
-			leftSideBearing
-		};
+		StbGlyph glyph;
+		glyph.unicodeCodepoint = unicodeCodepoint;
+		glyph.glyphIndex = glyphIndex;
+		glyph.bitmapData = std::move(bitmapData);
+		glyph.offset = bottomLeft;
+		glyph.dimensions = dimensions;
+		glyph.horizontalAdvanceWidth = advanceWidth;
+		glyph.leftSideBearing = leftSideBearing;
+		return glyph;
 	}
 
 	void tryCreateStbGlyphBitmaps(
@@ -162,6 +162,7 @@ namespace Gfx::FontLoadSystemInternal {
 		font.verticalAscent = stbFont.verticalAscent;
 		font.verticalDescent = stbFont.verticalDescent;
 		font.verticalLineGap = stbFont.verticalLineGap;
+		font.pixelScale = stbFont.pixelScale;
 
 		glyphStartIndex = 0;
 		for (size_t glyphIndex = 0; glyphIndex < glyphBitmaps.size(); ++glyphIndex) {
@@ -172,8 +173,6 @@ namespace Gfx::FontLoadSystemInternal {
 			glyph.codePoint = stbGlyph.unicodeCodepoint;
 			glyph.horizontalAdvanceWidth = stbGlyph.horizontalAdvanceWidth;
 			glyph.leftSideBearing = stbGlyph.leftSideBearing;
-
-
 
 			auto& glyphKerningMap{ font.glyphKerningMap[glyph.codePoint] };
 

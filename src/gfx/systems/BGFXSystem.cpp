@@ -210,21 +210,33 @@ namespace Gfx::BGFXSystemInternal {
 
 		const auto& vertexLayout{ registry.get<BGFXVertexLayout>(renderCommand.shaderProgram) };
 
-		constexpr uint32_t maxVertices = (32 << 10);
-		constexpr uint32_t maxIndices = (32 << 10);
+		const uint32_t vertexCount = renderCommand.vertexCount;
+		const uint32_t indexCount = renderCommand.indexCount;
 
-		if (bgfx::getAvailTransientVertexBuffer(maxVertices, vertexLayout.vertexLayout) < maxVertices ||
-			bgfx::getAvailTransientIndexBuffer(maxIndices) < maxIndices) {
+		const uint32_t availableVertexCount = bgfx::getAvailTransientVertexBuffer(vertexCount, vertexLayout.vertexLayout);
+		const uint32_t availableIndexCount = bgfx::getAvailTransientIndexBuffer(indexCount, indexBuffer.is32Bit);
+
+		if (availableVertexCount < vertexCount) {
+			Core::logEntry(
+				registry, "Requested transient vertex buffer size {} exceeds available amount of {}", vertexCount,
+				availableVertexCount);
+			return;
+		}
+
+		if (availableIndexCount < indexCount) {
+			Core::logEntry(
+				registry, "Requested transient index buffer size {} exceeds available amount of {}", indexCount,
+				availableIndexCount);
 			return;
 		}
 
 		bgfx::TransientVertexBuffer transientVertexBuffer{};
-		bgfx::allocTransientVertexBuffer(&transientVertexBuffer, maxVertices, vertexLayout.vertexLayout);
+		bgfx::allocTransientVertexBuffer(&transientVertexBuffer, vertexCount, vertexLayout.vertexLayout);
 
 		std::memcpy(transientVertexBuffer.data, vertexBuffer.data.data(), vertexBuffer.data.size());
 
 		bgfx::TransientIndexBuffer transientIndexBuffer{};
-		bgfx::allocTransientIndexBuffer(&transientIndexBuffer, maxIndices, indexBuffer.is32Bit);
+		bgfx::allocTransientIndexBuffer(&transientIndexBuffer, indexCount, indexBuffer.is32Bit);
 
 		std::memcpy(transientIndexBuffer.data, indexBuffer.data.data(), indexBuffer.data.size());
 
