@@ -141,7 +141,15 @@ namespace Gfx::SpriteRenderSystemInternal {
 		const Material& material, const Image& textureImage, const Sprite& sprite, const ShaderProgram& shaderProgram) {
 
 		if (!zBucket.materialBuffers.contains(materialEntity)) {
-			zBucket.materialBuffers.emplace(materialEntity, createMaterialBuffers(shaderProgram.vertexLayout));
+			auto materialBuffers = createMaterialBuffers(shaderProgram.vertexLayout);
+			const bool isVertexBufferValid = !materialBuffers.vertexBuffer.data.empty();
+			const bool isIndexBufferValid = !materialBuffers.indexBuffer.data.empty();
+			assert(isVertexBufferValid && isIndexBufferValid);
+			if (!isVertexBufferValid || !isIndexBufferValid) {
+				return;
+			}
+
+			zBucket.materialBuffers.emplace(materialEntity, std::move(materialBuffers));
 		}
 
 		auto& materialBuffers{ zBucket.materialBuffers[materialEntity] };

@@ -5,6 +5,7 @@ find_package(bgfx CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
 set(gfx-lib-src
+        src/gfx/atlas/systems/ImageAtlasLoadSystem.cpp
         src/gfx/descriptors/ShaderProgramDescriptor.cpp
         src/gfx/font/systems/FontLoadSystem.cpp
         src/gfx/font/systems/FontRenderSystem.cpp
@@ -17,6 +18,8 @@ set(gfx-lib-src
         src/gfx/systems/SpriteAnimationSystem.cpp
         src/gfx/systems/SpriteLoadSystem.cpp
         src/gfx/systems/SpriteRenderSystem.cpp
+        src/gfx/tilemap/systems/TilemapLoadSystem.cpp
+        src/gfx/tilemap/systems/TilemapRenderSystem.cpp
 )
 
 set(gfx-lib-modules
@@ -36,6 +39,10 @@ set(gfx-lib-modules
         src/gfx/TextureCoordinates.cppm
         src/gfx/VertexBuffer.cppm
         src/gfx/Viewport.cppm
+        src/gfx/atlas/ImageAtlas.cppm
+        src/gfx/atlas/ImageAtlasDescriptor.cppm
+        src/gfx/atlas/services/ImageAtlasLoadSystemService.cppm
+        src/gfx/atlas/systems/ImageAtlasLoadSystem.cppm
         src/gfx/descriptors/CameraDescriptor.cppm
         src/gfx/descriptors/ImageDescriptor.cppm
         src/gfx/descriptors/ViewportDescriptor.cppm
@@ -66,6 +73,13 @@ set(gfx-lib-modules
         src/gfx/systems/SpriteAnimationSystem.cppm
         src/gfx/systems/SpriteLoadSystem.cppm
         src/gfx/systems/SpriteRenderSystem.cppm
+        src/gfx/tilemap/Tilemap.cppm
+        src/gfx/tilemap/TilemapDescriptor.cppm
+        src/gfx/tilemap/TilemapObject.cppm
+        src/gfx/tilemap/services/TilemapLoadSystemService.cppm
+        src/gfx/tilemap/services/TilemapRenderSystemService.cppm
+        src/gfx/tilemap/systems/TilemapLoadSystem.cppm
+        src/gfx/tilemap/systems/TilemapRenderSystem.cppm
 )
 
 set(gfx-lib-reflection-modules
@@ -76,6 +90,8 @@ set(gfx-lib-reflection-modules
         src/gfx-reflection/Sprite.cppm
         src/gfx-reflection/TextureCoordinates.cppm
         src/gfx-reflection/Viewport.cppm
+        src/gfx-reflection/atlas/ImageAtlas.cppm
+        src/gfx-reflection/tilemap/Tilemap.cppm
 )
 
 add_library(gfx-lib STATIC ${gfx-lib-src} ${gfx-lib-modules} ${gfx-lib-reflection-modules})

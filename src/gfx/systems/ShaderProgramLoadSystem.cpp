@@ -7,6 +7,7 @@ module Gfx.ShaderProgramLoadSystem;
 import Core.EnTTRegistry;
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
+import Core.ProcessError;
 import Core.ResourceHandle;
 import Core.ResourceLoadRequest;
 import Gfx.ShaderDescriptor;
@@ -38,6 +39,8 @@ namespace Gfx {
 	ShaderProgramLoadSystem::~ShaderProgramLoadSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void ShaderProgramLoadSystem::tickSystem(entt::registry& registry) {
+		using namespace Core;
+
 		const auto& platformView = registry.view<ShaderPlatformInfo>();
 		if (platformView.empty()) {
 			return;
@@ -45,7 +48,7 @@ namespace Gfx {
 
 		const auto& shaderPlatformInfo{ registry.get<ShaderPlatformInfo>(platformView.front()) };
 
-		auto createProgramResourceView = registry.view<const ShaderProgramDescriptor>(entt::exclude<ShaderProgram>);
+		auto createProgramResourceView = registry.view<const ShaderProgramDescriptor>(entt::exclude<ProcessError, ShaderProgram>);
 		createProgramResourceView.each(
 			[this, &shaderPlatformInfo, &registry](entt::entity entity, const ShaderProgramDescriptor& programDescriptor) {
 				_tryCreateShaderProgramResource(registry, entity, shaderPlatformInfo, programDescriptor);
@@ -56,8 +59,25 @@ namespace Gfx {
 
 	void ShaderProgramLoadSystem::_tryCreateShaderProgramResource(
 		entt::registry& registry, entt::entity entity, const ShaderPlatformInfo& shaderPlatformInfo, const ShaderProgramDescriptor& shaderProgramDescriptor) {
+		using namespace Core;
 		using namespace ShaderProgramLoadSystemInternal;
+
 		if (!shaderPlatformInfo.shadersFolderName) {
+			return;
+		}
+
+		if (shaderProgramDescriptor.vertexShaderFilePath.empty()) {
+			addProcessError(registry, entity, "Empty vertex shader file path in shader program creation.");
+			return;
+		}
+
+		if (shaderProgramDescriptor.fragmentShaderFilePath.empty()) {
+			addProcessError(registry, entity, "Empty fragment shader file path in shader program creation.");
+			return;
+		}
+
+		if (shaderProgramDescriptor.vertexLayout.attributes.empty()) {
+			addProcessError(registry, entity, "Empty vertex layout attributes in shader program creation.");
 			return;
 		}
 
