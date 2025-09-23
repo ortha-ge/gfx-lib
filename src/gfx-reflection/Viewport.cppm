@@ -3,7 +3,7 @@ export module Gfx.Reflection.Viewport;
 export import Gfx.Viewport;
 export import Gfx.ViewportDescriptor;
 
-import Core.EnTTClassAnnotation;
+import Core.EnTTComponentAttribute;
 import Core.ReflectionContext;
 import Glm.Reflection.Vec2;
 
@@ -22,6 +22,6 @@ void Core::reflect<Gfx::Viewport>(ReflectionContext& reflectionContext) {
 	reflectionContext.addClass<Viewport>("Viewport")
 		.property("offset", &Viewport::offset)
 		.property("dimensions", &Viewport::dimensions)
-		.annotate(createEnTTClassAnnotation<Viewport>())
+		.annotate(createEnTTComponentAttribute<Viewport>())
 		.build();
 }

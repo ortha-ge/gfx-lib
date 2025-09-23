@@ -2,7 +2,7 @@ export module Gfx.Reflection.FontObject;
 
 export import Gfx.FontObject;
 
-import Core.EnTTClassAnnotation;
+import Core.EnTTComponentAttribute;
 import Core.ReflectionContext;
 
 template <>
@@ -11,6 +11,6 @@ void Core::reflect<Gfx::FontObject>(ReflectionContext& reflectionContext) {
 
 	reflectionContext.addClass<FontObject>("FontObject")
 		.property("text", &FontObject::text)
-		.annotate(createEnTTClassAnnotation<FontObject>())
+		.annotate(createEnTTComponentAttribute<FontObject>())
 		.build();
 }
