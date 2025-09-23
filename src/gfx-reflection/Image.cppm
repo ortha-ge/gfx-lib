@@ -1,16 +1,16 @@
-module;
 
-#include <utility>
+export module Gfx.Reflection.ImageDescriptor;
 
-export module Core.ImageDescriptor.Reflection;
+export import Gfx.ImageDescriptor;
 
 import Core.ClassReflection;
-import Core.ImageDescriptor;
+
 import Core.ReflectionContext;
 import Core.TypeId;
 
 template<>
-void Core::reflect<Core::ImageDescriptor>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ImageDescriptor>(ReflectionContext& reflectionContext) {
+	using namespace Gfx;
 	reflectionContext.addClass<ImageDescriptor>("Image")
 		.property("imageFilePath", &ImageDescriptor::imageFilePath)
 		.build();

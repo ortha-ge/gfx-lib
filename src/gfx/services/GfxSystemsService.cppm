@@ -1,10 +1,11 @@
 
 export module Gfx.SystemsService;
 
+export import Gfx.Systems;
+
 import kangaru;
 import Core.EnTTRegistryService;
 import Core.SchedulerService;
-export import Gfx.Systems;
 
 export namespace Gfx {
 

@@ -9,7 +9,7 @@ import Gfx.Reflection.TextureCoordinates;
 template<>
 void Core::reflect<Gfx::SpriteDescriptor>(ReflectionContext& reflectionContext) {
 	using namespace Gfx;
-	reflectionContext.addClass<SpriteDescriptor>("Sprite")
+	reflectionContext.addClass<SpriteDescriptor>("SpriteDescriptor")
 		.property("frames", &SpriteDescriptor::frames)
 		.build();
 }

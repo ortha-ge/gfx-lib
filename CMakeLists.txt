@@ -82,19 +82,29 @@ set(gfx-lib-modules
         src/gfx/tilemap/systems/TilemapRenderSystem.cppm
 )
 
+set(gfx-lib-reflection-src
+        src/gfx-reflection/Reflection.cpp
+)
+
 set(gfx-lib-reflection-modules
         src/gfx-reflection/Camera.cppm
+        src/gfx-reflection/Image.cppm
         src/gfx-reflection/Material.cppm
+        src/gfx-reflection/Reflection.cppm
+        src/gfx-reflection/RenderObject.cppm
         src/gfx-reflection/Projection.cppm
         src/gfx-reflection/ShaderProgram.cppm
         src/gfx-reflection/Sprite.cppm
+        src/gfx-reflection/SpriteObject.cppm
         src/gfx-reflection/TextureCoordinates.cppm
         src/gfx-reflection/Viewport.cppm
         src/gfx-reflection/atlas/ImageAtlas.cppm
+        src/gfx-reflection/font/FontObject.cppm
         src/gfx-reflection/tilemap/Tilemap.cppm
+        src/gfx-reflection/tilemap/TilemapObject.cppm
 )
 
-add_library(gfx-lib STATIC ${gfx-lib-src} ${gfx-lib-modules} ${gfx-lib-reflection-modules})
+add_library(gfx-lib STATIC ${gfx-lib-src} ${gfx-lib-modules} ${gfx-lib-reflection-src} ${gfx-lib-reflection-modules})
 
 target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES ${gfx-lib-modules} ${gfx-lib-reflection-modules})
 target_compile_features(gfx-lib PUBLIC cxx_std_23)

@@ -152,6 +152,9 @@ namespace Gfx {
 
 		registry.view<FontObject, GlobalSpatial>()
 			.each([this, &registry, viewportEntity](const FontObject& fontObject, const GlobalSpatial& spatial) {
+				if (fontObject.text.empty()) {
+					return;
+				}
 
 				auto&& [imageEntity, image] = getResourceAndEntity<Image>(registry, fontObject.font);
 				if (!image) {

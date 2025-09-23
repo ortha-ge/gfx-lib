@@ -4,6 +4,7 @@ module;
 
 module Gfx.SystemsService;
 
+import Core.ReflectionContext;
 import Gfx.BGFXSystemService;
 import Gfx.FontLoadSystemService;
 import Gfx.FontRenderSystemService;
@@ -16,10 +17,13 @@ import Gfx.SpriteLoadSystemService;
 import Gfx.SpriteRenderSystemService;
 import Gfx.TilemapLoadSystemService;
 import Gfx.TilemapRenderSystemService;
+import Gfx.Reflection;
 
 namespace Gfx {
 
 	void initGfxSubSystems(GfxSystems&, kgr::container& container) {
+		reflectAll(Core::getCurrentReflectionContext());
+
 		// Resource
 		container.emplace<SpriteLoadSystemService>();
 		container.emplace<MaterialLoadSystemService>();
