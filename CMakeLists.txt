@@ -10,7 +10,6 @@ set(gfx-lib-src
         src/gfx/font/systems/FontLoadSystem.cpp
         src/gfx/font/systems/FontRenderSystem.cpp
         src/gfx/services/GfxSystemsService.cpp
-        src/gfx/systems/BGFXSystem.cpp
         src/gfx/systems/GfxSystems.cpp
         src/gfx/systems/ImageLoadSystem.cpp
         src/gfx/systems/MaterialLoadSystem.cpp
@@ -23,8 +22,6 @@ set(gfx-lib-src
 )
 
 set(gfx-lib-modules
-        src/gfx/BGFXContext.cppm
-        src/gfx/BGFXDrawCallback.cppm
         src/gfx/Camera.cppm
         src/gfx/Image.cppm
         src/gfx/IndexBuffer.cppm
@@ -32,6 +29,7 @@ set(gfx-lib-modules
         src/gfx/Projection.cppm
         src/gfx/RenderCommand.cppm
         src/gfx/RenderObject.cppm
+        src/gfx/RenderTexture.cppm
         src/gfx/ShaderPlatformInfo.cppm
         src/gfx/ShaderProgram.cppm
         src/gfx/Sprite.cppm
@@ -57,7 +55,6 @@ set(gfx-lib-modules
         src/gfx/font/services/FontRenderSystemService.cppm
         src/gfx/font/systems/FontLoadSystem.cppm
         src/gfx/font/systems/FontRenderSystem.cppm
-        src/gfx/services/BGFXSystemService.cppm
         src/gfx/services/GfxSystemsService.cppm
         src/gfx/services/ImageLoadSystemService.cppm
         src/gfx/services/MaterialLoadSystemService.cppm
@@ -65,7 +62,6 @@ set(gfx-lib-modules
         src/gfx/services/SpriteAnimationSystemService.cppm
         src/gfx/services/SpriteLoadSystemService.cppm
         src/gfx/services/SpriteRenderSystemService.cppm
-        src/gfx/systems/BGFXSystem.cppm
         src/gfx/systems/GfxSystems.cppm
         src/gfx/systems/ImageLoadSystem.cppm
         src/gfx/systems/MaterialLoadSystem.cppm
@@ -108,7 +104,8 @@ add_library(gfx-lib STATIC ${gfx-lib-src} ${gfx-lib-modules} ${gfx-lib-reflectio
 
 target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES ${gfx-lib-modules} ${gfx-lib-reflection-modules})
 target_compile_features(gfx-lib PUBLIC cxx_std_23)
-target_link_libraries(gfx-lib PUBLIC core-lib bgfx::bx bgfx::bimg_decode bgfx::bgfx)
+target_link_libraries(gfx-lib PUBLIC core-lib bgfx::bx bgfx::bimg_decode)
 target_include_directories(gfx-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src PRIVATE ${Stb_INCLUDE_DIR})
 
 #add_subdirectory(tests)
+add_subdirectory(src/gfx/bgfx)

@@ -5,7 +5,6 @@ module;
 module Gfx.SystemsService;
 
 import Core.ReflectionContext;
-import Gfx.BGFXSystemService;
 import Gfx.FontLoadSystemService;
 import Gfx.FontRenderSystemService;
 import Gfx.ImageAtlasLoadSystemService;
@@ -18,6 +17,7 @@ import Gfx.SpriteRenderSystemService;
 import Gfx.TilemapLoadSystemService;
 import Gfx.TilemapRenderSystemService;
 import Gfx.Reflection;
+import Gfx.BGFX.SystemsService;
 
 namespace Gfx {
 
@@ -43,7 +43,7 @@ namespace Gfx {
 		container.emplace<SpriteAnimationSystemService>();
 		container.emplace<SpriteRenderSystemService>();
 
-		container.emplace<BGFXSystemService>();
+		container.emplace<BGFX::SystemsService>();
 	}
 
 } // namespace Gfx

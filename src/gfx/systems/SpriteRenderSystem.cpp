@@ -46,10 +46,11 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 	using ZMaterialBucketMap = std::map<float, ZMaterialBucket>;
 
-	MaterialBuffers createMaterialBuffers(const ShaderVertexLayoutDescriptor& vertexLayout) {
+	MaterialBuffers createMaterialBuffers(const entt::entity shaderProgramEntity, const ShaderVertexLayoutDescriptor& vertexLayout) {
 		constexpr uint32_t maxVertices = (32 << 10);
 		constexpr uint32_t maxIndices = (32 << 10);
 		VertexBuffer vertexBuffer;
+		vertexBuffer.vertexLayout = shaderProgramEntity;
 		vertexBuffer.type = VertexBufferType::Transient;
 		vertexBuffer.data.resize(getBufferSizeForVertexLayout(vertexLayout, maxVertices));
 
@@ -138,10 +139,10 @@ namespace Gfx::SpriteRenderSystemInternal {
 	void pushSpriteToZBucket(
 		entt::registry& registry, ZMaterialBucket& zBucket, const Core::GlobalSpatial& spatial,
 		const RenderObject& renderObject, const SpriteObject& spriteObject, const entt::entity materialEntity,
-		const Material& material, const Image& textureImage, const Sprite& sprite, const ShaderProgram& shaderProgram) {
+		const Material& material, const Image& textureImage, const Sprite& sprite, const entt::entity shaderProgramEntity, const ShaderProgram& shaderProgram) {
 
 		if (!zBucket.materialBuffers.contains(materialEntity)) {
-			auto materialBuffers = createMaterialBuffers(shaderProgram.vertexLayout);
+			auto materialBuffers = createMaterialBuffers(shaderProgramEntity, shaderProgram.vertexLayout);
 			const bool isVertexBufferValid = !materialBuffers.vertexBuffer.data.empty();
 			const bool isIndexBufferValid = !materialBuffers.indexBuffer.data.empty();
 			assert(isVertexBufferValid && isIndexBufferValid);
@@ -177,7 +178,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 			return;
 		}
 
-		const auto* shaderProgram = Core::getResource<ShaderProgram>(registry, material->shaderProgram);
+		auto&& [shaderProgramEntity, shaderProgram] = Core::getResourceAndEntity<ShaderProgram>(registry, material->shaderProgram);
 		if (!shaderProgram) {
 			return;
 		}
@@ -205,7 +206,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 		pushSpriteToZBucket(
 			registry, zBucketMap[spatial.position.z], spatial, renderObject, spriteObject, materialEntity, *material, *texture,
-			*sprite, *shaderProgram);
+			*sprite, shaderProgramEntity, *shaderProgram);
 	}
 
 	ZMaterialBucketMap prepareSpriteZBucketMap(entt::registry& registry) {
@@ -221,7 +222,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 	void renderMaterialBuffers(
 		entt::registry& registry, entt::entity viewportEntity, entt::entity materialEntity,
-		const MaterialBuffers& materialBuffers, uint16_t renderPass) {
+		const MaterialBuffers& materialBuffers, uint32_t sortDepth) {
 
 		if (materialEntity == entt::null || !registry.all_of<Material>(materialEntity)) {
 			return;
@@ -254,7 +255,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 		renderCommand.indexCount = materialBuffers.quadCount * 6;
 		registry.emplace<IndexBuffer>(renderCommand.indexBuffer, materialBuffers.indexBuffer);
 
-		renderCommand.renderPass = renderPass;
+		renderCommand.sortDepth = sortDepth;
 
 		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ textureEntity });
 		renderCommand.uniformData["u_alphaColour"] = Core::Any(material.alphaColour.value_or(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }));
@@ -264,17 +265,17 @@ namespace Gfx::SpriteRenderSystemInternal {
 	}
 
 	void renderSpriteZBucket(
-		entt::registry& registry, entt::entity viewportEntity, const ZMaterialBucket& zBucket, uint16_t& renderPass) {
+		entt::registry& registry, entt::entity viewportEntity, const ZMaterialBucket& zBucket, uint32_t sortDepth) {
 		for (auto&& [materialEntity, materialBuffers] : zBucket.materialBuffers) {
-			renderMaterialBuffers(registry, viewportEntity, materialEntity, materialBuffers, renderPass++);
+			renderMaterialBuffers(registry, viewportEntity, materialEntity, materialBuffers, sortDepth);
 		}
 	}
 
 	void renderSpriteZBucketMap(
 		entt::registry& registry, entt::entity viewportEntity, const ZMaterialBucketMap& zBucketMap) {
-		uint16_t renderPass{ 0u };
-		for (auto&& [z, zBucket] : zBucketMap) {
-			renderSpriteZBucket(registry, viewportEntity, zBucket, renderPass);
+		uint32_t sortDepth = 0u;
+		for (auto&& [_, zBucket] : zBucketMap) {
+			renderSpriteZBucket(registry, viewportEntity, zBucket, sortDepth++);
 		}
 	}
 
@@ -305,7 +306,7 @@ namespace Gfx {
 		using namespace SpriteRenderSystemInternal;
 		ZMaterialBucketMap zBucketMap{ prepareSpriteZBucketMap(registry) };
 
-		registry.view<Viewport>().each([&registry, &zBucketMap](entt::entity entity, const Viewport& viewport) {
+		registry.view<Viewport>().each([&registry, &zBucketMap](entt::entity entity, const Viewport&) {
 			renderSpriteZBucketMap(registry, entity, zBucketMap);
 		});
 	}

@@ -29,6 +29,7 @@ void Core::reflect<Gfx::ShaderVertexLayoutAttribute>(ReflectionContext& reflecti
 		.property("id", &ShaderVertexLayoutAttribute::attributeId)
 		.property("elementCount", &ShaderVertexLayoutAttribute::count)
 		.property("elementType", &ShaderVertexLayoutAttribute::typeId)
+		.property("isNormalized", &ShaderVertexLayoutAttribute::isNormalized)
 		.build();
 }
 

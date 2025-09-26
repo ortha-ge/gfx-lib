@@ -67,6 +67,7 @@ namespace Gfx::TilemapRenderSystemInternal {
 		const size_t indexCount = mappedTiles.size() * 6;
 
 		VertexBuffer vertexBuffer;
+		vertexBuffer.vertexLayout = shaderProgramEntity;
 		vertexBuffer.type = VertexBufferType::Transient;
 		vertexBuffer.data.resize(sizeof(TilemapVertex) * vertexCount);
 
@@ -148,31 +149,27 @@ namespace Gfx {
 		using namespace Core;
 		using namespace TilemapRenderSystemInternal;
 
-		auto viewportView = registry.view<Viewport>();
-		if (viewportView.empty()) {
-			return;
-		}
+		registry.view<Viewport>()
+			.each([&registry](const entt::entity viewportEntity, const Viewport& viewport) {
+				registry.view<TilemapObject, GlobalSpatial>()
+					.each([&registry, viewportEntity](const TilemapObject& tilemapObject, const GlobalSpatial& spatial) {
+						const auto* tilemap = getResource<Tilemap>(registry, tilemapObject.tilemap);
+						if (!tilemap) {
+							return;
+						}
 
-		const entt::entity viewportEntity = viewportView.front();
+						const auto* atlas = getResource<ImageAtlas>(registry, tilemap->atlas);
+						if (!atlas) {
+							return;
+						}
 
-		registry.view<TilemapObject, GlobalSpatial>()
-			.each([&registry, viewportEntity](const TilemapObject& tilemapObject, const GlobalSpatial& spatial) {
-				const auto* tilemap = getResource<Tilemap>(registry, tilemapObject.tilemap);
-				if (!tilemap) {
-					return;
-				}
+						auto&& [shaderProgramEntity, shaderProgram] = getResourceAndEntity<ShaderProgram>(registry, tilemapObject.shaderProgram);
+						if (!shaderProgram) {
+							return;
+						}
 
-				const auto* atlas = getResource<ImageAtlas>(registry, tilemap->atlas);
-				if (!atlas) {
-					return;
-				}
-
-				auto&& [shaderProgramEntity, shaderProgram] = getResourceAndEntity<ShaderProgram>(registry, tilemapObject.shaderProgram);
-				if (!shaderProgram) {
-					return;
-				}
-
-				renderTilemap(registry, *tilemap, *atlas, spatial, shaderProgramEntity, viewportEntity);
+						renderTilemap(registry, *tilemap, *atlas, spatial, shaderProgramEntity, viewportEntity);
+					});
 			});
 	}
 

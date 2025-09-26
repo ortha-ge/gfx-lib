@@ -19,6 +19,7 @@ export namespace Gfx {
 		ShaderVertexLayoutAttributeId attributeId{};
 		Core::TypeId typeId;
 		uint8_t count{};
+		bool isNormalized{ false };
 	};
 
 	struct ShaderVertexLayoutDescriptor {

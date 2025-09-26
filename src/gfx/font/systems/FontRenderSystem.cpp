@@ -48,6 +48,7 @@ namespace Gfx::FontRenderSystemInternal {
 		});
 
 		VertexBuffer vertexBuffer;
+		vertexBuffer.vertexLayout = shaderProgramEntity;
 		vertexBuffer.data.resize(sizeof(FontVertex) * 4 * vertexCount);
 		vertexBuffer.type = VertexBufferType::Transient;
 
@@ -143,59 +144,55 @@ namespace Gfx {
 		using namespace Core;
 		using namespace FontRenderSystemInternal;
 
-		auto viewportView = registry.view<Viewport>();
-		if (viewportView.empty()) {
-			return;
-		}
+		registry.view<Viewport>()
+			.each([this, &registry](const entt::entity viewportEntity, const Viewport&) {
+				registry.view<FontObject, GlobalSpatial>()
+					.each([this, &registry, viewportEntity](const FontObject& fontObject, const GlobalSpatial& spatial) {
+						if (fontObject.text.empty()) {
+							return;
+						}
 
-		const entt::entity viewportEntity = viewportView.front();
+						auto&& [imageEntity, image] = getResourceAndEntity<Image>(registry, fontObject.font);
+						if (!image) {
+							return;
+						}
 
-		registry.view<FontObject, GlobalSpatial>()
-			.each([this, &registry, viewportEntity](const FontObject& fontObject, const GlobalSpatial& spatial) {
-				if (fontObject.text.empty()) {
-					return;
-				}
+						const auto* font = getResource<Font>(registry, fontObject.font);
+						if (!font) {
+							return;
+						}
 
-				auto&& [imageEntity, image] = getResourceAndEntity<Image>(registry, fontObject.font);
-				if (!image) {
-					return;
-				}
+						// Validate text
+						for (size_t i = 0; i < fontObject.text.size(); ++i) {
+							wchar_t codepoint = fontObject.text[i];
+							if (codepoint == '\n') {
+								continue;
+							}
 
-				const auto* font = getResource<Font>(registry, fontObject.font);
-				if (!font) {
-					return;
-				}
-
-				// Validate text
-				for (size_t i = 0; i < fontObject.text.size(); ++i) {
-					wchar_t codepoint = fontObject.text[i];
-					if (codepoint == '\n') {
-						continue;
-					}
-
-					if (!font->glyphMap.contains(codepoint)) {
-						return;
-					}
-
-					if (i > 0) {
-						wchar_t previousCodepoint = fontObject.text[i - 1];
-						if (font->glyphKerningMap.contains(previousCodepoint)) {
-							if (!font->glyphKerningMap.at(previousCodepoint).contains(codepoint)) {
+							if (!font->glyphMap.contains(codepoint)) {
 								return;
 							}
+
+							if (i > 0) {
+								wchar_t previousCodepoint = fontObject.text[i - 1];
+								if (font->glyphKerningMap.contains(previousCodepoint)) {
+									if (!font->glyphKerningMap.at(previousCodepoint).contains(codepoint)) {
+										return;
+									}
+								}
+							}
 						}
-					}
-				}
 
-				auto&& [shaderProgramEntity, shaderProgram] = getResourceAndEntity<ShaderProgram>(registry, mFontShaderProgram);
-				if (!shaderProgram) {
-					return;
-				}
+						auto&& [shaderProgramEntity, shaderProgram] = getResourceAndEntity<ShaderProgram>(registry, mFontShaderProgram);
+						if (!shaderProgram) {
+							return;
+						}
 
-				RenderCommand renderCommand = createFontObjectRenderCommand(registry, fontObject, *font, viewportEntity, shaderProgramEntity, imageEntity, spatial);
+						RenderCommand renderCommand = createFontObjectRenderCommand(registry, fontObject, *font, viewportEntity, shaderProgramEntity, imageEntity, spatial);
 
-				const entt::entity renderCommandEntity = registry.create();
-				registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);
+						const entt::entity renderCommandEntity = registry.create();
+						registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);
+					});
 			});
 	}
 
