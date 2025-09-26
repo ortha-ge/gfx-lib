@@ -14,6 +14,7 @@ import Gfx.Image;
 import Gfx.ImageAtlas;
 import Gfx.IndexBuffer;
 import Gfx.RenderCommand;
+import Gfx.RenderState;
 import Gfx.ShaderProgram;
 import Gfx.TextureCoordinates;
 import Gfx.Tilemap;
@@ -123,6 +124,13 @@ namespace Gfx::TilemapRenderSystemInternal {
 		renderCommand.viewportEntity = viewportEntity;
 		renderCommand.renderPass = 1;
 		renderCommand.uniformData["s_texColour"] = Any(entt::entity{ atlasImageEntity });
+
+		RenderState renderState{};
+		renderState.bufferWriting = BufferWriting::RGB | BufferWriting::Alpha;
+		renderState.blendLhs = BlendOperand::SourceAlpha;
+		renderState.blendOperator = BlendOperator::Add;
+		renderState.blendRhs = BlendOperand::InverseSourceAlpha;
+		renderCommand.renderState = renderState;
 
 		const entt::entity renderCommandEntity = registry.create();
 		registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);

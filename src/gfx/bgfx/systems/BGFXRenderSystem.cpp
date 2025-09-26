@@ -17,12 +17,14 @@ import Core.TypeId;
 import Gfx.Camera;
 import Gfx.IndexBuffer;
 import Gfx.RenderCommand;
+import Gfx.RenderState;
 import Gfx.ShaderProgram;
 import Gfx.VertexBuffer;
 import Gfx.Viewport;
 import Gfx.BGFX.BGFXFrameBuffer;
 import Gfx.BGFX.BGFXShader;
 import Gfx.BGFX.BGFXShaderProgram;
+import Gfx.BGFX.BGFXState;
 import Gfx.BGFX.BGFXTexture;
 import Gfx.BGFX.BGFXTransientIndexBuffer;
 import Gfx.BGFX.BGFXTransientVertexBuffer;
@@ -52,7 +54,6 @@ namespace Gfx::BGFX {
 		});
 
 		for (auto&& [viewId, renderCommands] : commandBuckets) {
-			//std::ranges::sort(renderCommands, [](const auto& lhs, const auto& rhs) { return lhs.sortDepth < rhs.sortDepth; });
 			for (auto&& renderCommand : renderCommands) {
 				processRenderCommand(registry, renderCommand);
 			}
@@ -303,20 +304,8 @@ namespace Gfx::BGFX {
 		bx::mtxOrtho(&projectionMatrix[0][0], left, right, bottom, top, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
 		bgfx::setViewTransform(viewId, &viewMatrix, &projectionMatrix);
 
-		if (renderCommand.bgfxState) {
-			bgfx::setState(*renderCommand.bgfxState);
-		} else {
-			// Set render states.
-			bgfx::setState(
-				0 | BGFX_STATE_WRITE_RGB |
-				BGFX_STATE_WRITE_A
-				//| BGFX_STATE_WRITE_Z
-				//| BGFX_STATE_DEPTH_TEST_LESS
-				| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA) |
-				BGFX_STATE_BLEND_EQUATION_ADD
-				//| BGFX_STATE_MSAA
-			);
-		}
+		// Set the render state
+		bgfx::setState(getBGFXRenderState(renderCommand.renderState));
 
 		// Bind the resources
 		if (!_tryBindVertexBuffer(registry, 0, renderCommand.vertexBuffer, renderCommand.vertexOffset, renderCommand.vertexCount)) {

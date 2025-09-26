@@ -29,6 +29,7 @@ set(gfx-lib-modules
         src/gfx/Projection.cppm
         src/gfx/RenderCommand.cppm
         src/gfx/RenderObject.cppm
+        src/gfx/RenderState.cppm
         src/gfx/RenderTexture.cppm
         src/gfx/ShaderPlatformInfo.cppm
         src/gfx/ShaderProgram.cppm
@@ -107,5 +108,5 @@ target_compile_features(gfx-lib PUBLIC cxx_std_23)
 target_link_libraries(gfx-lib PUBLIC core-lib bgfx::bx bgfx::bimg_decode)
 target_include_directories(gfx-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src PRIVATE ${Stb_INCLUDE_DIR})
 
-#add_subdirectory(tests)
+add_subdirectory(tests)
 add_subdirectory(src/gfx/bgfx)

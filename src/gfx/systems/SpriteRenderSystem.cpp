@@ -20,6 +20,7 @@ import Gfx.Material;
 import Gfx.MaterialDescriptor;
 import Gfx.RenderCommand;
 import Gfx.RenderObject;
+import Gfx.RenderState;
 import Gfx.ShaderProgram;
 import Gfx.ShaderProgramDescriptor;
 import Gfx.Sprite;
@@ -259,6 +260,13 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ textureEntity });
 		renderCommand.uniformData["u_alphaColour"] = Core::Any(material.alphaColour.value_or(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }));
+
+		RenderState renderState{};
+		renderState.bufferWriting = BufferWriting::RGB | BufferWriting::Alpha;
+		renderState.blendLhs = BlendOperand::SourceAlpha;
+		renderState.blendOperator = BlendOperator::Add;
+		renderState.blendRhs = BlendOperand::InverseSourceAlpha;
+		renderCommand.renderState = renderState;
 
 		entt::entity renderCommandEntity = registry.create();
 		registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);

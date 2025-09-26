@@ -18,6 +18,7 @@ import Gfx.FontObject;
 import Gfx.Image;
 import Gfx.IndexBuffer;
 import Gfx.RenderCommand;
+import Gfx.RenderState;
 import Gfx.ShaderProgram;
 import Gfx.VertexBuffer;
 import Gfx.Viewport;
@@ -42,6 +43,13 @@ namespace Gfx::FontRenderSystemInternal {
 		renderCommand.shaderProgram = shaderProgramEntity;
 		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ imageEntity });
 		renderCommand.uniformData["u_alphaColour"] = Core::Any(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+
+		RenderState renderState{};
+		renderState.bufferWriting = BufferWriting::RGB | BufferWriting::Alpha;
+		renderState.blendLhs = BlendOperand::SourceAlpha;
+		renderState.blendOperator = BlendOperator::Add;
+		renderState.blendRhs = BlendOperand::InverseSourceAlpha;
+		renderCommand.renderState = renderState;
 
 		size_t vertexCount = std::ranges::count_if(fontObject.text, [](auto&& character) {
 			return character != '\n';
