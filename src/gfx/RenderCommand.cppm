@@ -25,6 +25,7 @@ export namespace Gfx {
 		std::optional<glm::ivec4> scissorRect{};
 
 		RenderState renderState{};
+		glm::mat4 viewMatrix{ 1.0f };
 		glm::mat4 modelMatrix{ 1.0f };
 		uint32_t sortDepth{ 0u };
 

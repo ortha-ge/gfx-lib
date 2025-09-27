@@ -14,13 +14,16 @@ module Gfx.BGFX.BGFXRenderSystem;
 import Core.Log;
 import Core.Spatial;
 import Core.TypeId;
+import Core.Window;
 import Gfx.Camera;
 import Gfx.IndexBuffer;
 import Gfx.RenderCommand;
 import Gfx.RenderState;
+import Gfx.RenderTexture;
 import Gfx.ShaderProgram;
 import Gfx.VertexBuffer;
 import Gfx.Viewport;
+import Gfx.BGFX.BGFXContext;
 import Gfx.BGFX.BGFXFrameBuffer;
 import Gfx.BGFX.BGFXShader;
 import Gfx.BGFX.BGFXShaderProgram;
@@ -263,9 +266,36 @@ namespace Gfx::BGFX {
 			viewId += 15;
 		}
 
-		// TODO: Should be coming from the render target or window.
-		constexpr float width = 1360.0f;
-		constexpr float height = 768.0f;
+		// Get the render target dimensions
+		entt::entity renderTarget = viewport.renderTarget;
+		if (renderTarget == entt::null) {
+			auto contextView = registry.view<BGFXContext>();
+			if (contextView.empty()) {
+				return;
+			}
+
+			const entt::entity contextEntity = contextView.front();
+			renderTarget = registry.get<BGFXContext>(contextEntity).defaultWindow;
+		}
+
+		if (renderTarget == entt::null) {
+			return;
+		}
+
+		float width = 1360.0f;
+		float height = 768.0f;
+
+		if (registry.all_of<Window>(renderTarget)) {
+			const auto& window{ registry.get<Window>(renderTarget) };
+			width = window.width;
+			height = window.height;
+		} else if (registry.all_of<RenderTexture>(renderTarget)) {
+			const auto& renderTexture{ registry.get<RenderTexture>(renderTarget) };
+			width = renderTexture.width;
+			height = renderTexture.height;
+		} else {
+			return;
+		}
 
 		const float left = viewport.offset.x * width;
 		const float right = viewport.dimensions.x * width;
@@ -280,29 +310,14 @@ namespace Gfx::BGFX {
 			bgfx::setScissor(scissorRect.x, scissorRect.y, scissorRect.z, scissorRect.w);
 		}
 
-		if (viewport.camera == entt::null) {
-			return;
-		}
-
-		if (!registry.all_of<Camera, Spatial>(viewport.camera)) {
-			return;
-		}
-
 		// Set up the model matrix
 		bgfx::setTransform(&renderCommand.modelMatrix);
 
 		// Set up the view-projection matrix
-		const auto& [camera, cameraSpatial] = registry.get<Camera, Spatial>(viewport.camera);
-
-		glm::mat4 translation = glm::translate(glm::mat4(1.0f), cameraSpatial.position);
-		glm::mat4 rotation = glm::mat4_cast(cameraSpatial.rotation);
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), cameraSpatial.scale);
-		glm::mat4 viewMatrix{ glm::inverse(translation * rotation * scale) };
-
 		// TODO: Camera settings like ortho/projection
 		glm::mat4 projectionMatrix;
 		bx::mtxOrtho(&projectionMatrix[0][0], left, right, bottom, top, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
-		bgfx::setViewTransform(viewId, &viewMatrix, &projectionMatrix);
+		bgfx::setViewTransform(viewId, &renderCommand.viewMatrix, &projectionMatrix);
 
 		// Set the render state
 		bgfx::setState(getBGFXRenderState(renderCommand.renderState));

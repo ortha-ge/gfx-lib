@@ -4,15 +4,20 @@ module;
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 module Gfx.TilemapRenderSystem;
 
 import Core.Any;
 import Core.GlobalSpatial;
 import Core.ResourceHandleUtils;
+import Core.Spatial;
+import Core.TypeId;
+import Gfx.Camera;
 import Gfx.Image;
 import Gfx.ImageAtlas;
 import Gfx.IndexBuffer;
+import Gfx.RenderCandidates;
 import Gfx.RenderCommand;
 import Gfx.RenderState;
 import Gfx.ShaderProgram;
@@ -36,7 +41,7 @@ namespace Gfx::TilemapRenderSystemInternal {
 
 	void renderTilemap(
 		entt::registry& registry, const Tilemap& tilemap, const ImageAtlas& atlas,
-		const Core::GlobalSpatial& spatial, const entt::entity shaderProgramEntity, const entt::entity viewportEntity) {
+		const Core::GlobalSpatial& spatial, const entt::entity shaderProgramEntity, const entt::entity viewportEntity, const glm::mat4& viewMatrix) {
 		using namespace Core;
 		using namespace Gfx;
 
@@ -132,6 +137,8 @@ namespace Gfx::TilemapRenderSystemInternal {
 		renderState.blendRhs = BlendOperand::InverseSourceAlpha;
 		renderCommand.renderState = renderState;
 
+		renderCommand.viewMatrix = viewMatrix;
+
 		const entt::entity renderCommandEntity = registry.create();
 		registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);
 	}
@@ -157,27 +164,58 @@ namespace Gfx {
 		using namespace Core;
 		using namespace TilemapRenderSystemInternal;
 
-		registry.view<Viewport>()
-			.each([&registry](const entt::entity viewportEntity, const Viewport& viewport) {
-				registry.view<TilemapObject, GlobalSpatial>()
-					.each([&registry, viewportEntity](const TilemapObject& tilemapObject, const GlobalSpatial& spatial) {
-						const auto* tilemap = getResource<Tilemap>(registry, tilemapObject.tilemap);
-						if (!tilemap) {
+		registry.view<Camera>()
+			.each([&registry](const entt::entity entity, const Camera&) {
+				RenderCandidates& renderCandidates = registry.get_or_emplace<RenderCandidates>(entity);
+
+				if (!renderCandidates.candidateBuckets.contains(TypeId::get<TilemapObject>())) {
+					auto renderCandidateVisitor = [&registry](RenderCandidateBucket::EntityList& entityList, const entt::entity entity) {
+						if (!registry.all_of<TilemapObject>(entity)) {
 							return;
 						}
 
-						const auto* atlas = getResource<ImageAtlas>(registry, tilemap->atlas);
-						if (!atlas) {
-							return;
-						}
+						entityList.emplace_back(entity);
+					};
 
-						auto&& [shaderProgramEntity, shaderProgram] = getResourceAndEntity<ShaderProgram>(registry, tilemapObject.shaderProgram);
-						if (!shaderProgram) {
-							return;
-						}
+					renderCandidates.candidateBuckets.emplace(TypeId::get<TilemapObject>(), renderCandidateVisitor);
+				}
+			});
 
-						renderTilemap(registry, *tilemap, *atlas, spatial, shaderProgramEntity, viewportEntity);
-					});
+		registry.view<Camera, Spatial, RenderCandidates>()
+			.each([&registry](const entt::entity, const Camera& camera, const Spatial& cameraSpatial, const RenderCandidates& renderCandidates) {
+				if (!renderCandidates.candidateBuckets.contains(TypeId::get<TilemapObject>())) {
+					return;
+				}
+
+				glm::mat4 translation = glm::translate(glm::mat4(1.0f), cameraSpatial.position);
+				glm::mat4 rotation = glm::mat4_cast(cameraSpatial.rotation);
+				glm::mat4 scale = glm::scale(glm::mat4(1.0f), cameraSpatial.scale);
+				glm::mat4 viewMatrix{ glm::inverse(translation * rotation * scale) };
+
+				const auto& tilemapRenderCandidates{ renderCandidates.candidateBuckets.at(TypeId::get<TilemapObject>()) };
+				for (auto&& tilemapEntity : tilemapRenderCandidates.entityList) {
+					if (!registry.all_of<TilemapObject, GlobalSpatial>(tilemapEntity)) {
+						continue;
+					}
+
+					const auto& [tilemapObject, spatial] = registry.get<TilemapObject, GlobalSpatial>(tilemapEntity);
+					const auto* tilemap = getResource<Tilemap>(registry, tilemapObject.tilemap);
+					if (!tilemap) {
+						return;
+					}
+
+					const auto* atlas = getResource<ImageAtlas>(registry, tilemap->atlas);
+					if (!atlas) {
+						return;
+					}
+
+					auto&& [shaderProgramEntity, shaderProgram] = getResourceAndEntity<ShaderProgram>(registry, tilemapObject.shaderProgram);
+					if (!shaderProgram) {
+						return;
+					}
+
+					renderTilemap(registry, *tilemap, *atlas, spatial, shaderProgramEntity, camera.viewport, viewMatrix);
+				}
 			});
 	}
 

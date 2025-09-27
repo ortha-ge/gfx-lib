@@ -14,10 +14,14 @@ import Core.GlobalSpatial;
 import Core.ResourceHandle;
 import Core.ResourceHandleUtils;
 import Core.Spatial;
+import Core.TypeId;
+import Gfx.Camera;
+import Gfx.RenderCandidates;
 import Gfx.Image;
 import Gfx.IndexBuffer;
 import Gfx.Material;
 import Gfx.MaterialDescriptor;
+import Gfx.RenderCandidates;
 import Gfx.RenderCommand;
 import Gfx.RenderObject;
 import Gfx.RenderState;
@@ -84,11 +88,20 @@ namespace Gfx::SpriteRenderSystemInternal {
 		const SpriteObject& spriteObject, const Material& material, const Image& textureImage, const Sprite& sprite,
 		const ShaderVertexLayoutDescriptor& vertexLayout) {
 
-		if (spriteObject.currentFrame >= sprite.descriptor.frames.size()) {
-			return;
+		// Use the entire image if the frames are empty
+		glm::vec2 bottomLeft{ 0.0f, 0.0f };
+		glm::vec2 topRight{ textureImage.width, textureImage.height };
+
+		if (!sprite.descriptor.frames.empty()) {
+			if (spriteObject.currentFrame >= sprite.descriptor.frames.size()) {
+				return;
+			}
+
+			const auto& textureCoordinates{ sprite.descriptor.frames[spriteObject.currentFrame] };
+			bottomLeft = textureCoordinates.bottomLeft;
+			topRight = textureCoordinates.topRight;
 		}
 
-		const auto& [bottomLeft, topRight]{ sprite.descriptor.frames[spriteObject.currentFrame] };
 		const uint32_t startVertex = materialBuffers.quadCount * 4;
 		const uint32_t startIndex = materialBuffers.quadCount * 6;
 		if (startVertex + 4 >= materialBuffers.maxVertexCount || startIndex + 6 >= materialBuffers.maxIndexCount) {
@@ -210,19 +223,23 @@ namespace Gfx::SpriteRenderSystemInternal {
 			*sprite, shaderProgramEntity, *shaderProgram);
 	}
 
-	ZMaterialBucketMap prepareSpriteZBucketMap(entt::registry& registry) {
+	ZMaterialBucketMap prepareSpriteZBucketMap(entt::registry& registry, const std::vector<entt::entity>& entities) {
 		ZMaterialBucketMap zBucketMap;
 
-		registry.view<Core::GlobalSpatial, RenderObject, SpriteObject>().each(
-			[&registry, &zBucketMap](const entt::entity entity, auto& spatial, auto& renderObject, auto& spriteObject) {
-				pushSpriteToZBucketMap(registry, zBucketMap, entity, spatial, renderObject, spriteObject);
-			});
+		for (auto&& entity : entities) {
+			if (!registry.all_of<Core::GlobalSpatial, RenderObject, SpriteObject>(entity)) {
+				continue;
+			}
+
+			const auto& [spatial, renderObject, spriteObject] = registry.get<Core::GlobalSpatial, RenderObject, SpriteObject>(entity);
+			pushSpriteToZBucketMap(registry, zBucketMap, entity, spatial, renderObject, spriteObject);
+		}
 
 		return zBucketMap;
 	}
 
 	void renderMaterialBuffers(
-		entt::registry& registry, entt::entity viewportEntity, entt::entity materialEntity,
+		entt::registry& registry, const Camera& camera, const glm::mat4& viewMatrix, entt::entity materialEntity,
 		const MaterialBuffers& materialBuffers, uint32_t sortDepth) {
 
 		if (materialEntity == entt::null || !registry.all_of<Material>(materialEntity)) {
@@ -245,7 +262,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 		}
 
 		RenderCommand renderCommand;
-		renderCommand.viewportEntity = viewportEntity;
+		renderCommand.viewportEntity = camera.viewport;
 		renderCommand.shaderProgram = shaderProgramEntity;
 
 		renderCommand.vertexBuffer = registry.create();
@@ -268,22 +285,24 @@ namespace Gfx::SpriteRenderSystemInternal {
 		renderState.blendRhs = BlendOperand::InverseSourceAlpha;
 		renderCommand.renderState = renderState;
 
+		renderCommand.viewMatrix = viewMatrix;
+
 		entt::entity renderCommandEntity = registry.create();
 		registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);
 	}
 
 	void renderSpriteZBucket(
-		entt::registry& registry, entt::entity viewportEntity, const ZMaterialBucket& zBucket, uint32_t sortDepth) {
+		entt::registry& registry, const Camera& camera, const glm::mat4& viewMatrix, const ZMaterialBucket& zBucket, uint32_t sortDepth) {
 		for (auto&& [materialEntity, materialBuffers] : zBucket.materialBuffers) {
-			renderMaterialBuffers(registry, viewportEntity, materialEntity, materialBuffers, sortDepth);
+			renderMaterialBuffers(registry, camera, viewMatrix, materialEntity, materialBuffers, sortDepth);
 		}
 	}
 
 	void renderSpriteZBucketMap(
-		entt::registry& registry, entt::entity viewportEntity, const ZMaterialBucketMap& zBucketMap) {
+		entt::registry& registry, const Camera& camera, const glm::mat4& viewMatrix, const ZMaterialBucketMap& zBucketMap) {
 		uint32_t sortDepth = 0u;
 		for (auto&& [_, zBucket] : zBucketMap) {
-			renderSpriteZBucket(registry, viewportEntity, zBucket, sortDepth++);
+			renderSpriteZBucket(registry, camera, viewMatrix, zBucket, sortDepth++);
 		}
 	}
 
@@ -301,6 +320,25 @@ namespace Gfx {
 	SpriteRenderSystem::~SpriteRenderSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void SpriteRenderSystem::tickSystem(entt::registry& registry) {
+		using namespace Core;
+
+		registry.view<Camera>()
+			.each([&registry](const entt::entity entity, const Camera&) {
+				RenderCandidates& renderCandidates = registry.get_or_emplace<RenderCandidates>(entity);
+
+				if (!renderCandidates.candidateBuckets.contains(TypeId::get<SpriteObject>())) {
+					auto renderCandidateVisitor = [&registry](RenderCandidateBucket::EntityList& entityList, const entt::entity entity) {
+						if (!registry.all_of<SpriteObject>(entity)) {
+							return;
+						}
+
+						entityList.emplace_back(entity);
+					};
+
+					renderCandidates.candidateBuckets.emplace(TypeId::get<SpriteObject>(), renderCandidateVisitor);
+				}
+			});
+
 		ZoneScopedN("SpriteRenderSystem::tickSystem");
 		registry.view<RenderObject>(entt::exclude<Material, MaterialDescriptor>)
 			.each([&registry](const entt::entity entity, const RenderObject& renderObject) {
@@ -312,11 +350,22 @@ namespace Gfx {
 			});
 
 		using namespace SpriteRenderSystemInternal;
-		ZMaterialBucketMap zBucketMap{ prepareSpriteZBucketMap(registry) };
+		registry.view<Camera, Spatial, RenderCandidates>()
+			.each([&registry](const entt::entity, const Camera& camera, const Spatial& cameraSpatial, const RenderCandidates& renderCandidates) {
+				if (!renderCandidates.candidateBuckets.contains(TypeId::get<SpriteObject>())) {
+					return;
+				}
 
-		registry.view<Viewport>().each([&registry, &zBucketMap](entt::entity entity, const Viewport&) {
-			renderSpriteZBucketMap(registry, entity, zBucketMap);
-		});
+				glm::mat4 translation = glm::translate(glm::mat4(1.0f), cameraSpatial.position);
+				glm::mat4 rotation = glm::mat4_cast(cameraSpatial.rotation);
+				glm::mat4 scale = glm::scale(glm::mat4(1.0f), cameraSpatial.scale);
+				glm::mat4 viewMatrix{ glm::inverse(translation * rotation * scale) };
+
+				const auto& spriteRenderCandidates{ renderCandidates.candidateBuckets.at(TypeId::get<SpriteObject>()) };
+
+				ZMaterialBucketMap zBucketMap{ prepareSpriteZBucketMap(registry, spriteRenderCandidates.entityList) };
+				renderSpriteZBucketMap(registry, camera, viewMatrix, zBucketMap);
+			});
 	}
 
 } // namespace Gfx

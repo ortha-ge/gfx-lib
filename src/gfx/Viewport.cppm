@@ -8,7 +8,6 @@ export module Gfx.Viewport;
 export namespace Gfx {
 
 	struct Viewport {
-		entt::entity camera{ entt::null };
 		entt::entity renderTarget{ entt::null };
 
 		glm::vec2 offset{ 0.0f, 0.0f };

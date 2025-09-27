@@ -4,6 +4,7 @@ module;
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 module Gfx.FontRenderSystem;
 
@@ -12,11 +13,15 @@ import Core.JsonTypeLoaderAdapter;
 import Core.ResourceHandleUtils;
 import Core.ResourceLoadRequest;
 import Core.GlobalSpatial;
+import Core.Spatial;
+import Core.TypeId;
 import Core.TypeLoader;
+import Gfx.Camera;
 import Gfx.Font;
 import Gfx.FontObject;
 import Gfx.Image;
 import Gfx.IndexBuffer;
+import Gfx.RenderCandidates;
 import Gfx.RenderCommand;
 import Gfx.RenderState;
 import Gfx.ShaderProgram;
@@ -33,12 +38,13 @@ namespace Gfx::FontRenderSystemInternal {
 	};
 
 	RenderCommand createFontObjectRenderCommand(
-		entt::registry& registry, const FontObject& fontObject, const Font& font, const entt::entity viewportEntity,
+		entt::registry& registry, const FontObject& fontObject, const Font& font, const Camera& camera, const glm::mat4& viewMatrix,
 		const entt::entity shaderProgramEntity, const entt::entity imageEntity, const Core::GlobalSpatial& spatial) {
 
 		RenderCommand renderCommand;
-		renderCommand.viewportEntity = viewportEntity;
+		renderCommand.viewportEntity = camera.viewport;
 		renderCommand.renderPass = 20;
+		renderCommand.viewMatrix = viewMatrix;
 
 		renderCommand.shaderProgram = shaderProgramEntity;
 		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ imageEntity });
@@ -152,11 +158,43 @@ namespace Gfx {
 		using namespace Core;
 		using namespace FontRenderSystemInternal;
 
-		registry.view<Viewport>()
-			.each([this, &registry](const entt::entity viewportEntity, const Viewport&) {
-				registry.view<FontObject, GlobalSpatial>()
-					.each([this, &registry, viewportEntity](const FontObject& fontObject, const GlobalSpatial& spatial) {
-						if (fontObject.text.empty()) {
+		registry.view<Camera>()
+			.each([&registry](const entt::entity entity, const Camera&) {
+				RenderCandidates& renderCandidates = registry.get_or_emplace<RenderCandidates>(entity);
+
+				if (!renderCandidates.candidateBuckets.contains(TypeId::get<FontObject>())) {
+					auto renderCandidateVisitor = [&registry](RenderCandidateBucket::EntityList& entityList, const entt::entity entity) {
+						if (!registry.all_of<FontObject>(entity)) {
+							return;
+						}
+
+						entityList.emplace_back(entity);
+					};
+
+					renderCandidates.candidateBuckets.emplace(TypeId::get<FontObject>(), renderCandidateVisitor);
+				}
+			});
+
+		registry.view<Camera, Spatial, RenderCandidates>()
+			.each([this, &registry](const entt::entity cameraEntity, const Camera& camera, const Spatial& cameraSpatial, const RenderCandidates& renderCandidates) {
+				if (!renderCandidates.candidateBuckets.contains(TypeId::get<FontObject>())) {
+					return;
+				}
+
+				glm::mat4 translation = glm::translate(glm::mat4(1.0f), cameraSpatial.position);
+				glm::mat4 rotation = glm::mat4_cast(cameraSpatial.rotation);
+				glm::mat4 scale = glm::scale(glm::mat4(1.0f), cameraSpatial.scale);
+				glm::mat4 viewMatrix{ glm::inverse(translation * rotation * scale) };
+
+				const auto& fontObjectRenderCandidates{ renderCandidates.candidateBuckets.at(TypeId::get<FontObject>()) };
+				for (auto&& fontObjectEntity : fontObjectRenderCandidates.entityList) {
+					if (!registry.all_of<FontObject, GlobalSpatial>(fontObjectEntity)) {
+						continue;
+					}
+
+					const auto& [fontObject, spatial] = registry.get<FontObject, GlobalSpatial>(fontObjectEntity);
+
+					if (fontObject.text.empty()) {
 							return;
 						}
 
@@ -196,11 +234,12 @@ namespace Gfx {
 							return;
 						}
 
-						RenderCommand renderCommand = createFontObjectRenderCommand(registry, fontObject, *font, viewportEntity, shaderProgramEntity, imageEntity, spatial);
+						RenderCommand renderCommand = createFontObjectRenderCommand(
+							registry, fontObject, *font, camera, viewMatrix, shaderProgramEntity, imageEntity, spatial);
 
 						const entt::entity renderCommandEntity = registry.create();
 						registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);
-					});
+				}
 			});
 	}
 

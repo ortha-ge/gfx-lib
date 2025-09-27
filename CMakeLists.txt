@@ -22,7 +22,6 @@ set(gfx-lib-src
 )
 
 set(gfx-lib-modules
-        src/gfx/Camera.cppm
         src/gfx/Image.cppm
         src/gfx/IndexBuffer.cppm
         src/gfx/Material.cppm
@@ -108,5 +107,5 @@ target_compile_features(gfx-lib PUBLIC cxx_std_23)
 target_link_libraries(gfx-lib PUBLIC core-lib bgfx::bx bgfx::bimg_decode)
 target_include_directories(gfx-lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src PRIVATE ${Stb_INCLUDE_DIR})
 
+add_subdirectory(src)
 add_subdirectory(tests)
-add_subdirectory(src/gfx/bgfx)

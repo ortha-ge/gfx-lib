@@ -178,7 +178,7 @@ namespace Gfx::BGFX {
 		}
 
 		mBGFXContext = registry.create();
-		registry.emplace<BGFXContext>(mBGFXContext);
+		registry.emplace<BGFXContext>(mBGFXContext, entity);
 		auto& callbacks = registry.emplace<BGFXCallbacks>(mBGFXContext, registry, mBGFXContext);
 
 		bgfx::Init initData;

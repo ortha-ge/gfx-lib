@@ -5,6 +5,7 @@ module;
 module Gfx.SystemsService;
 
 import Core.ReflectionContext;
+import Gfx.CreateRenderCandidatesVisitorSystemService;
 import Gfx.FontLoadSystemService;
 import Gfx.FontRenderSystemService;
 import Gfx.ImageAtlasLoadSystemService;
@@ -23,6 +24,9 @@ namespace Gfx {
 
 	void initGfxSubSystems(GfxSystems&, kgr::container& container) {
 		reflectAll(Core::getCurrentReflectionContext());
+
+		// Camera + RenderCandidates
+		container.emplace<CreateRenderCandidatesVisitorSystemService>();
 
 		// Resource
 		container.emplace<SpriteLoadSystemService>();
