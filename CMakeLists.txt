@@ -14,9 +14,6 @@ set(gfx-lib-src
         src/gfx/systems/ImageLoadSystem.cpp
         src/gfx/systems/MaterialLoadSystem.cpp
         src/gfx/systems/ShaderProgramLoadSystem.cpp
-        src/gfx/systems/SpriteAnimationSystem.cpp
-        src/gfx/systems/SpriteLoadSystem.cpp
-        src/gfx/systems/SpriteRenderSystem.cpp
         src/gfx/tilemap/systems/TilemapLoadSystem.cpp
         src/gfx/tilemap/systems/TilemapRenderSystem.cpp
 )
@@ -32,8 +29,6 @@ set(gfx-lib-modules
         src/gfx/RenderTexture.cppm
         src/gfx/ShaderPlatformInfo.cppm
         src/gfx/ShaderProgram.cppm
-        src/gfx/Sprite.cppm
-        src/gfx/SpriteObject.cppm
         src/gfx/TextureCoordinates.cppm
         src/gfx/VertexBuffer.cppm
         src/gfx/Viewport.cppm
@@ -59,16 +54,10 @@ set(gfx-lib-modules
         src/gfx/services/ImageLoadSystemService.cppm
         src/gfx/services/MaterialLoadSystemService.cppm
         src/gfx/services/ShaderProgramLoadSystemService.cppm
-        src/gfx/services/SpriteAnimationSystemService.cppm
-        src/gfx/services/SpriteLoadSystemService.cppm
-        src/gfx/services/SpriteRenderSystemService.cppm
         src/gfx/systems/GfxSystems.cppm
         src/gfx/systems/ImageLoadSystem.cppm
         src/gfx/systems/MaterialLoadSystem.cppm
         src/gfx/systems/ShaderProgramLoadSystem.cppm
-        src/gfx/systems/SpriteAnimationSystem.cppm
-        src/gfx/systems/SpriteLoadSystem.cppm
-        src/gfx/systems/SpriteRenderSystem.cppm
         src/gfx/tilemap/Tilemap.cppm
         src/gfx/tilemap/TilemapDescriptor.cppm
         src/gfx/tilemap/TilemapObject.cppm

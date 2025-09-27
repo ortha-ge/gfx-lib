@@ -18,7 +18,7 @@ namespace Gfx {
 
 		mTickHandle = mScheduler.schedule([this] {
 			tickSystem(mRegistry);
-		});
+		}, 255);
 	}
 
 	CreateRenderCandidatesVisitorSystem::~CreateRenderCandidatesVisitorSystem() {
