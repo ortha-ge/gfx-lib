@@ -3,16 +3,9 @@ cmake_minimum_required(VERSION 3.31)
 
 find_package(Catch2 3 REQUIRED)
 
-set(gfx-lib-tests-src
-        bgfx/BGFXStateTests.cpp
-)
+add_executable(gfx-lib-tests)
 
-set(gfx-lib-tests-modules
-)
-
-add_executable(gfx-lib-tests ${gfx-lib-tests-src})
-
-target_sources(gfx-lib-tests PUBLIC FILE_SET modules TYPE CXX_MODULES FILES ${gfx-lib-tests-modules})
+target_sources(gfx-lib-tests PUBLIC FILE_SET modules TYPE CXX_MODULES BASE_DIRS .)
 target_compile_features(gfx-lib-tests PUBLIC cxx_std_23)
 target_link_libraries(gfx-lib-tests PRIVATE gfx-lib Catch2::Catch2WithMain)
 
@@ -24,6 +17,8 @@ target_link_libraries(gfx-lib-tests PRIVATE gfx-lib Catch2::Catch2WithMain)
 #)
 
 #add_dependencies(gfx-lib-tests gfx-lib-tests-assets)
+
+add_subdirectory(bgfx)
 
 include(CTest)
 include(Catch)

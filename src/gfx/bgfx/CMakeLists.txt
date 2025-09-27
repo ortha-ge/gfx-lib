@@ -1,13 +1,5 @@
 
-target_sources(gfx-lib
-        PRIVATE
-        BGFXState.cpp
-)
-
-target_sources(gfx-lib
-        PUBLIC FILE_SET modules
-        TYPE CXX_MODULES
-        FILES
+target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
         BGFXContext.cppm
         BGFXFrameBuffer.cppm
         BGFXShader.cppm
@@ -18,6 +10,10 @@ target_sources(gfx-lib
         BGFXTransientVertexBuffer.cppm
         BGFXUniform.cppm
         BGFXVertexLayout.cppm
+)
+
+target_sources(gfx-lib PRIVATE
+        BGFXState.cpp
 )
 
 target_link_libraries(gfx-lib PUBLIC bgfx::bgfx)
