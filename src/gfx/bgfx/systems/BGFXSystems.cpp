@@ -13,6 +13,7 @@ import Core.NativeWindowHandles;
 import Core.Window;
 import Gfx.ShaderPlatformInfo;
 import Gfx.BGFX.BGFXContext;
+import Gfx.BGFX.BGFXFrameBuffer;
 
 namespace Gfx::BGFX::BGFXSystemsInternal {
 
@@ -195,6 +196,10 @@ namespace Gfx::BGFX {
 		}
 
 		Core::logEntry(registry, "BGFX initialized.");
+
+		registry.emplace<BGFXFrameBuffer>(entity, BGFXFrameBuffer{
+			.handle = BGFX_INVALID_HANDLE
+		});
 
 		registry.emplace<ShaderPlatformInfo>(mBGFXContext, getShaderPlatformInfo());
 	}

@@ -50,18 +50,44 @@ namespace Gfx::BGFX {
 	}
 
 	void BGFXRenderSystem::tickSystem(entt::registry& registry) {
+		using namespace Core;
+
+		bgfx::ViewId viewId{ 0 };
+
+		// Clear all windows
+		registry.view<Window, BGFXFrameBuffer>()
+			.each([this, &viewId](const Window& window, const BGFXFrameBuffer& frameBuffer) {
+				bgfx::setViewFrameBuffer(viewId, frameBuffer.handle);
+				bgfx::setViewRect(viewId, 0.0f, 0.0f, window.width, window.height);
+				bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+				bgfx::touch(viewId);
+				++viewId;
+			});
+
+		// Clear all framebuffers
+		registry.view<RenderTexture, BGFXFrameBuffer>()
+			.each([&viewId](const RenderTexture& renderTexture, const BGFXFrameBuffer& frameBuffer) {
+				if (!bgfx::isValid(frameBuffer.handle)) {
+					return;
+				}
+
+				bgfx::setViewFrameBuffer(viewId, frameBuffer.handle);
+				bgfx::setViewRect(viewId, 0.0f, 0.0f, renderTexture.width, renderTexture.height);
+				bgfx::setViewClear(viewId, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
+				bgfx::touch(viewId);
+				++viewId;
+			});
+
 		struct RenderPassBuckets {
 			std::unordered_map<entt::entity, std::vector<RenderCommand>> viewportBuckets;
 		};
 
-		// Sorts by render pass and viewport
+		// Each render pass and viewport combo is sorted and gets its own viewId.
 		std::map<uint16_t, RenderPassBuckets> viewportCommandBuckets;
 		registry.view<RenderCommand>().each([&viewportCommandBuckets](const RenderCommand& renderCommand) {
 			viewportCommandBuckets[renderCommand.renderPass].viewportBuckets[renderCommand.viewportEntity].emplace_back(renderCommand);
 		});
 
-		// Each render pass and viewport combo gets its own view Id.
-		bgfx::ViewId viewId{ 0 };
 		for (auto&& [_renderPass, viewportCommandBucket] : viewportCommandBuckets) {
 			for (auto&& [_viewport, renderCommands] : viewportCommandBucket.viewportBuckets) {
 				for (auto&& renderCommand : renderCommands) {
