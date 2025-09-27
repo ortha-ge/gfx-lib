@@ -22,7 +22,7 @@ export namespace Gfx::BGFX {
 		~BGFXRenderSystem();
 
 		void tickSystem(entt::registry&);
-		void processRenderCommand(entt::registry&, const RenderCommand&);
+		void processRenderCommand(entt::registry&, const RenderCommand&, bgfx::ViewId viewId);
 
 		bool _tryBindVertexBuffer(entt::registry&, uint8_t stream, entt::entity, uint32_t offset, uint32_t count);
 		bool _tryBindIndexBuffer(entt::registry&, entt::entity, uint32_t offset, uint32_t count);

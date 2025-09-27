@@ -50,15 +50,24 @@ namespace Gfx::BGFX {
 	}
 
 	void BGFXRenderSystem::tickSystem(entt::registry& registry) {
+		struct RenderPassBuckets {
+			std::unordered_map<entt::entity, std::vector<RenderCommand>> viewportBuckets;
+		};
 
-		std::unordered_map<bgfx::ViewId, std::vector<RenderCommand>> commandBuckets;
-		registry.view<RenderCommand>().each([&commandBuckets, &registry](const RenderCommand& renderCommand) {
-			commandBuckets[renderCommand.renderPass].emplace_back(renderCommand);
+		// Sorts by render pass and viewport
+		std::map<uint16_t, RenderPassBuckets> viewportCommandBuckets;
+		registry.view<RenderCommand>().each([&viewportCommandBuckets](const RenderCommand& renderCommand) {
+			viewportCommandBuckets[renderCommand.renderPass].viewportBuckets[renderCommand.viewportEntity].emplace_back(renderCommand);
 		});
 
-		for (auto&& [viewId, renderCommands] : commandBuckets) {
-			for (auto&& renderCommand : renderCommands) {
-				processRenderCommand(registry, renderCommand);
+		// Each render pass and viewport combo gets its own view Id.
+		bgfx::ViewId viewId{ 0 };
+		for (auto&& [_renderPass, viewportCommandBucket] : viewportCommandBuckets) {
+			for (auto&& [_viewport, renderCommands] : viewportCommandBucket.viewportBuckets) {
+				for (auto&& renderCommand : renderCommands) {
+					processRenderCommand(registry, renderCommand, viewId);
+				}
+				++viewId;
 			}
 		}
 
@@ -234,7 +243,7 @@ namespace Gfx::BGFX {
 		return true;
 	}
 
-	void BGFXRenderSystem::processRenderCommand(entt::registry& registry, const RenderCommand& renderCommand) {
+	void BGFXRenderSystem::processRenderCommand(entt::registry& registry, const RenderCommand& renderCommand, bgfx::ViewId viewId) {
 		using namespace Core;
 
 		// Wait for the shader program to be initialized
@@ -252,19 +261,6 @@ namespace Gfx::BGFX {
 		}
 
 		const Viewport& viewport{ registry.get<Viewport>(renderCommand.viewportEntity) };
-
-		// TODO: viewId should be allocated uniquely per viewport, and is no longer needed for sprite depth sorting.
-		bgfx::ViewId viewId = renderCommand.renderPass;
-
-		// HACK: Add to the viewId if there is a render target
-		if (viewport.renderTarget != entt::null) {
-			// HACK: Don't render the render target test to the render target.
-			if (viewId > 200) {
-				return;
-			}
-
-			viewId += 15;
-		}
 
 		// Get the render target dimensions
 		entt::entity renderTarget = viewport.renderTarget;
