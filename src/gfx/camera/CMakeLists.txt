@@ -4,6 +4,7 @@ target_sources(gfx-lib
         TYPE CXX_MODULES
         FILES
         Camera.cppm
+        CameraDescriptor.cppm
         RenderCandidates.cppm
         services/CreateRenderCandidatesVisitorSystemService.cppm
         systems/CreateRenderCandidatesVisitorSystem.cppm

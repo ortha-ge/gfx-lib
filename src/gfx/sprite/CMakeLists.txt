@@ -4,6 +4,7 @@ target_sources(gfx-lib
         TYPE CXX_MODULES
         FILES
         Sprite.cppm
+        SpriteDescriptor.cppm
         SpriteObject.cppm
         services/SpriteAnimationSystemService.cppm
         services/SpriteLoadSystemService.cppm
