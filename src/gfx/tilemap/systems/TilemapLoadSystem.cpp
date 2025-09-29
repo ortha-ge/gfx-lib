@@ -1,8 +1,8 @@
 module;
 
+#include <memory>
 #include <utility>
-
-#include <entt/entt.hpp>
+#include <vector>
 
 module Gfx.TilemapLoadSystem;
 
@@ -17,7 +17,7 @@ import Gfx.Reflection.ImageAtlas;
 
 namespace Gfx {
 
-	TilemapLoadSystem::TilemapLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	TilemapLoadSystem::TilemapLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

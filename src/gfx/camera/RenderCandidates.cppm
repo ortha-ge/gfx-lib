@@ -4,11 +4,10 @@ module;
 #include <unordered_map>
 #include <vector>
 
-#include <entt/entity/entity.hpp>
-
 export module Gfx.RenderCandidates;
 
 import Core.TypeId;
+import entt;
 
 export namespace Gfx {
 

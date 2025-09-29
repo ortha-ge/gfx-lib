@@ -1,18 +1,14 @@
-module;
-
-#include <entt/entt.hpp>
-
 export module Gfx.BGFX.Systems;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
+import entt;
 
 export namespace Gfx::BGFX {
 
 	class BGFXSystems {
 	public:
 
-		BGFXSystems(Core::EnTTRegistry&, Core::Scheduler&);
+		BGFXSystems(entt::registry&, Core::Scheduler&);
 		~BGFXSystems();
 
 		void tickSystem(entt::registry&);
@@ -23,7 +19,7 @@ export namespace Gfx::BGFX {
 
 		void connectEnTTSignals(entt::registry&);
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

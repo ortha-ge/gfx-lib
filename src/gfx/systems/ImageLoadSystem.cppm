@@ -1,24 +1,25 @@
 module;
 
+#include <memory>
+
 #include <bx/allocator.h>
-#include <entt/fwd.hpp>
 
 export module Gfx.ImageLoadSystem;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
+import entt;
 
 export namespace Gfx {
 
 	class ImageLoadSystem {
 	public:
-		ImageLoadSystem(Core::EnTTRegistry&, Core::Scheduler&);
+		ImageLoadSystem(entt::registry&, Core::Scheduler&);
 		~ImageLoadSystem();
 
 		static void tickSystem(entt::registry& registry);
 
 	private:
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle{};
 

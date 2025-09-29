@@ -1,8 +1,6 @@
-module;
-
-#include <glm/vec2.hpp>
-
 export module Gfx.TextureCoordinates;
+
+import glm;
 
 export namespace Gfx {
 

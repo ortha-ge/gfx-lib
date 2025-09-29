@@ -1,9 +1,7 @@
-module;
-
-#include <entt/entity/entity.hpp>
-#include <glm/vec2.hpp>
-
 export module Gfx.Viewport;
+
+import entt;
+import glm;
 
 export namespace Gfx {
 

@@ -1,24 +1,26 @@
 module;
 
+#include <string>
+#include <unordered_map>
+
 #include <bgfx/bgfx.h>
-#include <entt/fwd.hpp>
 
 export module Gfx.BGFX.BGFXRenderSystem;
 
 import Core.Any;
-import Core.EnTTRegistry;
 import Core.Scheduler;
 import Gfx.RenderCommand;
 import Gfx.BGFX.BGFXFrameBuffer;
 import Gfx.BGFX.BGFXTexture;
 import Gfx.BGFX.BGFXUniform;
+import entt;
 
 export namespace Gfx::BGFX {
 
 	class BGFXRenderSystem {
 	public:
 
-		BGFXRenderSystem(Core::EnTTRegistry&, Core::Scheduler&);
+		BGFXRenderSystem(entt::registry&, Core::Scheduler&);
 		~BGFXRenderSystem();
 
 		void tickSystem(entt::registry&);
@@ -34,7 +36,7 @@ export namespace Gfx::BGFX {
 
 	private:
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

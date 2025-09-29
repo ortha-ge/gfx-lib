@@ -1,8 +1,7 @@
 module;
 
+#include <memory>
 #include <vector>
-
-#include <entt/entity/entity.hpp>
 
 export module Gfx.ShaderProgram;
 

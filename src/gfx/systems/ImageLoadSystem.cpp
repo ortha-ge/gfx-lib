@@ -4,7 +4,6 @@ module;
 
 #include <bimg/decode.h>
 #include <bx/error.h>
-#include <entt/entt.hpp>
 #include <tracy/Tracy.hpp>
 
 module Gfx.ImageLoadSystem;
@@ -18,7 +17,7 @@ import Gfx.ImageDescriptor;
 
 namespace Gfx {
 
-	ImageLoadSystem::ImageLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	ImageLoadSystem::ImageLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
 		, mScheduler{ scheduler }
 		, mAllocator{ std::make_unique<bx::DefaultAllocator>() } {

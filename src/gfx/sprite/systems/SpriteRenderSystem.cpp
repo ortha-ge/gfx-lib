@@ -1,10 +1,10 @@
 module;
 
+#include <map>
+#include <memory>
+#include <unordered_map>
 #include <variant>
 
-#include <entt/entt.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 #include <tracy/Tracy.hpp>
 
 module Gfx.SpriteRenderSystem;
@@ -32,6 +32,8 @@ import Gfx.SpriteObject;
 import Gfx.TextureCoordinates;
 import Gfx.VertexBuffer;
 import Gfx.Viewport;
+import entt;
+import glm;
 
 namespace Gfx::SpriteRenderSystemInternal {
 
@@ -310,7 +312,7 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 namespace Gfx {
 
-	SpriteRenderSystem::SpriteRenderSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	SpriteRenderSystem::SpriteRenderSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
 		, mScheduler{ scheduler } {
 

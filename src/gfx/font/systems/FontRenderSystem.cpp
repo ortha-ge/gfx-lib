@@ -1,10 +1,9 @@
 module;
 
+#include <algorithm>
+#include <cstdint>
+#include <memory>
 #include <utility>
-
-#include <entt/entt.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 module Gfx.FontRenderSystem;
 
@@ -28,6 +27,8 @@ import Gfx.ShaderProgram;
 import Gfx.VertexBuffer;
 import Gfx.Viewport;
 import Gfx.Reflection.ShaderProgramDescriptor;
+import entt;
+import glm;
 
 namespace Gfx::FontRenderSystemInternal {
 
@@ -138,7 +139,7 @@ namespace Gfx::FontRenderSystemInternal {
 
 namespace Gfx {
 
-	FontRenderSystem::FontRenderSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	FontRenderSystem::FontRenderSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

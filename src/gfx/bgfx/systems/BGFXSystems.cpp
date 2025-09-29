@@ -1,10 +1,12 @@
 module;
 
+#include <cstdio>
+#include <optional>
+#include <string>
 #include <utility>
 
 #include <bx/bx.h>
 #include <bgfx/bgfx.h>
-#include <entt/entt.hpp>
 
 module Gfx.BGFX.Systems;
 
@@ -138,7 +140,7 @@ struct BGFXCallbacks : bgfx::CallbackI {
 
 namespace Gfx::BGFX {
 
-	BGFXSystems::BGFXSystems(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	BGFXSystems::BGFXSystems(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

@@ -2,21 +2,18 @@ module;
 
 #include <list>
 
-#include <entt/entity/entity.hpp>
-#include <entt/fwd.hpp>
-
 export module Gfx.ShaderProgramLoadSystem;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
 import Gfx.ShaderPlatformInfo;
 import Gfx.ShaderProgramDescriptor;
+import entt;
 
 export namespace Gfx {
 
 	class ShaderProgramLoadSystem {
 	public:
-		ShaderProgramLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler);
+		ShaderProgramLoadSystem(entt::registry& registry, Core::Scheduler& scheduler);
 		~ShaderProgramLoadSystem();
 
 		void tickSystem(entt::registry&);
@@ -31,7 +28,7 @@ export namespace Gfx {
 			entt::entity fsShaderEntity{ entt::null };
 		};
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

@@ -1,13 +1,14 @@
 module;
 
+#include <map>
+#include <string>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include <bx/bx.h>
 #include <bx/math.h>
 #include <bgfx/bgfx.h>
-#include <entt/entt.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 module Gfx.BGFX.BGFXRenderSystem;
 
@@ -23,6 +24,7 @@ import Gfx.RenderTexture;
 import Gfx.ShaderProgram;
 import Gfx.VertexBuffer;
 import Gfx.Viewport;
+import Gfx.ViewportUtilities;
 import Gfx.BGFX.BGFXContext;
 import Gfx.BGFX.BGFXFrameBuffer;
 import Gfx.BGFX.BGFXShader;
@@ -33,10 +35,12 @@ import Gfx.BGFX.BGFXTransientIndexBuffer;
 import Gfx.BGFX.BGFXTransientVertexBuffer;
 import Gfx.BGFX.BGFXUniform;
 import Gfx.BGFX.BGFXVertexLayout;
+import entt;
+import glm;
 
 namespace Gfx::BGFX {
 
-	BGFXRenderSystem::BGFXRenderSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	BGFXRenderSystem::BGFXRenderSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 
@@ -289,42 +293,18 @@ namespace Gfx::BGFX {
 		const Viewport& viewport{ registry.get<Viewport>(renderCommand.viewportEntity) };
 
 		// Get the render target dimensions
-		entt::entity renderTarget = viewport.renderTarget;
-		if (renderTarget == entt::null) {
-			auto contextView = registry.view<BGFXContext>();
-			if (contextView.empty()) {
-				return;
-			}
-
-			const entt::entity contextEntity = contextView.front();
-			renderTarget = registry.get<BGFXContext>(contextEntity).defaultWindow;
-		}
-
-		if (renderTarget == entt::null) {
+		const auto viewportScreenRect = getViewportScreenRect(registry, viewport);
+		if (!viewportScreenRect) {
 			return;
 		}
 
-		float width = 1360.0f;
-		float height = 768.0f;
+		glm::ivec2 viewportScreenSize = getViewportScreenSize(*viewportScreenRect);
 
-		if (registry.all_of<Window>(renderTarget)) {
-			const auto& window{ registry.get<Window>(renderTarget) };
-			width = window.width;
-			height = window.height;
-		} else if (registry.all_of<RenderTexture>(renderTarget)) {
-			const auto& renderTexture{ registry.get<RenderTexture>(renderTarget) };
-			width = renderTexture.width;
-			height = renderTexture.height;
-		} else {
-			return;
-		}
-
-		const float left = viewport.offset.x * width;
-		const float right = viewport.dimensions.x * width;
-		const float top = viewport.offset.y * height;
-		const float bottom = viewport.dimensions.y * height;
-
-		bgfx::setViewRect(viewId, left, top, right - left, bottom - top);
+		bgfx::setViewRect(viewId,
+			viewportScreenRect->bottomLeft.x,
+			viewportScreenRect->topRight.y,
+			viewportScreenSize.x,
+			viewportScreenSize.y);
 
 		// Set the scissor rect for the submit call.
 		if (renderCommand.scissorRect) {
@@ -338,7 +318,10 @@ namespace Gfx::BGFX {
 		// Set up the view-projection matrix
 		// TODO: Camera settings like ortho/projection
 		glm::mat4 projectionMatrix;
-		bx::mtxOrtho(&projectionMatrix[0][0], left, right, bottom, top, 0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
+		bx::mtxOrtho(&projectionMatrix[0][0], viewportScreenRect->bottomLeft.x, viewportScreenRect->topRight.x,
+			viewportScreenRect->bottomLeft.y, viewportScreenRect->topRight.y,
+			0.0f, 1000.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
+
 		bgfx::setViewTransform(viewId, &renderCommand.viewMatrix, &projectionMatrix);
 
 		// Set the render state

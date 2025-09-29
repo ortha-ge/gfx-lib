@@ -1,7 +1,3 @@
-module;
-
-#include <entt/entt.hpp>
-
 module Gfx.SystemsService;
 
 import Core.ReflectionContext;

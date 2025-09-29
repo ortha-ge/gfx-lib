@@ -1,25 +1,21 @@
-module;
-
-#include <entt/fwd.hpp>
-
 export module Gfx.ImageAtlasLoadSystem;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
+import entt;
 
 export namespace Gfx {
 
 	class ImageAtlasLoadSystem {
 	public:
 
-		ImageAtlasLoadSystem(Core::EnTTRegistry&, Core::Scheduler&);
+		ImageAtlasLoadSystem(entt::registry&, Core::Scheduler&);
 		~ImageAtlasLoadSystem();
 
 		void tickSystem(entt::registry&);
 
 	private:
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

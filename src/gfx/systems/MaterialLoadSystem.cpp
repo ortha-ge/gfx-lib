@@ -1,10 +1,10 @@
 module;
 
-#include <entt/entt.hpp>
+#include <memory>
+#include <utility>
 
 module Gfx.MaterialLoadSystem;
 
-import Core.EnTTRegistry;
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
 import Core.JsonTypeLoaderAdapter;
@@ -18,7 +18,7 @@ import Gfx.Reflection.ShaderProgramDescriptor;
 
 namespace Gfx {
 
-	MaterialLoadSystem::MaterialLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	MaterialLoadSystem::MaterialLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
 		, mScheduler{ scheduler } {
 

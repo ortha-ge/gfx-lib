@@ -1,8 +1,6 @@
-module;
-
-#include <entt/entt.hpp>
-
 export module Gfx.Camera;
+
+import entt;
 
 export namespace Gfx {
 

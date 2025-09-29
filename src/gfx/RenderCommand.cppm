@@ -5,14 +5,12 @@ module;
 #include <string>
 #include <unordered_map>
 
-#include <entt/entity/entity.hpp>
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
 export module Gfx.RenderCommand;
 
 import Core.Any;
 import Gfx.RenderState;
+import entt;
+import glm;
 
 export namespace Gfx {
 

@@ -1,25 +1,21 @@
-module;
-
-#include <entt/fwd.hpp>
-
 export module Gfx.CreateRenderCandidatesVisitorSystem;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
+import entt;
 
 export namespace Gfx {
 
 	class CreateRenderCandidatesVisitorSystem {
 	public:
 
-		CreateRenderCandidatesVisitorSystem(Core::EnTTRegistry&, Core::Scheduler&);
+		CreateRenderCandidatesVisitorSystem(entt::registry&, Core::Scheduler&);
 		~CreateRenderCandidatesVisitorSystem();
 
 		void tickSystem(entt::registry&);
 
 	private:
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

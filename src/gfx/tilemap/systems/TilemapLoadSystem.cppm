@@ -1,25 +1,21 @@
-module;
-
-#include <entt/fwd.hpp>
-
 export module Gfx.TilemapLoadSystem;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
+import entt;
 
 export namespace Gfx {
 
 	class TilemapLoadSystem {
 	public:
 
-		TilemapLoadSystem(Core::EnTTRegistry&, Core::Scheduler&);
+		TilemapLoadSystem(entt::registry&, Core::Scheduler&);
 		~TilemapLoadSystem();
 
 		void tickSystem(entt::registry&);
 
 	private:
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

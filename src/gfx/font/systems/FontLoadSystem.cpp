@@ -1,10 +1,11 @@
 module;
 
+#include <optional>
+#include <vector>
+
 #define STB_TRUETYPE_IMPLEMENTATION
 
 #include <bimg/decode.h>
-#include <entt/entt.hpp>
-#include <glm/glm.hpp>
 #include <stb_truetype.h>
 
 module Gfx.FontLoadSystem;
@@ -15,6 +16,8 @@ import Core.RawDataResource;
 import Gfx.Font;
 import Gfx.FontDescriptor;
 import Gfx.Image;
+import entt;
+import glm;
 
 namespace Gfx::FontLoadSystemInternal {
 
@@ -204,7 +207,7 @@ namespace Gfx {
 
 
 
-	FontLoadSystem::FontLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	FontLoadSystem::FontLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

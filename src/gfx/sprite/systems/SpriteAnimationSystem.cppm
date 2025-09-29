@@ -2,21 +2,19 @@ module;
 
 #include <chrono>
 
-#include <entt/fwd.hpp>
-
 export module Gfx.SpriteAnimationSystem;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
 import Gfx.Sprite;
 import Gfx.SpriteObject;
+import entt;
 
 export namespace Gfx {
 
 	class SpriteAnimationSystem {
 	public:
 
-		SpriteAnimationSystem(Core::EnTTRegistry&, Core::Scheduler&);
+		SpriteAnimationSystem(entt::registry&, Core::Scheduler&);
 		~SpriteAnimationSystem();
 
 		static void tickSystem(entt::registry&);
@@ -25,7 +23,7 @@ export namespace Gfx {
 
 	private:
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

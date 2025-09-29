@@ -1,7 +1,3 @@
-module;
-
-#include <entt/entt.hpp>
-
 module Gfx.SpriteLoadSystem;
 
 import Core.ProcessError;
@@ -9,7 +5,7 @@ import Gfx.Sprite;
 
 namespace Gfx {
 
-	SpriteLoadSystem::SpriteLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	SpriteLoadSystem::SpriteLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

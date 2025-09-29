@@ -1,19 +1,15 @@
-module;
-
-#include <entt/fwd.hpp>
-
 export module Gfx.SpriteLoadSystem;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
 import Gfx.SpriteDescriptor;
+import entt;
 
 export namespace Gfx {
 
 	class SpriteLoadSystem {
 	public:
 
-		SpriteLoadSystem(Core::EnTTRegistry&, Core::Scheduler&);
+		SpriteLoadSystem(entt::registry&, Core::Scheduler&);
 		~SpriteLoadSystem();
 
 		static void tickSystem(entt::registry&);
@@ -21,7 +17,7 @@ export namespace Gfx {
 
 	private:
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

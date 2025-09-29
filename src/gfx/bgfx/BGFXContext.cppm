@@ -1,9 +1,6 @@
-module;
-
-#include <bgfx/bgfx.h>
-#include <entt/entity/entity.hpp>
-
 export module Gfx.BGFX.BGFXContext;
+
+import entt;
 
 export namespace Gfx::BGFX {
 

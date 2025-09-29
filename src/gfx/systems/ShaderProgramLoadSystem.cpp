@@ -1,10 +1,9 @@
 module;
 
-#include <entt/entt.hpp>
+#include <string>
 
 module Gfx.ShaderProgramLoadSystem;
 
-import Core.EnTTRegistry;
 import Core.FileDescriptor;
 import Core.FileLoadRequest;
 import Core.ProcessError;
@@ -29,7 +28,7 @@ namespace Gfx::ShaderProgramLoadSystemInternal {
 
 namespace Gfx {
 
-	ShaderProgramLoadSystem::ShaderProgramLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	ShaderProgramLoadSystem::ShaderProgramLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
 		, mScheduler{ scheduler } {
 

@@ -3,9 +3,9 @@ module;
 #include <optional>
 #include <string>
 
-#include <glm/vec4.hpp>
-
 export module Gfx.MaterialDescriptor;
+
+import glm;
 
 export namespace Gfx {
 

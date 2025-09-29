@@ -13,6 +13,11 @@ target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
         TextureCoordinates.cppm
         VertexBuffer.cppm
         Viewport.cppm
+        ViewportUtilities.cppm
+)
+
+target_sources(gfx-lib PRIVATE
+        ViewportUtilities.cpp
 )
 
 add_subdirectory(atlas)

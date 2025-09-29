@@ -1,10 +1,4 @@
-module;
-
 export module Gfx.Systems;
-
-import Core.EnTTRegistry;
-import Core.Scheduler;
-
 
 export namespace Gfx {
 

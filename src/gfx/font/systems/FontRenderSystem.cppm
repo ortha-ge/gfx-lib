@@ -1,26 +1,22 @@
-module;
-
-#include <entt/fwd.hpp>
-
 export module Gfx.FontRenderSystem;
 
-import Core.EnTTRegistry;
 import Core.ResourceHandle;
 import Core.Scheduler;
+import entt;
 
 export namespace Gfx {
 
 	class FontRenderSystem {
 	public:
 
-		FontRenderSystem(Core::EnTTRegistry&, Core::Scheduler&);
+		FontRenderSystem(entt::registry&, Core::Scheduler&);
 		~FontRenderSystem();
 
 		void tickSystem(entt::registry&);
 
 	private:
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 

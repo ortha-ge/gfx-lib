@@ -1,8 +1,6 @@
-module;
-
-#include <glm/vec2.hpp>
-
 export module Gfx.ViewportDescriptor;
+
+import glm;
 
 export namespace Gfx {
 

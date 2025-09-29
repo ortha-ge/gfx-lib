@@ -1,14 +1,13 @@
 module;
 
+#include <memory>
 #include <optional>
-
-#include <entt/entity/entity.hpp>
-#include <glm/vec4.hpp>
 
 export module Gfx.Material;
 
 import Core.ResourceHandle;
 import Gfx.TextureCoordinates;
+import glm;
 
 export namespace Gfx {
 

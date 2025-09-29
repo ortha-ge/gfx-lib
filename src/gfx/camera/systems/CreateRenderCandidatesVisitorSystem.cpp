@@ -1,8 +1,7 @@
 module;
 
+#include <memory>
 #include <utility>
-
-#include <entt/entt.hpp>
 
 module Gfx.CreateRenderCandidatesVisitorSystem;
 
@@ -12,7 +11,7 @@ import Gfx.RenderCandidates;
 
 namespace Gfx {
 
-	CreateRenderCandidatesVisitorSystem::CreateRenderCandidatesVisitorSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	CreateRenderCandidatesVisitorSystem::CreateRenderCandidatesVisitorSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

@@ -3,9 +3,9 @@ module;
 #include <cstdint>
 #include <vector>
 
-#include <entt/entity/entity.hpp>
-
 export module Gfx.VertexBuffer;
+
+import entt;
 
 export namespace Gfx {
 

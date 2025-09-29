@@ -1,21 +1,14 @@
-module;
-
-#include <list>
-
-#include <entt/entity/entity.hpp>
-#include <entt/fwd.hpp>
-
 export module Gfx.MaterialLoadSystem;
 
-import Core.EnTTRegistry;
 import Core.Scheduler;
 import Gfx.MaterialDescriptor;
+import entt;
 
 export namespace Gfx {
 
 	class MaterialLoadSystem {
 	public:
-		MaterialLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler);
+		MaterialLoadSystem(entt::registry& registry, Core::Scheduler& scheduler);
 		~MaterialLoadSystem();
 
 		void tickSystem(entt::registry&);
@@ -23,7 +16,7 @@ export namespace Gfx {
 	private:
 		void _tryCreateMaterialResource(entt::registry&, entt::entity, const MaterialDescriptor&);
 
-		Core::EnTTRegistry& mRegistry;
+		entt::registry& mRegistry;
 		Core::Scheduler& mScheduler;
 		Core::TaskHandle mTickHandle;
 	};

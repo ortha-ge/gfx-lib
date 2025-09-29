@@ -1,10 +1,8 @@
 module;
 
+#include <cstdint>
 #include <utility>
-
-#include <entt/entt.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
+#include <vector>
 
 module Gfx.TilemapRenderSystem;
 
@@ -26,6 +24,8 @@ import Gfx.Tilemap;
 import Gfx.TilemapObject;
 import Gfx.VertexBuffer;
 import Gfx.Viewport;
+import entt;
+import glm;
 
 namespace Gfx::TilemapRenderSystemInternal {
 
@@ -147,7 +147,7 @@ namespace Gfx::TilemapRenderSystemInternal {
 
 namespace Gfx {
 
-	TilemapRenderSystem::TilemapRenderSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	TilemapRenderSystem::TilemapRenderSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

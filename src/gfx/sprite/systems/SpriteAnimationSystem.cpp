@@ -4,7 +4,6 @@ module;
 #include <utility>
 #include <variant>
 
-#include <entt/entt.hpp>
 #include <tracy/Tracy.hpp>
 
 module Gfx.SpriteAnimationSystem;
@@ -15,7 +14,7 @@ import Gfx.SpriteObject;
 
 namespace Gfx {
 
-	SpriteAnimationSystem::SpriteAnimationSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	SpriteAnimationSystem::SpriteAnimationSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

@@ -2,8 +2,6 @@ module;
 
 #include <utility>
 
-#include <entt/entt.hpp>
-
 module Gfx.ImageAtlasLoadSystem;
 
 import Core.ProcessError;
@@ -14,7 +12,7 @@ import Gfx.ImageDescriptor;
 
 namespace Gfx {
 
-	ImageAtlasLoadSystem::ImageAtlasLoadSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	ImageAtlasLoadSystem::ImageAtlasLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 

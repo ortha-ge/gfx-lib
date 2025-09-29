@@ -2,9 +2,9 @@ module;
 
 #include <cstring>
 #include <utility>
+#include <vector>
 
 #include <bgfx/bgfx.h>
-#include <entt/entt.hpp>
 
 module Gfx.BGFX.BGFXResourceCreationSystem;
 
@@ -71,7 +71,7 @@ namespace Gfx::BGFX::BGFXResourceCreationSystemInternal {
 
 namespace Gfx::BGFX {
 
-	BGFXResourceCreationSystem::BGFXResourceCreationSystem(Core::EnTTRegistry& registry, Core::Scheduler& scheduler)
+	BGFXResourceCreationSystem::BGFXResourceCreationSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
 		, mScheduler(scheduler) {
 
