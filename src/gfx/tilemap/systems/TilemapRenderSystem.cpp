@@ -43,8 +43,8 @@ namespace Ortha::Gfx::TilemapRenderSystemInternal {
 	void renderTilemap(
 		entt::registry& registry, const Tilemap& tilemap, const ImageAtlas& atlas,
 		const Core::GlobalSpatial& spatial, const entt::entity shaderProgramEntity, const entt::entity viewportEntity, const glm::mat4& viewMatrix) {
-		using namespace Core;
-		using namespace Ortha::Gfx;
+		using namespace Ortha::Core;
+		using namespace Gfx;
 
 		auto&& [atlasImageEntity, atlasImage] = getResourceAndEntity<Image>(registry, atlas.image);
 		if (!atlasImage) {
@@ -162,7 +162,7 @@ namespace Ortha::Gfx {
 	}
 
 	void TilemapRenderSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 		using namespace TilemapRenderSystemInternal;
 
 		registry.view<Camera>()

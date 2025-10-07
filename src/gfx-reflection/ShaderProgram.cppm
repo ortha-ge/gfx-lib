@@ -9,72 +9,76 @@ export import Ortha.Gfx.ShaderProgramDescriptor;
 
 import Ortha.Core.Reflect;
 
-template<>
-void Core::reflect<Ortha::Gfx::ShaderVertexLayoutAttributeId>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
-	reflectionContext.addEnum<ShaderVertexLayoutAttributeId>("ShaderVertexLayoutAttributeId")
-		.constant<ShaderVertexLayoutAttributeId::Position>("Position")
-		.constant<ShaderVertexLayoutAttributeId::TexCoord0>("TexCoord0")
-		.constant<ShaderVertexLayoutAttributeId::Colour0>("Colour0")
-		;
-}
+namespace Ortha::Core {
 
-template<>
-void Core::reflect<Ortha::Gfx::ShaderVertexLayoutAttribute>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
+	template<>
+	void reflect<Gfx::ShaderVertexLayoutAttributeId>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+		reflectionContext.addEnum<ShaderVertexLayoutAttributeId>("ShaderVertexLayoutAttributeId")
+			.constant<ShaderVertexLayoutAttributeId::Position>("Position")
+			.constant<ShaderVertexLayoutAttributeId::TexCoord0>("TexCoord0")
+			.constant<ShaderVertexLayoutAttributeId::Colour0>("Colour0")
+			;
+	}
 
-	reflect<ShaderVertexLayoutAttributeId>(reflectionContext);
+	template<>
+	void reflect<Gfx::ShaderVertexLayoutAttribute>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
 
-	reflectionContext.addClass<ShaderVertexLayoutAttribute>("ShaderVertexLayoutAttribute")
-		.field<&ShaderVertexLayoutAttribute::attributeId>("id")
-		.field<&ShaderVertexLayoutAttribute::count>("elementCount")
-		.field<&ShaderVertexLayoutAttribute::typeId>("elementType")
-		.field<&ShaderVertexLayoutAttribute::isNormalized>("isNormalized")
-		;
-}
+		reflect<ShaderVertexLayoutAttributeId>(reflectionContext);
 
-template<>
-void Core::reflect<Ortha::Gfx::ShaderVertexLayoutDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
+		reflectionContext.addClass<ShaderVertexLayoutAttribute>("ShaderVertexLayoutAttribute")
+			.field<&ShaderVertexLayoutAttribute::attributeId>("id")
+			.field<&ShaderVertexLayoutAttribute::count>("elementCount")
+			.field<&ShaderVertexLayoutAttribute::typeId>("elementType")
+			.field<&ShaderVertexLayoutAttribute::isNormalized>("isNormalized")
+			;
+	}
 
-	reflect<ShaderVertexLayoutAttribute>(reflectionContext);
+	template<>
+	void reflect<Gfx::ShaderVertexLayoutDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
 
-	reflectionContext.addClass<ShaderVertexLayoutDescriptor>("ShaderVertexLayout")
-		.field<&ShaderVertexLayoutDescriptor::attributes>("attributes")
-		;
-}
+		reflect<ShaderVertexLayoutAttribute>(reflectionContext);
 
-template<>
-void Core::reflect<Ortha::Gfx::ShaderUniformType>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
-	reflectionContext.addEnum<ShaderUniformType>("ShaderUniformType")
-		.constant<ShaderUniformType::Sampler>("Sampler")
-		.constant<ShaderUniformType::Float4>("Float4")
-		;
-}
+		reflectionContext.addClass<ShaderVertexLayoutDescriptor>("ShaderVertexLayout")
+			.field<&ShaderVertexLayoutDescriptor::attributes>("attributes")
+			;
+	}
 
-template<>
-void Core::reflect<Ortha::Gfx::ShaderUniformDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
+	template<>
+	void reflect<Gfx::ShaderUniformType>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+		reflectionContext.addEnum<ShaderUniformType>("ShaderUniformType")
+			.constant<ShaderUniformType::Sampler>("Sampler")
+			.constant<ShaderUniformType::Float4>("Float4")
+			;
+	}
 
-	reflect<ShaderUniformType>(reflectionContext);
+	template<>
+	void reflect<Gfx::ShaderUniformDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
 
-	reflectionContext.addClass<ShaderUniformDescriptor>("ShaderUniform")
-		.field<&ShaderUniformDescriptor::name>("name")
-		.field<&ShaderUniformDescriptor::type>("type")
-		;
-}
+		reflect<ShaderUniformType>(reflectionContext);
 
-template<>
-void Core::reflect<Ortha::Gfx::ShaderProgramDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
-	reflect<ShaderUniformDescriptor>(reflectionContext);
-	reflect<ShaderVertexLayoutDescriptor>(reflectionContext);
+		reflectionContext.addClass<ShaderUniformDescriptor>("ShaderUniform")
+			.field<&ShaderUniformDescriptor::name>("name")
+			.field<&ShaderUniformDescriptor::type>("type")
+			;
+	}
 
-	reflectionContext.addClass<ShaderProgramDescriptor>("ShaderProgram")
-		.field<&ShaderProgramDescriptor::vertexShaderFilePath>("vertexShaderFilePath")
-		.field<&ShaderProgramDescriptor::fragmentShaderFilePath>("fragmentShaderFilePath")
-		.field<&ShaderProgramDescriptor::uniforms>("uniforms")
-		.field<&ShaderProgramDescriptor::vertexLayout>("vertexLayout")
-		;
+	template<>
+	void reflect<Gfx::ShaderProgramDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+		reflect<ShaderUniformDescriptor>(reflectionContext);
+		reflect<ShaderVertexLayoutDescriptor>(reflectionContext);
+
+		reflectionContext.addClass<ShaderProgramDescriptor>("ShaderProgram")
+			.field<&ShaderProgramDescriptor::vertexShaderFilePath>("vertexShaderFilePath")
+			.field<&ShaderProgramDescriptor::fragmentShaderFilePath>("fragmentShaderFilePath")
+			.field<&ShaderProgramDescriptor::uniforms>("uniforms")
+			.field<&ShaderProgramDescriptor::vertexLayout>("vertexLayout")
+			;
+	}
+
 }

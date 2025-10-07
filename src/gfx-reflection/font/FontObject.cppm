@@ -5,12 +5,16 @@ export import Ortha.Gfx.FontObject;
 import Ortha.Core.EnTTComponentAttribute;
 import Ortha.Core.Reflect;
 
-template <>
-void Core::reflect<Ortha::Gfx::FontObject>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
+namespace Ortha::Core {
 
-	reflectionContext.addClass<FontObject>("FontObject")
-		.field<&FontObject::text>("text")
-		//.annotate(createEnTTComponentAttribute<FontObject>())
-		;
+	template <>
+	void reflect<Gfx::FontObject>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+
+		reflectionContext.addClass<FontObject>("FontObject")
+			.field<&FontObject::text>("text")
+			//.annotate(createEnTTComponentAttribute<FontObject>())
+			;
+	}
+
 }

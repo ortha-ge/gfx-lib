@@ -133,7 +133,7 @@ namespace Ortha::Gfx::BGFX {
 
 	void BGFXResourceCreationSystem::_tryCreateShader(entt::registry& registry, entt::entity entity,
 		const Core::RawDataResource& rawDataResource) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		const bgfx::Memory* mem = bgfx::copy(rawDataResource.rawData.data(), rawDataResource.size);
 		const bgfx::ShaderHandle shaderHandle = bgfx::createShader(mem);
@@ -146,7 +146,7 @@ namespace Ortha::Gfx::BGFX {
 	}
 
 	void BGFXResourceCreationSystem::_tryCreateShaderProgram(entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		const auto& [ vertexShaderEntity, vertexShader] = getResourceAndEntity<BGFXShader>(registry, shaderProgram.vertexShader);
 		const auto& [ fragmentShaderEntity, fragmentShader] = getResourceAndEntity<BGFXShader>(registry, shaderProgram.fragmentShader);
@@ -176,7 +176,7 @@ namespace Ortha::Gfx::BGFX {
 	}
 
 	void BGFXResourceCreationSystem::_tryCreateVertexLayout(entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		//using namespace BGFXSystemInternal;
 		bgfx::VertexLayout vertexLayout{};
@@ -220,7 +220,7 @@ namespace Ortha::Gfx::BGFX {
 	}
 
 	void BGFXResourceCreationSystem::_tryCreateUniforms(entt::registry& registry, entt::entity entity, const ShaderProgram& shaderProgram) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		BGFXUniforms bgfxUniforms{};
 		for (auto&& uniform : shaderProgram.uniforms) {
@@ -255,7 +255,7 @@ namespace Ortha::Gfx::BGFX {
 	}
 
 	void BGFXResourceCreationSystem::_tryCreateTexture(entt::registry& registry, entt::entity entity, const Image& imageResource) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		const bgfx::Memory* mem = bgfx::copy(imageResource.image.data(), imageResource.image.size());
 		bgfx::TextureHandle texture = bgfx::createTexture2D(
@@ -271,7 +271,7 @@ namespace Ortha::Gfx::BGFX {
 	}
 
 	void BGFXResourceCreationSystem::_tryCreateFrameBuffer(entt::registry& registry, const entt::entity entity, const RenderTexture& renderTexture) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		const bgfx::FrameBufferHandle frameBufferHandle = bgfx::createFrameBuffer(renderTexture.width, renderTexture.height, bgfx::TextureFormat::RGBA32F);
 		if (!bgfx::isValid(frameBufferHandle)) {
@@ -283,7 +283,7 @@ namespace Ortha::Gfx::BGFX {
 	}
 
 	void BGFXResourceCreationSystem::_tryCreateTransientVertexBuffer(entt::registry& registry, entt::entity& entity, const VertexBuffer& vertexBuffer) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		if (!registry.all_of<BGFXVertexLayout>(vertexBuffer.vertexLayout)) {
 			return;

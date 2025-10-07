@@ -32,7 +32,7 @@ namespace Ortha::Gfx {
 	}
 
 	void TilemapLoadSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 		registry.view<TilemapDescriptor>(entt::exclude<ProcessError, Tilemap>)
 			.each([&registry](const entt::entity entity, const TilemapDescriptor& tilemapDescriptor) {
 				auto loaderAdapter = std::make_shared<JsonTypeLoaderAdapter<ImageAtlasDescriptor>>();

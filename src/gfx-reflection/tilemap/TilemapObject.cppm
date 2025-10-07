@@ -5,11 +5,15 @@ export import Ortha.Gfx.TilemapObject;
 import Ortha.Core.EnTTComponentAttribute;
 import Ortha.Core.Reflect;
 
-template <>
-void Core::reflect<Ortha::Gfx::TilemapObject>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
+namespace Ortha::Core {
 
-	reflectionContext.addClass<TilemapObject>("TilemapObject")
-		//.annotate(createEnTTComponentAttribute<TilemapObject>())
-		;
+	template <>
+	void reflect<Gfx::TilemapObject>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+
+		reflectionContext.addClass<TilemapObject>("TilemapObject")
+			//.annotate(createEnTTComponentAttribute<TilemapObject>())
+			;
+	}
+
 }

@@ -7,21 +7,25 @@ import Ortha.Core.EnTTComponentAttribute;
 import Ortha.Core.Reflect;
 import Glm.Reflection.Vec2;
 
-template<>
-void Core::reflect<Ortha::Gfx::ViewportDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
-	reflectionContext.addClass<ViewportDescriptor>("ViewportDescriptor")
-		.field<&ViewportDescriptor::offset>("offset")
-		.field<&ViewportDescriptor::dimensions>("dimensions")
-		;
-}
+namespace Ortha::Core {
 
-template<>
-void Core::reflect<Ortha::Gfx::Viewport>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
-	reflectionContext.addClass<Viewport>("Viewport")
-		.field<&Viewport::offset>("offset")
-		.field<&Viewport::dimensions>("dimensions")
-		//.annotate(createEnTTComponentAttribute<Viewport>())
-		;
+	template<>
+	void reflect<Gfx::ViewportDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+		reflectionContext.addClass<ViewportDescriptor>("ViewportDescriptor")
+			.field<&ViewportDescriptor::offset>("offset")
+			.field<&ViewportDescriptor::dimensions>("dimensions")
+			;
+	}
+
+	template<>
+	void reflect<Gfx::Viewport>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+		reflectionContext.addClass<Viewport>("Viewport")
+			.field<&Viewport::offset>("offset")
+			.field<&Viewport::dimensions>("dimensions")
+			//.annotate(createEnTTComponentAttribute<Viewport>())
+			;
+	}
+
 }

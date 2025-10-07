@@ -30,7 +30,7 @@ namespace Ortha::Gfx {
 
 	void ImageLoadSystem::tickSystem(entt::registry& registry) {
 		ZoneScopedN("ImageLoadSystem::tickSystem");
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		registry.view<const ImageDescriptor, const RawDataResource>(entt::exclude<FileLoadRequest, ProcessError, Image>)
 			.each([&registry](

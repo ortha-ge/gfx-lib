@@ -11,7 +11,7 @@ import Ortha.Gfx.RenderTexture;
 namespace Ortha::Gfx {
 
 	std::optional<glm::ivec2> getViewportRenderTargetSize(entt::registry& registry, const Viewport& viewport) {
-		using namespace Core;
+		using namespace Ortha::Core;
 		entt::entity renderTarget = viewport.renderTarget;
 		if (renderTarget == entt::null) {
 			//TODO: Select main window

@@ -14,7 +14,7 @@ namespace Ortha::Gfx {
 	}
 
 	size_t getStrideForVertexLayout(const ShaderVertexLayoutDescriptor& vertexLayout) {
-		using namespace Ortha::RTTI;
+		using namespace RTTI;
 		size_t stride{ 0zu };
 		for (auto&& attribute : vertexLayout.attributes) {
 			stride += getTypeInfo(attribute.typeId).getSize() * attribute.count;

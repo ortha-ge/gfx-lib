@@ -25,7 +25,7 @@ namespace Ortha::Gfx {
 	}
 
 	void CreateRenderCandidatesVisitorSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		registry.view<Camera, RenderCandidates>()
 			.each([&registry](const entt::entity entity, const Camera& camera, const RenderCandidates& renderCandidates) {

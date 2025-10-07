@@ -40,7 +40,7 @@ namespace Ortha::Gfx::FontLoadSystemInternal {
 	};
 
 	void tryCreateStbFont(entt::registry& registry, const entt::entity entity, const Core::RawDataResource& rawData) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		constexpr int fontFaceIndex = 0;
 		stbtt_fontinfo info{};
@@ -102,7 +102,7 @@ namespace Ortha::Gfx::FontLoadSystemInternal {
 	void tryCreateStbGlyphBitmaps(
 		entt::registry& registry, const entt::entity entity, const StbFont& stbFont,
 		const Core::RawDataResource& rawData) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		constexpr int bpp = 1;
 		constexpr int characterCount{ 255 };
@@ -221,7 +221,7 @@ namespace Ortha::Gfx {
 	}
 
 	void FontLoadSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 		using namespace FontLoadSystemInternal;
 
 		registry.view<FontDescriptor, RawDataResource>(entt::exclude<FileLoadRequest, ProcessError, StbFont>)

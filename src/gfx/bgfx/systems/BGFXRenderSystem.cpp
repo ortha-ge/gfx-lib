@@ -54,7 +54,7 @@ namespace Ortha::Gfx::BGFX {
 	}
 
 	void BGFXRenderSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		bgfx::ViewId viewId{ 0 };
 
@@ -274,7 +274,7 @@ namespace Ortha::Gfx::BGFX {
 	}
 
 	void BGFXRenderSystem::processRenderCommand(entt::registry& registry, const RenderCommand& renderCommand, bgfx::ViewId viewId) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		// Wait for the shader program to be initialized
 		if (!registry.all_of<BGFXShaderProgram, BGFXUniforms>(renderCommand.shaderProgram)) {

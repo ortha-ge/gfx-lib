@@ -5,7 +5,7 @@ import Ortha.Core.Reflect;
 namespace Ortha::Gfx {
 
 	void reflectAll(Ortha::RTTI::ReflectionContext& reflectionContext) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		reflect<CameraDescriptor>(reflectionContext);
 		reflect<Camera>(reflectionContext);

@@ -157,7 +157,7 @@ namespace Ortha::Gfx {
 	}
 
 	void FontRenderSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 		using namespace FontRenderSystemInternal;
 
 		registry.view<Camera>()

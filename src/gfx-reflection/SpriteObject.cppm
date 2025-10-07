@@ -6,11 +6,15 @@ import Ortha.Core.EnTTComponentAttribute;
 import Ortha.Core.Reflect;
 import Ortha.Gfx.Reflection.TextureCoordinates;
 
-template<>
-void Core::reflect<Ortha::Gfx::SpriteObject>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
-	reflectionContext.addClass<SpriteObject>("Sprite")
-		.field<&SpriteObject::currentFrame>("currentFrame")
-		//.annotate(createEnTTComponentAttribute<SpriteObject>())
-		;
+namespace Ortha::Core {
+
+	template<>
+	void reflect<Gfx::SpriteObject>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+		reflectionContext.addClass<SpriteObject>("Sprite")
+			.field<&SpriteObject::currentFrame>("currentFrame")
+			//.annotate(createEnTTComponentAttribute<SpriteObject>())
+			;
+	}
+
 }

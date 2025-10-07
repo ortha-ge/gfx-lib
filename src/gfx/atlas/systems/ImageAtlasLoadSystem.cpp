@@ -26,7 +26,7 @@ namespace Ortha::Gfx {
 	}
 
 	void ImageAtlasLoadSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 		registry.view<ImageAtlasDescriptor>(entt::exclude<ProcessError, ImageAtlas>)
 			.each([&registry](const entt::entity entity, const ImageAtlasDescriptor& imageAtlasDescriptor) {
 				ImageAtlas imageAtlas;

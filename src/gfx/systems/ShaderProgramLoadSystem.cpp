@@ -38,7 +38,7 @@ namespace Ortha::Gfx {
 	ShaderProgramLoadSystem::~ShaderProgramLoadSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void ShaderProgramLoadSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		const auto& platformView = registry.view<ShaderPlatformInfo>();
 		if (platformView.empty()) {
@@ -58,7 +58,7 @@ namespace Ortha::Gfx {
 
 	void ShaderProgramLoadSystem::_tryCreateShaderProgramResource(
 		entt::registry& registry, entt::entity entity, const ShaderPlatformInfo& shaderPlatformInfo, const ShaderProgramDescriptor& shaderProgramDescriptor) {
-		using namespace Core;
+		using namespace Ortha::Core;
 		using namespace ShaderProgramLoadSystemInternal;
 
 		if (!shaderPlatformInfo.shadersFolderName) {

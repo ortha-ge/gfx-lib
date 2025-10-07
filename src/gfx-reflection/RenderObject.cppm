@@ -5,11 +5,15 @@ export import Ortha.Gfx.RenderObject;
 import Ortha.Core.EnTTComponentAttribute;
 import Ortha.Core.Reflect;
 
-template <>
-void Core::reflect<Ortha::Gfx::RenderObject>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Ortha::Gfx;
+namespace Ortha::Core {
 
-	reflectionContext.addClass<RenderObject>("RenderObject")
-		//.annotate(createEnTTComponentAttribute<RenderObject>())
-		;
+	template <>
+	void reflect<Gfx::RenderObject>(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Gfx;
+
+		reflectionContext.addClass<RenderObject>("RenderObject")
+			//.annotate(createEnTTComponentAttribute<RenderObject>())
+			;
+	}
+
 }

@@ -322,7 +322,7 @@ namespace Ortha::Gfx {
 	SpriteRenderSystem::~SpriteRenderSystem() { mScheduler.unschedule(std::move(mTickHandle)); }
 
 	void SpriteRenderSystem::tickSystem(entt::registry& registry) {
-		using namespace Core;
+		using namespace Ortha::Core;
 
 		registry.view<Camera>()
 			.each([&registry](const entt::entity entity, const Camera&) {
