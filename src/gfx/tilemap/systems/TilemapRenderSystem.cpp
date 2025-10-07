@@ -6,11 +6,12 @@ module;
 
 module Gfx.TilemapRenderSystem;
 
-import Core.Any;
+import Ortha.RTTI.Any;
 import Core.GlobalSpatial;
 import Core.ResourceHandleUtils;
 import Core.Spatial;
-import Core.TypeId;
+import Ortha.RTTI.TypeHandle;
+import Ortha.RTTI.TypeId;
 import Gfx.Camera;
 import Gfx.Image;
 import Gfx.ImageAtlas;
@@ -128,7 +129,7 @@ namespace Gfx::TilemapRenderSystemInternal {
 		renderCommand.shaderProgram = shaderProgramEntity;
 		renderCommand.viewportEntity = viewportEntity;
 		renderCommand.renderPass = 1;
-		renderCommand.uniformData["s_texColour"] = Any(entt::entity{ atlasImageEntity });
+		renderCommand.uniformData["s_texColour"] = Ortha::RTTI::Any(entt::entity{ atlasImageEntity });
 
 		RenderState renderState{};
 		renderState.bufferWriting = BufferWriting::RGB | BufferWriting::Alpha;
@@ -168,7 +169,7 @@ namespace Gfx {
 			.each([&registry](const entt::entity entity, const Camera&) {
 				RenderCandidates& renderCandidates = registry.get_or_emplace<RenderCandidates>(entity);
 
-				if (!renderCandidates.candidateBuckets.contains(TypeId::get<TilemapObject>())) {
+				if (!renderCandidates.candidateBuckets.contains(Ortha::RTTI::TypeId::get<TilemapObject>())) {
 					auto renderCandidateVisitor = [&registry](RenderCandidateBucket::EntityList& entityList, const entt::entity entity) {
 						if (!registry.all_of<TilemapObject>(entity)) {
 							return;
@@ -177,13 +178,13 @@ namespace Gfx {
 						entityList.emplace_back(entity);
 					};
 
-					renderCandidates.candidateBuckets.emplace(TypeId::get<TilemapObject>(), renderCandidateVisitor);
+					renderCandidates.candidateBuckets.emplace(Ortha::RTTI::TypeHandle::get<TilemapObject>(), renderCandidateVisitor);
 				}
 			});
 
 		registry.view<Camera, Spatial, RenderCandidates>()
 			.each([&registry](const entt::entity, const Camera& camera, const Spatial& cameraSpatial, const RenderCandidates& renderCandidates) {
-				if (!renderCandidates.candidateBuckets.contains(TypeId::get<TilemapObject>())) {
+				if (!renderCandidates.candidateBuckets.contains(Ortha::RTTI::TypeId::get<TilemapObject>())) {
 					return;
 				}
 
@@ -192,7 +193,7 @@ namespace Gfx {
 				glm::mat4 scale = glm::scale(glm::mat4(1.0f), cameraSpatial.scale);
 				glm::mat4 viewMatrix{ glm::inverse(translation * rotation * scale) };
 
-				const auto& tilemapRenderCandidates{ renderCandidates.candidateBuckets.at(TypeId::get<TilemapObject>()) };
+				const auto& tilemapRenderCandidates{ renderCandidates.candidateBuckets.at(Ortha::RTTI::TypeId::get<TilemapObject>()) };
 				for (auto&& tilemapEntity : tilemapRenderCandidates.entityList) {
 					if (!registry.all_of<TilemapObject, GlobalSpatial>(tilemapEntity)) {
 						continue;

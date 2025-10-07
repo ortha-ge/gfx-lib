@@ -13,7 +13,7 @@ import Core.Log;
 import Core.ProcessError;
 import Core.ResourceHandle;
 import Core.ResourceHandleUtils;
-import Core.TypeId;
+import Ortha.RTTI.TypeId;
 import Gfx.ShaderDescriptor;
 import Gfx.ShaderProgramDescriptor;
 import Gfx.BGFX.BGFXFrameBuffer;
@@ -201,9 +201,9 @@ namespace Gfx::BGFX {
 			}
 
 			bgfx::AttribType::Enum attributeType{};
-			if (inputAttribute.typeId == Core::TypeId::get<float>()) {
+			if (inputAttribute.typeId == Ortha::RTTI::TypeId::get<float>()) {
 				attributeType = bgfx::AttribType::Float;
-			} else if (inputAttribute.typeId == Core::TypeId::get<uint8_t>()) {
+			} else if (inputAttribute.typeId == Ortha::RTTI::TypeId::get<uint8_t>()) {
 				attributeType = bgfx::AttribType::Uint8;
 			} else {
 				addProcessError(registry, entity, "Unhandled attribute type.");

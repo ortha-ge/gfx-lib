@@ -3,15 +3,12 @@ export module Gfx.Reflection.ImageDescriptor;
 
 export import Gfx.ImageDescriptor;
 
-import Core.ClassReflection;
-
-import Core.ReflectionContext;
-import Core.TypeId;
+import Core.Reflect;
 
 template<>
-void Core::reflect<Gfx::ImageDescriptor>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ImageDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 	reflectionContext.addClass<ImageDescriptor>("Image")
-		.property("imageFilePath", &ImageDescriptor::imageFilePath)
-		.build();
+		.field<&ImageDescriptor::imageFilePath>("imageFilePath")
+		;
 }

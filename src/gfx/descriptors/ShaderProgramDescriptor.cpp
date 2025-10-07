@@ -5,6 +5,8 @@ module;
 
 module Gfx.ShaderProgramDescriptor;
 
+import Ortha.RTTI.TypeInfo;
+
 namespace Gfx {
 
 	size_t getBufferSizeForVertexLayout(const ShaderVertexLayoutDescriptor& vertexLayout, size_t vertexCount) {
@@ -12,9 +14,10 @@ namespace Gfx {
 	}
 
 	size_t getStrideForVertexLayout(const ShaderVertexLayoutDescriptor& vertexLayout) {
+		using namespace Ortha::RTTI;
 		size_t stride{ 0zu };
 		for (auto&& attribute : vertexLayout.attributes) {
-			stride += attribute.typeId.getTypeInfo().getSize() * attribute.count;
+			stride += getTypeInfo(attribute.typeId).getSize() * attribute.count;
 		}
 
 		return stride;
@@ -27,7 +30,7 @@ namespace Gfx {
 				break;
 			}
 
-			offset += attribute.typeId.getTypeInfo().getSize() * attribute.count;
+			offset += getTypeInfo(attribute.typeId).getSize() * attribute.count;
 		}
 
 		return offset;

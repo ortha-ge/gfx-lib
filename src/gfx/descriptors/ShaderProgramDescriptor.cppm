@@ -6,7 +6,7 @@ module;
 
 export module Gfx.ShaderProgramDescriptor;
 
-import Core.TypeId;
+import Ortha.RTTI.TypeId;
 
 export namespace Gfx {
 
@@ -17,7 +17,7 @@ export namespace Gfx {
 
 	struct ShaderVertexLayoutAttribute {
 		ShaderVertexLayoutAttributeId attributeId{};
-		Core::TypeId typeId;
+		Ortha::RTTI::TypeId typeId;
 		uint8_t count{};
 		bool isNormalized{ false };
 	};

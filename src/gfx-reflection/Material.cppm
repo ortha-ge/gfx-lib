@@ -4,15 +4,15 @@ export module Gfx.Reflection.MaterialDescriptor;
 
 export import Gfx.MaterialDescriptor;
 
-import Core.ReflectionContext;
+import Core.Reflect;
 import Glm.Reflection.Vec4;
 
 template<>
-void Core::reflect<Gfx::MaterialDescriptor>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::MaterialDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 	reflectionContext.addClass<MaterialDescriptor>("Material")
-		.property("shaderProgramFilePath", &MaterialDescriptor::shaderProgramFilePath)
-		.property("textureImageFilePath", &MaterialDescriptor::textureImageFilePath)
-		.property("alphaColour", &MaterialDescriptor::alphaColour)
-		.build();
+		.field<&MaterialDescriptor::shaderProgramFilePath>("shaderProgramFilePath")
+		.field<&MaterialDescriptor::textureImageFilePath>("textureImageFilePath")
+		.field<&MaterialDescriptor::alphaColour>("alphaColour")
+		;
 }

@@ -7,13 +7,14 @@ module;
 
 module Gfx.FontRenderSystem;
 
-import Core.Any;
+import Ortha.RTTI.Any;
 import Core.JsonTypeLoaderAdapter;
 import Core.ResourceHandleUtils;
 import Core.ResourceLoadRequest;
 import Core.GlobalSpatial;
 import Core.Spatial;
-import Core.TypeId;
+import Ortha.RTTI.TypeHandle;
+import Ortha.RTTI.TypeId;
 import Core.TypeLoader;
 import Gfx.Camera;
 import Gfx.Font;
@@ -48,8 +49,8 @@ namespace Gfx::FontRenderSystemInternal {
 		renderCommand.viewMatrix = viewMatrix;
 
 		renderCommand.shaderProgram = shaderProgramEntity;
-		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ imageEntity });
-		renderCommand.uniformData["u_alphaColour"] = Core::Any(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+		renderCommand.uniformData["s_texColour"] = Ortha::RTTI::Any(entt::entity{ imageEntity });
+		renderCommand.uniformData["u_alphaColour"] = Ortha::RTTI::Any(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f });
 
 		RenderState renderState{};
 		renderState.bufferWriting = BufferWriting::RGB | BufferWriting::Alpha;
@@ -163,7 +164,7 @@ namespace Gfx {
 			.each([&registry](const entt::entity entity, const Camera&) {
 				RenderCandidates& renderCandidates = registry.get_or_emplace<RenderCandidates>(entity);
 
-				if (!renderCandidates.candidateBuckets.contains(TypeId::get<FontObject>())) {
+				if (!renderCandidates.candidateBuckets.contains(Ortha::RTTI::TypeId::get<FontObject>())) {
 					auto renderCandidateVisitor = [&registry](RenderCandidateBucket::EntityList& entityList, const entt::entity entity) {
 						if (!registry.all_of<FontObject>(entity)) {
 							return;
@@ -172,13 +173,13 @@ namespace Gfx {
 						entityList.emplace_back(entity);
 					};
 
-					renderCandidates.candidateBuckets.emplace(TypeId::get<FontObject>(), renderCandidateVisitor);
+					renderCandidates.candidateBuckets.emplace(Ortha::RTTI::TypeId::get<FontObject>(), renderCandidateVisitor);
 				}
 			});
 
 		registry.view<Camera, Spatial, RenderCandidates>()
 			.each([this, &registry](const entt::entity cameraEntity, const Camera& camera, const Spatial& cameraSpatial, const RenderCandidates& renderCandidates) {
-				if (!renderCandidates.candidateBuckets.contains(TypeId::get<FontObject>())) {
+				if (!renderCandidates.candidateBuckets.contains(Ortha::RTTI::TypeId::get<FontObject>())) {
 					return;
 				}
 
@@ -187,7 +188,7 @@ namespace Gfx {
 				glm::mat4 scale = glm::scale(glm::mat4(1.0f), cameraSpatial.scale);
 				glm::mat4 viewMatrix{ glm::inverse(translation * rotation * scale) };
 
-				const auto& fontObjectRenderCandidates{ renderCandidates.candidateBuckets.at(TypeId::get<FontObject>()) };
+				const auto& fontObjectRenderCandidates{ renderCandidates.candidateBuckets.at(Ortha::RTTI::TypeId::get<FontObject>()) };
 				for (auto&& fontObjectEntity : fontObjectRenderCandidates.entityList) {
 					if (!registry.all_of<FontObject, GlobalSpatial>(fontObjectEntity)) {
 						continue;

@@ -1,6 +1,6 @@
 module Gfx.SystemsService;
 
-import Core.ReflectionContext;
+import Ortha.RTTI.ReflectionContextStack;
 import Gfx.CreateRenderCandidatesVisitorSystemService;
 import Gfx.FontLoadSystemService;
 import Gfx.FontRenderSystemService;
@@ -15,11 +15,12 @@ import Gfx.TilemapLoadSystemService;
 import Gfx.TilemapRenderSystemService;
 import Gfx.Reflection;
 import Gfx.BGFX.SystemsService;
+import Ortha.RTTI.ReflectionContext;
 
 namespace Gfx {
 
 	void initGfxSubSystems(GfxSystems&, kgr::container& container) {
-		reflectAll(Core::getCurrentReflectionContext());
+		reflectAll(static_cast<Ortha::RTTI::ReflectionContext&>(Ortha::RTTI::getCurrentReflectionContext()));
 
 		// Camera + RenderCandidates
 		container.emplace<CreateRenderCandidatesVisitorSystemService>();

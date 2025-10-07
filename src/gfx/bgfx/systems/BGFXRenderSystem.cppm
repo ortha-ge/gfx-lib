@@ -7,7 +7,7 @@ module;
 
 export module Gfx.BGFX.BGFXRenderSystem;
 
-import Core.Any;
+import Ortha.RTTI.Any;
 import Core.Scheduler;
 import Gfx.RenderCommand;
 import Gfx.BGFX.BGFXFrameBuffer;
@@ -29,7 +29,7 @@ export namespace Gfx::BGFX {
 		bool _tryBindVertexBuffer(entt::registry&, uint8_t stream, entt::entity, uint32_t offset, uint32_t count);
 		bool _tryBindIndexBuffer(entt::registry&, entt::entity, uint32_t offset, uint32_t count);
 		bool _tryBindFrameBuffer(entt::registry&, uint8_t viewId, entt::entity);
-		bool _tryBindUniforms(entt::registry&, const BGFXUniforms&, const std::unordered_map<std::string, Core::Any>&);
+		bool _tryBindUniforms(entt::registry&, const BGFXUniforms&, const std::unordered_map<std::string, Ortha::RTTI::Any>&);
 		bool _tryBindEntityUniform(entt::registry&, const bgfx::UniformHandle&, entt::entity);
 		bool _tryBindTextureUniform(entt::registry&, const bgfx::UniformHandle&, const BGFXTexture&);
 		bool _tryBindFrameBufferUniform(entt::registry&, const bgfx::UniformHandle&, const BGFXFrameBuffer&);

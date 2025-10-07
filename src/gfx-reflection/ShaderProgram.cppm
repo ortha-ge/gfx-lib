@@ -7,65 +7,74 @@ export module Gfx.Reflection.ShaderProgramDescriptor;
 
 export import Gfx.ShaderProgramDescriptor;
 
-import Core.ClassReflection;
-import Core.EnumReflection;
-import Core.ReflectionContext;
-import Core.TypeId;
+import Core.Reflect;
 
 template<>
-void Core::reflect<Gfx::ShaderVertexLayoutAttributeId>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ShaderVertexLayoutAttributeId>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 	reflectionContext.addEnum<ShaderVertexLayoutAttributeId>("ShaderVertexLayoutAttributeId")
-		.constant("Position", ShaderVertexLayoutAttributeId::Position)
-		.constant("TexCoord0", ShaderVertexLayoutAttributeId::TexCoord0)
-		.constant("Colour0", ShaderVertexLayoutAttributeId::Colour0)
-		.build();
+		.constant<ShaderVertexLayoutAttributeId::Position>("Position")
+		.constant<ShaderVertexLayoutAttributeId::TexCoord0>("TexCoord0")
+		.constant<ShaderVertexLayoutAttributeId::Colour0>("Colour0")
+		;
 }
 
 template<>
-void Core::reflect<Gfx::ShaderVertexLayoutAttribute>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ShaderVertexLayoutAttribute>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
+
+	reflect<ShaderVertexLayoutAttributeId>(reflectionContext);
+
 	reflectionContext.addClass<ShaderVertexLayoutAttribute>("ShaderVertexLayoutAttribute")
-		.property("id", &ShaderVertexLayoutAttribute::attributeId)
-		.property("elementCount", &ShaderVertexLayoutAttribute::count)
-		.property("elementType", &ShaderVertexLayoutAttribute::typeId)
-		.property("isNormalized", &ShaderVertexLayoutAttribute::isNormalized)
-		.build();
+		.field<&ShaderVertexLayoutAttribute::attributeId>("id")
+		.field<&ShaderVertexLayoutAttribute::count>("elementCount")
+		.field<&ShaderVertexLayoutAttribute::typeId>("elementType")
+		.field<&ShaderVertexLayoutAttribute::isNormalized>("isNormalized")
+		;
 }
 
 template<>
-void Core::reflect<Gfx::ShaderVertexLayoutDescriptor>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ShaderVertexLayoutDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
+
+	reflect<ShaderVertexLayoutAttribute>(reflectionContext);
+
 	reflectionContext.addClass<ShaderVertexLayoutDescriptor>("ShaderVertexLayout")
-		.property("attributes", &ShaderVertexLayoutDescriptor::attributes)
-		.build();
+		.field<&ShaderVertexLayoutDescriptor::attributes>("attributes")
+		;
 }
 
 template<>
-void Core::reflect<Gfx::ShaderUniformType>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ShaderUniformType>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 	reflectionContext.addEnum<ShaderUniformType>("ShaderUniformType")
-		.constant("Sampler", ShaderUniformType::Sampler)
-		.constant("Float4", ShaderUniformType::Float4)
-		.build();
+		.constant<ShaderUniformType::Sampler>("Sampler")
+		.constant<ShaderUniformType::Float4>("Float4")
+		;
 }
 
 template<>
-void Core::reflect<Gfx::ShaderUniformDescriptor>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ShaderUniformDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
+
+	reflect<ShaderUniformType>(reflectionContext);
+
 	reflectionContext.addClass<ShaderUniformDescriptor>("ShaderUniform")
-		.property("name", &ShaderUniformDescriptor::name)
-		.property("type", &ShaderUniformDescriptor::type)
-		.build();
+		.field<&ShaderUniformDescriptor::name>("name")
+		.field<&ShaderUniformDescriptor::type>("type")
+		;
 }
 
 template<>
-void Core::reflect<Gfx::ShaderProgramDescriptor>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ShaderProgramDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
+	reflect<ShaderUniformDescriptor>(reflectionContext);
+	reflect<ShaderVertexLayoutDescriptor>(reflectionContext);
+
 	reflectionContext.addClass<ShaderProgramDescriptor>("ShaderProgram")
-		.property("vertexShaderFilePath", &ShaderProgramDescriptor::vertexShaderFilePath)
-		.property("fragmentShaderFilePath", &ShaderProgramDescriptor::fragmentShaderFilePath)
-		.property("uniforms", &ShaderProgramDescriptor::uniforms)
-		.property("vertexLayout", &ShaderProgramDescriptor::vertexLayout)
-		.build();
+		.field<&ShaderProgramDescriptor::vertexShaderFilePath>("vertexShaderFilePath")
+		.field<&ShaderProgramDescriptor::fragmentShaderFilePath>("fragmentShaderFilePath")
+		.field<&ShaderProgramDescriptor::uniforms>("uniforms")
+		.field<&ShaderProgramDescriptor::vertexLayout>("vertexLayout")
+		;
 }

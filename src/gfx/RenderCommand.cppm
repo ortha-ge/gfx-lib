@@ -7,7 +7,7 @@ module;
 
 export module Gfx.RenderCommand;
 
-import Core.Any;
+import Ortha.RTTI.Any;
 import Gfx.RenderState;
 import entt;
 import glm;
@@ -16,7 +16,7 @@ export namespace Gfx {
 
 	struct RenderCommand {
 		entt::entity shaderProgram{ entt::null };
-		std::unordered_map<std::string, Core::Any> uniformData;
+		std::unordered_map<std::string, Ortha::RTTI::Any> uniformData;
 
 		// Viewport
 		entt::entity viewportEntity{ entt::null };

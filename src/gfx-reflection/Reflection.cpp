@@ -1,8 +1,10 @@
 module Gfx.Reflection;
 
+import Core.Reflect;
+
 namespace Gfx {
 
-	void reflectAll(Core::ReflectionContext& reflectionContext) {
+	void reflectAll(Ortha::RTTI::ReflectionContext& reflectionContext) {
 		using namespace Core;
 
 		reflect<CameraDescriptor>(reflectionContext);

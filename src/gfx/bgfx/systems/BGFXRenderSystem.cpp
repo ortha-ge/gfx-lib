@@ -14,7 +14,7 @@ module Gfx.BGFX.BGFXRenderSystem;
 
 import Core.Log;
 import Core.Spatial;
-import Core.TypeId;
+import Ortha.RTTI.TypeId;
 import Core.Window;
 import Gfx.Camera;
 import Gfx.IndexBuffer;
@@ -202,7 +202,7 @@ namespace Gfx::BGFX {
 
 	bool BGFXRenderSystem::_tryBindUniforms(
 		entt::registry& registry, const BGFXUniforms& bgfxUniforms,
-		const std::unordered_map<std::string, Core::Any>& uniformData) {
+		const std::unordered_map<std::string, Ortha::RTTI::Any>& uniformData) {
 
 		for (auto&& [uniformName, uniformValueAny] : uniformData) {
 			if (!bgfxUniforms.uniforms.contains(uniformName)) {
@@ -216,13 +216,13 @@ namespace Gfx::BGFX {
 			}
 
 			const auto& uniformTypeId{ uniformValueAny.getTypeId() };
-			if (uniformTypeId == Core::TypeId::get<entt::entity>()) {
-				const auto uniformDataEntity = *static_cast<const entt::entity*>(uniformValueAny.getInstance());
+			if (uniformTypeId == Ortha::RTTI::TypeId::get<entt::entity>()) {
+				const auto uniformDataEntity = *static_cast<const entt::entity*>(uniformValueAny.getTypeInstance().getInstance());
 				if (!_tryBindEntityUniform(registry, uniformHandle, uniformDataEntity)) {
 					return false;
 				}
-			} else if (uniformTypeId == Core::TypeId::get<glm::vec4>()) {
-				const auto* uniformColour = static_cast<const glm::vec4*>(uniformValueAny.getInstance());
+			} else if (uniformTypeId == Ortha::RTTI::TypeId::get<glm::vec4>()) {
+				const auto* uniformColour = static_cast<const glm::vec4*>(uniformValueAny.getTypeInstance().getInstance());
 				bgfx::setUniform(uniformHandle, uniformColour);
 			} else {
 				// TODO: Log Unhandled

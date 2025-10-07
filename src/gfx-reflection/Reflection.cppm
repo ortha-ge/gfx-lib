@@ -16,11 +16,11 @@ export import Gfx.Reflection.Tilemap;
 export import Gfx.Reflection.TilemapObject;
 export import Gfx.Reflection.Viewport;
 
-import Core.ReflectionContext;
+import Ortha.RTTI.ReflectionContext;
 import Gfx.Systems;
 
 export namespace Gfx {
 
-	void reflectAll(Core::ReflectionContext&);
+	void reflectAll(Ortha::RTTI::ReflectionContext&);
 
 } // namespace Gfx

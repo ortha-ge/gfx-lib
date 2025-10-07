@@ -6,7 +6,7 @@ module;
 
 export module Gfx.RenderCandidates;
 
-import Core.TypeId;
+import Ortha.RTTI.TypeId;
 import entt;
 
 export namespace Gfx {
@@ -18,7 +18,7 @@ export namespace Gfx {
 	};
 
 	struct RenderCandidates {
-		std::unordered_map<Core::TypeId, RenderCandidateBucket, Core::TypeIdHasher> candidateBuckets;
+		std::unordered_map<Ortha::RTTI::TypeId, RenderCandidateBucket, Ortha::RTTI::TypeIdHasher> candidateBuckets;
 	};
 
 } // namespace Gfx

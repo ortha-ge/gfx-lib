@@ -4,24 +4,24 @@ export import Gfx.Viewport;
 export import Gfx.ViewportDescriptor;
 
 import Core.EnTTComponentAttribute;
-import Core.ReflectionContext;
+import Core.Reflect;
 import Glm.Reflection.Vec2;
 
 template<>
-void Core::reflect<Gfx::ViewportDescriptor>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::ViewportDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 	reflectionContext.addClass<ViewportDescriptor>("ViewportDescriptor")
-		.property("offset", &ViewportDescriptor::offset)
-		.property("dimensions", &ViewportDescriptor::dimensions)
-		.build();
+		.field<&ViewportDescriptor::offset>("offset")
+		.field<&ViewportDescriptor::dimensions>("dimensions")
+		;
 }
 
 template<>
-void Core::reflect<Gfx::Viewport>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::Viewport>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 	reflectionContext.addClass<Viewport>("Viewport")
-		.property("offset", &Viewport::offset)
-		.property("dimensions", &Viewport::dimensions)
-		.annotate(createEnTTComponentAttribute<Viewport>())
-		.build();
+		.field<&Viewport::offset>("offset")
+		.field<&Viewport::dimensions>("dimensions")
+		//.annotate(createEnTTComponentAttribute<Viewport>())
+		;
 }

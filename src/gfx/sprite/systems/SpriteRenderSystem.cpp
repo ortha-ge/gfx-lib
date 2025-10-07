@@ -9,12 +9,12 @@ module;
 
 module Gfx.SpriteRenderSystem;
 
-import Core.Any;
+import Ortha.RTTI.Any;
 import Core.GlobalSpatial;
 import Core.ResourceHandle;
 import Core.ResourceHandleUtils;
 import Core.Spatial;
-import Core.TypeId;
+import Ortha.RTTI.TypeId;
 import Gfx.Camera;
 import Gfx.RenderCandidates;
 import Gfx.Image;
@@ -277,8 +277,8 @@ namespace Gfx::SpriteRenderSystemInternal {
 
 		renderCommand.sortDepth = sortDepth;
 
-		renderCommand.uniformData["s_texColour"] = Core::Any(entt::entity{ textureEntity });
-		renderCommand.uniformData["u_alphaColour"] = Core::Any(material.alphaColour.value_or(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }));
+		renderCommand.uniformData["s_texColour"] = Ortha::RTTI::Any(entt::entity{ textureEntity });
+		renderCommand.uniformData["u_alphaColour"] = Ortha::RTTI::Any(material.alphaColour.value_or(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }));
 
 		RenderState renderState{};
 		renderState.bufferWriting = BufferWriting::RGB | BufferWriting::Alpha;
@@ -328,7 +328,7 @@ namespace Gfx {
 			.each([&registry](const entt::entity entity, const Camera&) {
 				RenderCandidates& renderCandidates = registry.get_or_emplace<RenderCandidates>(entity);
 
-				if (!renderCandidates.candidateBuckets.contains(TypeId::get<SpriteObject>())) {
+				if (!renderCandidates.candidateBuckets.contains(Ortha::RTTI::TypeId::get<SpriteObject>())) {
 					auto renderCandidateVisitor = [&registry](RenderCandidateBucket::EntityList& entityList, const entt::entity entity) {
 						if (!registry.all_of<SpriteObject>(entity)) {
 							return;
@@ -337,7 +337,7 @@ namespace Gfx {
 						entityList.emplace_back(entity);
 					};
 
-					renderCandidates.candidateBuckets.emplace(TypeId::get<SpriteObject>(), renderCandidateVisitor);
+					renderCandidates.candidateBuckets.emplace(Ortha::RTTI::TypeId::get<SpriteObject>(), renderCandidateVisitor);
 				}
 			});
 
@@ -354,7 +354,7 @@ namespace Gfx {
 		using namespace SpriteRenderSystemInternal;
 		registry.view<Camera, Spatial, RenderCandidates>()
 			.each([&registry](const entt::entity, const Camera& camera, const Spatial& cameraSpatial, const RenderCandidates& renderCandidates) {
-				if (!renderCandidates.candidateBuckets.contains(TypeId::get<SpriteObject>())) {
+				if (!renderCandidates.candidateBuckets.contains(Ortha::RTTI::TypeId::get<SpriteObject>())) {
 					return;
 				}
 
@@ -363,7 +363,7 @@ namespace Gfx {
 				glm::mat4 scale = glm::scale(glm::mat4(1.0f), cameraSpatial.scale);
 				glm::mat4 viewMatrix{ glm::inverse(translation * rotation * scale) };
 
-				const auto& spriteRenderCandidates{ renderCandidates.candidateBuckets.at(TypeId::get<SpriteObject>()) };
+				const auto& spriteRenderCandidates{ renderCandidates.candidateBuckets.at(Ortha::RTTI::TypeId::get<SpriteObject>()) };
 
 				ZMaterialBucketMap zBucketMap{ prepareSpriteZBucketMap(registry, spriteRenderCandidates.entityList) };
 				renderSpriteZBucketMap(registry, camera, viewMatrix, zBucketMap);

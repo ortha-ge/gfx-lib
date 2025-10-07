@@ -2,26 +2,28 @@ export module Gfx.Reflection.Tilemap;
 
 export import Gfx.TilemapDescriptor;
 
-import Core.ReflectionContext;
+import Core.Reflect;
 import Glm.Reflection.Vec2;
 
 template <>
-void Core::reflect<Gfx::Tile>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::Tile>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 
 	reflectionContext.addClass<Tile>("Tile")
-		.property("coordinates", &Tile::coordinates)
-		.property("atlasIndex", &Tile::atlasIndex)
-		.build();
+		.field<&Tile::coordinates>("coordinates")
+		.field<&Tile::atlasIndex>("atlasIndex")
+		;
 }
 
 template <>
-void Core::reflect<Gfx::TilemapDescriptor>(ReflectionContext& reflectionContext) {
+void Core::reflect<Gfx::TilemapDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
 	using namespace Gfx;
 
+	reflect<Tile>(reflectionContext);
+
 	reflectionContext.addClass<TilemapDescriptor>("TileMap")
-		.property("atlasFilePath", &TilemapDescriptor::atlasFilePath)
-		.property("dimensions", &TilemapDescriptor::dimensions)
-		.property("tiles", &TilemapDescriptor::tiles)
-		.build();
+		.field<&TilemapDescriptor::atlasFilePath>("atlasFilePath")
+		.field<&TilemapDescriptor::dimensions>("dimensions")
+		.field<&TilemapDescriptor::tiles>("tiles")
+		;
 }
