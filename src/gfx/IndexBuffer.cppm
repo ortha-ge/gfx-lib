@@ -3,9 +3,9 @@ module;
 #include <cstdint>
 #include <vector>
 
-export module Gfx.IndexBuffer;
+export module Ortha.Gfx.IndexBuffer;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	enum class IndexBufferType : uint8_t {
 		Transient
@@ -17,4 +17,4 @@ export namespace Gfx {
 		bool is32Bit{ false };
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

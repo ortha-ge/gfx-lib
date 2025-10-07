@@ -5,33 +5,33 @@ module;
 #include <memory>
 #include <utility>
 
-module Gfx.FontRenderSystem;
+module Ortha.Gfx.FontRenderSystem;
 
 import Ortha.RTTI.Any;
-import Core.JsonTypeLoaderAdapter;
-import Core.ResourceHandleUtils;
-import Core.ResourceLoadRequest;
-import Core.GlobalSpatial;
-import Core.Spatial;
+import Ortha.Core.JsonTypeLoaderAdapter;
+import Ortha.Core.ResourceHandleUtils;
+import Ortha.Core.ResourceLoadRequest;
+import Ortha.Core.GlobalSpatial;
+import Ortha.Core.Spatial;
 import Ortha.RTTI.TypeHandle;
 import Ortha.RTTI.TypeId;
-import Core.TypeLoader;
-import Gfx.Camera;
-import Gfx.Font;
-import Gfx.FontObject;
-import Gfx.Image;
-import Gfx.IndexBuffer;
-import Gfx.RenderCandidates;
-import Gfx.RenderCommand;
-import Gfx.RenderState;
-import Gfx.ShaderProgram;
-import Gfx.VertexBuffer;
-import Gfx.Viewport;
-import Gfx.Reflection.ShaderProgramDescriptor;
+import Ortha.Core.TypeLoader;
+import Ortha.Gfx.Camera;
+import Ortha.Gfx.Font;
+import Ortha.Gfx.FontObject;
+import Ortha.Gfx.Image;
+import Ortha.Gfx.IndexBuffer;
+import Ortha.Gfx.RenderCandidates;
+import Ortha.Gfx.RenderCommand;
+import Ortha.Gfx.RenderState;
+import Ortha.Gfx.ShaderProgram;
+import Ortha.Gfx.VertexBuffer;
+import Ortha.Gfx.Viewport;
+import Ortha.Gfx.Reflection.ShaderProgramDescriptor;
 import entt;
 import glm;
 
-namespace Gfx::FontRenderSystemInternal {
+namespace Ortha::Gfx::FontRenderSystemInternal {
 
 	struct FontVertex {
 		glm::vec3 position;
@@ -136,9 +136,9 @@ namespace Gfx::FontRenderSystemInternal {
 		return renderCommand;
 	}
 
-} // namespace Gfx::FontRenderSystemInternal
+} // namespace Ortha::Gfx::FontRenderSystemInternal
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	FontRenderSystem::FontRenderSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -245,4 +245,4 @@ namespace Gfx {
 			});
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

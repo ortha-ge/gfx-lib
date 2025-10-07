@@ -3,11 +3,11 @@ module;
 #include <cstddef>
 #include <vector>
 
-module Gfx.ShaderProgramDescriptor;
+module Ortha.Gfx.ShaderProgramDescriptor;
 
 import Ortha.RTTI.TypeInfo;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	size_t getBufferSizeForVertexLayout(const ShaderVertexLayoutDescriptor& vertexLayout, size_t vertexCount) {
 		return getStrideForVertexLayout(vertexLayout) * vertexCount;
@@ -36,4 +36,4 @@ namespace Gfx {
 		return offset;
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

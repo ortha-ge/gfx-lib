@@ -2,12 +2,12 @@ module;
 
 #include <bgfx/bgfx.h>
 
-export module Gfx.BGFX.BGFXTransientVertexBuffer;
+export module Ortha.Gfx.BGFX.BGFXTransientVertexBuffer;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	struct BGFXTransientVertexBuffer {
 		bgfx::TransientVertexBuffer buffer{};
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

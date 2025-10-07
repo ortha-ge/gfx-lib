@@ -2,12 +2,12 @@ module;
 
 #include <bgfx/bgfx.h>
 
-export module Gfx.BGFX.BGFXTexture;
+export module Ortha.Gfx.BGFX.BGFXTexture;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	struct BGFXTexture {
 		bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

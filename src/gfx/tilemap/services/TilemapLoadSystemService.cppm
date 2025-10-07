@@ -1,13 +1,13 @@
-export module Gfx.TilemapLoadSystemService;
+export module Ortha.Gfx.TilemapLoadSystemService;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
-import Gfx.TilemapLoadSystem;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
+import Ortha.Gfx.TilemapLoadSystem;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct TilemapLoadSystemService
 		: kgr::single_service<TilemapLoadSystem, kgr::dependency<Core::EnTTRegistryService, Core::SchedulerService>> {};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -4,12 +4,12 @@ module;
 #include <unordered_map>
 #include <vector>
 
-export module Gfx.RenderCandidates;
+export module Ortha.Gfx.RenderCandidates;
 
 import Ortha.RTTI.TypeId;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct RenderCandidateBucket {
 		using EntityList = std::vector<entt::entity>;
@@ -21,4 +21,4 @@ export namespace Gfx {
 		std::unordered_map<Ortha::RTTI::TypeId, RenderCandidateBucket, Ortha::RTTI::TypeIdHasher> candidateBuckets;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

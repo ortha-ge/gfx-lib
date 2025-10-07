@@ -1,13 +1,13 @@
-export module Gfx.Reflection.ImageAtlas;
+export module Ortha.Gfx.Reflection.ImageAtlas;
 
-export import Gfx.ImageAtlasDescriptor;
+export import Ortha.Gfx.ImageAtlasDescriptor;
 
-import Core.Reflect;
-import Gfx.Reflection.TextureCoordinates;
+import Ortha.Core.Reflect;
+import Ortha.Gfx.Reflection.TextureCoordinates;
 
 template<>
-void Core::reflect<Gfx::ImageAtlasRegion>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::ImageAtlasRegion>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 
 	reflectionContext.addClass<ImageAtlasRegion>("ImageAtlasRegion")
 		.field<&ImageAtlasRegion::name>("name")
@@ -16,8 +16,8 @@ void Core::reflect<Gfx::ImageAtlasRegion>(Ortha::RTTI::ReflectionContext& reflec
 }
 
 template<>
-void Core::reflect<Gfx::ImageAtlasDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::ImageAtlasDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 
 	reflect<ImageAtlasRegion>(reflectionContext);
 

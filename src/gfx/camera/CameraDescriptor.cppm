@@ -1,11 +1,11 @@
-export module Gfx.CameraDescriptor;
+export module Ortha.Gfx.CameraDescriptor;
 
-import Gfx.Projection;
+import Ortha.Gfx.Projection;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct CameraDescriptor {
 		Projection projection{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -4,9 +4,9 @@ module;
 
 #include <glm/vec2.hpp>
 
-export module Gfx.Font;
+export module Ortha.Gfx.Font;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct FontGlyph {
 		glm::ivec2 offset{};
@@ -28,4 +28,4 @@ export namespace Gfx {
 		std::unordered_map<wchar_t, std::unordered_map<wchar_t, int>> glyphKerningMap;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -5,9 +5,9 @@ module;
 
 #include <bgfx/bgfx.h>
 
-module Gfx.BGFX.BGFXState;
+module Ortha.Gfx.BGFX.BGFXState;
 
-namespace Gfx::BGFX {
+namespace Ortha::Gfx::BGFX {
 
 	uint64_t getBGFXPrimitiveTypeState(const PrimitiveType& primitiveType) {
 		switch (primitiveType) {
@@ -139,4 +139,4 @@ namespace Gfx::BGFX {
 		return state;
 	}
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

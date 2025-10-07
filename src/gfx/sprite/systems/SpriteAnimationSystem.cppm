@@ -2,14 +2,14 @@ module;
 
 #include <chrono>
 
-export module Gfx.SpriteAnimationSystem;
+export module Ortha.Gfx.SpriteAnimationSystem;
 
-import Core.Scheduler;
-import Gfx.Sprite;
-import Gfx.SpriteObject;
+import Ortha.Core.Scheduler;
+import Ortha.Gfx.Sprite;
+import Ortha.Gfx.SpriteObject;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class SpriteAnimationSystem {
 	public:
@@ -29,4 +29,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -1,13 +1,13 @@
 
-export module Gfx.SystemsService;
+export module Ortha.Gfx.SystemsService;
 
-export import Gfx.Systems;
+export import Ortha.Gfx.Systems;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	void initGfxSubSystems(GfxSystems&, kgr::container&);
 
@@ -15,4 +15,4 @@ export namespace Gfx {
 		: kgr::single_service<GfxSystems>
 		, kgr::autocall<kgr::invoke_method<initGfxSubSystems>>{};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -4,12 +4,12 @@
 #include <bgfx/bgfx.h>
 #include <catch2/catch_test_macros.hpp>
 
-import Gfx.RenderState;
-import Gfx.BGFX.BGFXState;
+import Ortha.Gfx.RenderState;
+import Ortha.Gfx.BGFX.BGFXState;
 
 TEST_CASE("SpriteRenderState_GetBGFXState_IsExpected", "BGFXState") {
-	using namespace Gfx;
-	using namespace Gfx::BGFX;
+	using namespace Ortha::Gfx;
+	using namespace Ortha::Gfx::BGFX;
 
 	constexpr uint64_t expectedState = 0
 		| BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A

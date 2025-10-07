@@ -2,15 +2,15 @@ module;
 
 #include <utility>
 
-module Gfx.ImageAtlasLoadSystem;
+module Ortha.Gfx.ImageAtlasLoadSystem;
 
-import Core.ProcessError;
-import Core.ResourceLoadRequest;
-import Gfx.ImageAtlas;
-import Gfx.ImageAtlasDescriptor;
-import Gfx.ImageDescriptor;
+import Ortha.Core.ProcessError;
+import Ortha.Core.ResourceLoadRequest;
+import Ortha.Gfx.ImageAtlas;
+import Ortha.Gfx.ImageAtlasDescriptor;
+import Ortha.Gfx.ImageDescriptor;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	ImageAtlasLoadSystem::ImageAtlasLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -37,4 +37,4 @@ namespace Gfx {
 			});
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -1,11 +1,11 @@
-export module Gfx.BGFX.BGFXContext;
+export module Ortha.Gfx.BGFX.BGFXContext;
 
 import entt;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	struct BGFXContext {
 		entt::entity defaultWindow{ entt::null };
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

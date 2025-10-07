@@ -5,9 +5,9 @@ module;
 
 #include <bgfx/bgfx.h>
 
-export module Gfx.RenderState;
+export module Ortha.Gfx.RenderState;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	enum class PrimitiveType : uint8_t {
 		Triangles,
@@ -87,4 +87,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -1,9 +1,9 @@
-export module Gfx.Viewport;
+export module Ortha.Gfx.Viewport;
 
 import entt;
 import glm;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct Viewport {
 		entt::entity renderTarget{ entt::null };
@@ -12,4 +12,4 @@ export namespace Gfx {
 		glm::vec2 dimensions{ 1.0f, 1.0f };
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

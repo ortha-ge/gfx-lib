@@ -1,9 +1,9 @@
-module Gfx.SpriteLoadSystem;
+module Ortha.Gfx.SpriteLoadSystem;
 
-import Core.ProcessError;
-import Gfx.Sprite;
+import Ortha.Core.ProcessError;
+import Ortha.Gfx.Sprite;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	SpriteLoadSystem::SpriteLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -36,4 +36,4 @@ namespace Gfx {
 		registry.emplace<Sprite>(entity, spriteDescriptor);
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

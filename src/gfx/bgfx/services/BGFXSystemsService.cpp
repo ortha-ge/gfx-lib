@@ -1,13 +1,13 @@
-module Gfx.BGFX.SystemsService;
+module Ortha.Gfx.BGFX.SystemsService;
 
-import Gfx.BGFX.BGFXRenderSystemService;
-import Gfx.BGFX.BGFXResourceCreationSystemService;
+import Ortha.Gfx.BGFX.BGFXRenderSystemService;
+import Ortha.Gfx.BGFX.BGFXResourceCreationSystemService;
 
-namespace Gfx::BGFX {
+namespace Ortha::Gfx::BGFX {
 
 	void initBGFXSubSystems(BGFXSystems&, kgr::container& container) {
 		container.emplace<BGFXResourceCreationSystemService>();
 		container.emplace<BGFXRenderSystemService>();
 	}
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

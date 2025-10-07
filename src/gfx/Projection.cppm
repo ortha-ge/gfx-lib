@@ -1,7 +1,7 @@
-export module Gfx.Projection;
+export module Ortha.Gfx.Projection;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	enum class Projection { Orthographic, Perspective };
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

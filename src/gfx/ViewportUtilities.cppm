@@ -2,13 +2,13 @@ module;
 
 #include <optional>
 
-export module Gfx.ViewportUtilities;
+export module Ortha.Gfx.ViewportUtilities;
 
-import Gfx.Viewport;
+import Ortha.Gfx.Viewport;
 import entt;
 import glm;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct ViewportScreenRect {
 		glm::ivec2 bottomLeft{};
@@ -20,4 +20,4 @@ export namespace Gfx {
 	glm::ivec2 getViewportScreenSize(const ViewportScreenRect&);
 	std::optional<ViewportScreenRect> getViewportScreenRect(entt::registry&, const Viewport&);
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

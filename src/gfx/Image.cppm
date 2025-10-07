@@ -3,9 +3,9 @@ module;
 #include <cstdint>
 #include <vector>
 
-export module Gfx.Image;
+export module Ortha.Gfx.Image;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct Image {
 		std::vector<uint8_t> image{};
@@ -25,4 +25,4 @@ export namespace Gfx {
 		bool srgb{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

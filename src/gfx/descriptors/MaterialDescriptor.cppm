@@ -3,11 +3,11 @@ module;
 #include <optional>
 #include <string>
 
-export module Gfx.MaterialDescriptor;
+export module Ortha.Gfx.MaterialDescriptor;
 
 import glm;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct MaterialDescriptor {
 		bool operator==(const MaterialDescriptor&) const = default;
@@ -16,4 +16,4 @@ export namespace Gfx {
 		std::optional<glm::vec4> alphaColour{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

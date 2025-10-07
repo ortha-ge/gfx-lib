@@ -10,35 +10,35 @@ module;
 #include <bx/math.h>
 #include <bgfx/bgfx.h>
 
-module Gfx.BGFX.BGFXRenderSystem;
+module Ortha.Gfx.BGFX.BGFXRenderSystem;
 
-import Core.Log;
-import Core.Spatial;
+import Ortha.Core.Log;
+import Ortha.Core.Spatial;
 import Ortha.RTTI.TypeId;
-import Core.Window;
-import Gfx.Camera;
-import Gfx.IndexBuffer;
-import Gfx.RenderCommand;
-import Gfx.RenderState;
-import Gfx.RenderTexture;
-import Gfx.ShaderProgram;
-import Gfx.VertexBuffer;
-import Gfx.Viewport;
-import Gfx.ViewportUtilities;
-import Gfx.BGFX.BGFXContext;
-import Gfx.BGFX.BGFXFrameBuffer;
-import Gfx.BGFX.BGFXShader;
-import Gfx.BGFX.BGFXShaderProgram;
-import Gfx.BGFX.BGFXState;
-import Gfx.BGFX.BGFXTexture;
-import Gfx.BGFX.BGFXTransientIndexBuffer;
-import Gfx.BGFX.BGFXTransientVertexBuffer;
-import Gfx.BGFX.BGFXUniform;
-import Gfx.BGFX.BGFXVertexLayout;
+import Ortha.Core.Window;
+import Ortha.Gfx.Camera;
+import Ortha.Gfx.IndexBuffer;
+import Ortha.Gfx.RenderCommand;
+import Ortha.Gfx.RenderState;
+import Ortha.Gfx.RenderTexture;
+import Ortha.Gfx.ShaderProgram;
+import Ortha.Gfx.VertexBuffer;
+import Ortha.Gfx.Viewport;
+import Ortha.Gfx.ViewportUtilities;
+import Ortha.Gfx.BGFX.BGFXContext;
+import Ortha.Gfx.BGFX.BGFXFrameBuffer;
+import Ortha.Gfx.BGFX.BGFXShader;
+import Ortha.Gfx.BGFX.BGFXShaderProgram;
+import Ortha.Gfx.BGFX.BGFXState;
+import Ortha.Gfx.BGFX.BGFXTexture;
+import Ortha.Gfx.BGFX.BGFXTransientIndexBuffer;
+import Ortha.Gfx.BGFX.BGFXTransientVertexBuffer;
+import Ortha.Gfx.BGFX.BGFXUniform;
+import Ortha.Gfx.BGFX.BGFXVertexLayout;
 import entt;
 import glm;
 
-namespace Gfx::BGFX {
+namespace Ortha::Gfx::BGFX {
 
 	BGFXRenderSystem::BGFXRenderSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -351,4 +351,4 @@ namespace Gfx::BGFX {
 		bgfx::submit(viewId, bgfxShaderProgram.programHandle, renderCommand.sortDepth);
 	}
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

@@ -3,11 +3,11 @@ module;
 #include <cstdint>
 #include <optional>
 
-export module Gfx.BGFX.BGFXState;
+export module Ortha.Gfx.BGFX.BGFXState;
 
-import Gfx.RenderState;
+import Ortha.Gfx.RenderState;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	uint64_t getBGFXPrimitiveTypeState(const PrimitiveType& primitiveType);
 	uint64_t getBGFXDepthTestState(const std::optional<DepthTest>& depthTest);
@@ -17,4 +17,4 @@ export namespace Gfx::BGFX {
 	uint64_t getBGFXBlendFuncState(const BlendOperand& src, const BlendOperator& op, const BlendOperand& dest);
 	uint64_t getBGFXRenderState(const RenderState& renderState);
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

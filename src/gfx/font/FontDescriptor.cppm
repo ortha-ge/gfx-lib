@@ -1,7 +1,7 @@
-export module Gfx.FontDescriptor;
+export module Ortha.Gfx.FontDescriptor;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct FontDescriptor {};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

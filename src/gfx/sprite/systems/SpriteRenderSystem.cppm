@@ -1,9 +1,9 @@
-export module Gfx.SpriteRenderSystem;
+export module Ortha.Gfx.SpriteRenderSystem;
 
-import Core.Scheduler;
+import Ortha.Core.Scheduler;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class SpriteRenderSystem {
 	public:
@@ -21,4 +21,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

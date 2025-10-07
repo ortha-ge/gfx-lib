@@ -1,9 +1,9 @@
-export module Gfx.BGFX.Systems;
+export module Ortha.Gfx.BGFX.Systems;
 
-import Core.Scheduler;
+import Ortha.Core.Scheduler;
 import entt;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	class BGFXSystems {
 	public:
@@ -27,4 +27,4 @@ export namespace Gfx::BGFX {
 
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

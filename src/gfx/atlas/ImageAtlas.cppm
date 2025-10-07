@@ -5,17 +5,17 @@ module;
 
 #include <glm/vec2.hpp>
 
-export module Gfx.ImageAtlas;
+export module Ortha.Gfx.ImageAtlas;
 
-export import Gfx.ImageAtlasDescriptor;
+export import Ortha.Gfx.ImageAtlasDescriptor;
 
-import Core.ResourceHandle;
+import Ortha.Core.ResourceHandle;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct ImageAtlas {
 		Core::ResourceHandlePtr image;
 		std::vector<ImageAtlasRegion> regions;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

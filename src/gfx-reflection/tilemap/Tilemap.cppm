@@ -1,13 +1,13 @@
-export module Gfx.Reflection.Tilemap;
+export module Ortha.Gfx.Reflection.Tilemap;
 
-export import Gfx.TilemapDescriptor;
+export import Ortha.Gfx.TilemapDescriptor;
 
-import Core.Reflect;
+import Ortha.Core.Reflect;
 import Glm.Reflection.Vec2;
 
 template <>
-void Core::reflect<Gfx::Tile>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::Tile>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 
 	reflectionContext.addClass<Tile>("Tile")
 		.field<&Tile::coordinates>("coordinates")
@@ -16,8 +16,8 @@ void Core::reflect<Gfx::Tile>(Ortha::RTTI::ReflectionContext& reflectionContext)
 }
 
 template <>
-void Core::reflect<Gfx::TilemapDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::TilemapDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 
 	reflect<Tile>(reflectionContext);
 

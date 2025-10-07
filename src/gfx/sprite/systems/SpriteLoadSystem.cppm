@@ -1,10 +1,10 @@
-export module Gfx.SpriteLoadSystem;
+export module Ortha.Gfx.SpriteLoadSystem;
 
-import Core.Scheduler;
-import Gfx.SpriteDescriptor;
+import Ortha.Core.Scheduler;
+import Ortha.Gfx.SpriteDescriptor;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class SpriteLoadSystem {
 	public:
@@ -23,4 +23,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

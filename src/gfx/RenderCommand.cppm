@@ -5,14 +5,14 @@ module;
 #include <string>
 #include <unordered_map>
 
-export module Gfx.RenderCommand;
+export module Ortha.Gfx.RenderCommand;
 
 import Ortha.RTTI.Any;
-import Gfx.RenderState;
+import Ortha.Gfx.RenderState;
 import entt;
 import glm;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct RenderCommand {
 		entt::entity shaderProgram{ entt::null };
@@ -42,4 +42,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -1,9 +1,9 @@
 module;
 
-export module Gfx.ShaderDescriptor;
+export module Ortha.Gfx.ShaderDescriptor;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct ShaderDescriptor {};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -2,12 +2,12 @@ module;
 
 #include <bgfx/bgfx.h>
 
-export module Gfx.BGFX.BGFXFrameBuffer;
+export module Ortha.Gfx.BGFX.BGFXFrameBuffer;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	struct BGFXFrameBuffer {
 		bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

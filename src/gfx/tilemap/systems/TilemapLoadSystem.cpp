@@ -5,18 +5,18 @@ module;
 #include <utility>
 #include <vector>
 
-module Gfx.TilemapLoadSystem;
+module Ortha.Gfx.TilemapLoadSystem;
 
-import Core.JsonTypeLoaderAdapter;
-import Core.ProcessError;
-import Core.ResourceLoadRequest;
-import Core.TypeLoader;
-import Gfx.ImageAtlas;
-import Gfx.Tilemap;
-import Gfx.TilemapDescriptor;
-import Gfx.Reflection.ImageAtlas;
+import Ortha.Core.JsonTypeLoaderAdapter;
+import Ortha.Core.ProcessError;
+import Ortha.Core.ResourceLoadRequest;
+import Ortha.Core.TypeLoader;
+import Ortha.Gfx.ImageAtlas;
+import Ortha.Gfx.Tilemap;
+import Ortha.Gfx.TilemapDescriptor;
+import Ortha.Gfx.Reflection.ImageAtlas;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	TilemapLoadSystem::TilemapLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -55,4 +55,4 @@ namespace Gfx {
 			});
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

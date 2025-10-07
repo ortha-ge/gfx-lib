@@ -2,15 +2,15 @@ module;
 
 #include <vector>
 
-export module Gfx.SpriteDescriptor;
+export module Ortha.Gfx.SpriteDescriptor;
 
-import Gfx.TextureCoordinates;
+import Ortha.Gfx.TextureCoordinates;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct SpriteDescriptor {
 		bool operator == (const SpriteDescriptor&) const = default;
 		std::vector<TextureCoordinates> frames{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -6,13 +6,13 @@ module;
 
 #include <glm/vec2.hpp>
 
-export module Gfx.Tilemap;
+export module Ortha.Gfx.Tilemap;
 
-export import Gfx.TilemapDescriptor;
+export import Ortha.Gfx.TilemapDescriptor;
 
-import Core.ResourceHandle;
+import Ortha.Core.ResourceHandle;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct Tilemap {
 		Core::ResourceHandlePtr atlas;
@@ -20,4 +20,4 @@ export namespace Gfx {
 		std::vector<std::vector<std::optional<uint16_t>>> tiles;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

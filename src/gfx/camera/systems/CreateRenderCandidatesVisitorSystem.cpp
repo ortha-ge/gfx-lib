@@ -3,13 +3,13 @@ module;
 #include <memory>
 #include <utility>
 
-module Gfx.CreateRenderCandidatesVisitorSystem;
+module Ortha.Gfx.CreateRenderCandidatesVisitorSystem;
 
-import Core.EntityVisitor;
-import Gfx.Camera;
-import Gfx.RenderCandidates;
+import Ortha.Core.EntityVisitor;
+import Ortha.Gfx.Camera;
+import Ortha.Gfx.RenderCandidates;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	CreateRenderCandidatesVisitorSystem::CreateRenderCandidatesVisitorSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -51,4 +51,4 @@ namespace Gfx {
 			});
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

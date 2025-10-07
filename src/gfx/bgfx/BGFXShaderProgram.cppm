@@ -2,12 +2,12 @@ module;
 
 #include <bgfx/bgfx.h>
 
-export module Gfx.BGFX.BGFXShaderProgram;
+export module Ortha.Gfx.BGFX.BGFXShaderProgram;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	struct BGFXShaderProgram {
 		bgfx::ProgramHandle programHandle = BGFX_INVALID_HANDLE;
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

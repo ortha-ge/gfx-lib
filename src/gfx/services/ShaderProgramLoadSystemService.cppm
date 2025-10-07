@@ -1,15 +1,15 @@
 
-export module Gfx.ShaderProgramLoadSystemService;
+export module Ortha.Gfx.ShaderProgramLoadSystemService;
 
-export import Gfx.ShaderProgramLoadSystem;
+export import Ortha.Gfx.ShaderProgramLoadSystem;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct ShaderProgramLoadSystemService
 		: kgr::single_service<ShaderProgramLoadSystem, kgr::dependency<Core::EnTTRegistryService, Core::SchedulerService>> {};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

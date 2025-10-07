@@ -1,13 +1,13 @@
-export module Gfx.Reflection.Sprite;
+export module Ortha.Gfx.Reflection.Sprite;
 
-export import Gfx.SpriteDescriptor;
+export import Ortha.Gfx.SpriteDescriptor;
 
-import Core.Reflect;
-import Gfx.Reflection.TextureCoordinates;
+import Ortha.Core.Reflect;
+import Ortha.Gfx.Reflection.TextureCoordinates;
 
 template<>
-void Core::reflect<Gfx::SpriteDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::SpriteDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 	reflectionContext.addClass<SpriteDescriptor>("SpriteDescriptor")
 		.field<&SpriteDescriptor::frames>("frames")
 	;

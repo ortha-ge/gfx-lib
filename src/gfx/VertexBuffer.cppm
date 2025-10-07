@@ -3,11 +3,11 @@ module;
 #include <cstdint>
 #include <vector>
 
-export module Gfx.VertexBuffer;
+export module Ortha.Gfx.VertexBuffer;
 
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	enum class VertexBufferType : uint8_t {
 		Transient
@@ -19,4 +19,4 @@ export namespace Gfx {
 		entt::entity vertexLayout{ entt::null };
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

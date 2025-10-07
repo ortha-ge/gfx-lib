@@ -1,14 +1,14 @@
-export module Gfx.BGFX.BGFXRenderSystemService;
+export module Ortha.Gfx.BGFX.BGFXRenderSystemService;
 
-export import Gfx.BGFX.BGFXRenderSystem;
+export import Ortha.Gfx.BGFX.BGFXRenderSystem;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	struct BGFXRenderSystemService
 		: kgr::single_service<BGFXRenderSystem, kgr::dependency<Core::EnTTRegistryService, Core::SchedulerService>> {};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

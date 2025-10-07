@@ -6,26 +6,26 @@ module;
 
 #include <bgfx/bgfx.h>
 
-module Gfx.BGFX.BGFXResourceCreationSystem;
+module Ortha.Gfx.BGFX.BGFXResourceCreationSystem;
 
-import Core.FileLoadRequest;
-import Core.Log;
-import Core.ProcessError;
-import Core.ResourceHandle;
-import Core.ResourceHandleUtils;
+import Ortha.Core.FileLoadRequest;
+import Ortha.Core.Log;
+import Ortha.Core.ProcessError;
+import Ortha.Core.ResourceHandle;
+import Ortha.Core.ResourceHandleUtils;
 import Ortha.RTTI.TypeId;
-import Gfx.ShaderDescriptor;
-import Gfx.ShaderProgramDescriptor;
-import Gfx.BGFX.BGFXFrameBuffer;
-import Gfx.BGFX.BGFXShader;
-import Gfx.BGFX.BGFXShaderProgram;
-import Gfx.BGFX.BGFXTexture;
-import Gfx.BGFX.BGFXTransientIndexBuffer;
-import Gfx.BGFX.BGFXTransientVertexBuffer;
-import Gfx.BGFX.BGFXUniform;
-import Gfx.BGFX.BGFXVertexLayout;
+import Ortha.Gfx.ShaderDescriptor;
+import Ortha.Gfx.ShaderProgramDescriptor;
+import Ortha.Gfx.BGFX.BGFXFrameBuffer;
+import Ortha.Gfx.BGFX.BGFXShader;
+import Ortha.Gfx.BGFX.BGFXShaderProgram;
+import Ortha.Gfx.BGFX.BGFXTexture;
+import Ortha.Gfx.BGFX.BGFXTransientIndexBuffer;
+import Ortha.Gfx.BGFX.BGFXTransientVertexBuffer;
+import Ortha.Gfx.BGFX.BGFXUniform;
+import Ortha.Gfx.BGFX.BGFXVertexLayout;
 
-namespace Gfx::BGFX::BGFXResourceCreationSystemInternal {
+namespace Ortha::Gfx::BGFX::BGFXResourceCreationSystemInternal {
 	void destroyTexture(entt::registry& registry, const entt::entity entity) {
 		if (!registry.all_of<BGFXTexture>(entity)) {
 			return;
@@ -69,7 +69,7 @@ namespace Gfx::BGFX::BGFXResourceCreationSystemInternal {
 	}
 }
 
-namespace Gfx::BGFX {
+namespace Ortha::Gfx::BGFX {
 
 	BGFXResourceCreationSystem::BGFXResourceCreationSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -340,4 +340,4 @@ namespace Gfx::BGFX {
 	}
 
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

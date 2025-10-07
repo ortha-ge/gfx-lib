@@ -8,16 +8,16 @@ module;
 #include <bx/bx.h>
 #include <bgfx/bgfx.h>
 
-module Gfx.BGFX.Systems;
+module Ortha.Gfx.BGFX.Systems;
 
-import Core.Log;
-import Core.NativeWindowHandles;
-import Core.Window;
-import Gfx.ShaderPlatformInfo;
-import Gfx.BGFX.BGFXContext;
-import Gfx.BGFX.BGFXFrameBuffer;
+import Ortha.Core.Log;
+import Ortha.Core.NativeWindowHandles;
+import Ortha.Core.Window;
+import Ortha.Gfx.ShaderPlatformInfo;
+import Ortha.Gfx.BGFX.BGFXContext;
+import Ortha.Gfx.BGFX.BGFXFrameBuffer;
 
-namespace Gfx::BGFX::BGFXSystemsInternal {
+namespace Ortha::Gfx::BGFX::BGFXSystemsInternal {
 
 struct BGFXCallbacks : bgfx::CallbackI {
 
@@ -138,7 +138,7 @@ struct BGFXCallbacks : bgfx::CallbackI {
 
 } //
 
-namespace Gfx::BGFX {
+namespace Ortha::Gfx::BGFX {
 
 	BGFXSystems::BGFXSystems(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -210,4 +210,4 @@ namespace Gfx::BGFX {
 		Core::logEntry(registry, "BGFX waiting for window handle...");
 		registry.on_construct<Core::NativeWindowHandles>().connect<&BGFXSystems::onNativeWindowHandlesCreated>(this);
 	}
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

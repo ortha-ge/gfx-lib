@@ -1,15 +1,15 @@
 
-export module Gfx.MaterialLoadSystemService;
+export module Ortha.Gfx.MaterialLoadSystemService;
 
-export import Gfx.MaterialLoadSystem;
+export import Ortha.Gfx.MaterialLoadSystem;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct MaterialLoadSystemService
 		: kgr::single_service<MaterialLoadSystem, kgr::dependency<Core::EnTTRegistryService, Core::SchedulerService>> {};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

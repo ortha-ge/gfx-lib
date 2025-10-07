@@ -1,12 +1,12 @@
-export module Gfx.TilemapObject;
+export module Ortha.Gfx.TilemapObject;
 
-import Core.ResourceHandle;
+import Ortha.Core.ResourceHandle;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct TilemapObject {
 		Core::ResourceHandlePtr tilemap;
 		Core::ResourceHandlePtr shaderProgram;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

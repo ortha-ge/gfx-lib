@@ -1,9 +1,9 @@
-export module Gfx.TilemapRenderSystem;
+export module Ortha.Gfx.TilemapRenderSystem;
 
-import Core.Scheduler;
+import Ortha.Core.Scheduler;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class TilemapRenderSystem {
 	public:
@@ -21,4 +21,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

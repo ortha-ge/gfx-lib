@@ -1,9 +1,9 @@
-export module Gfx.ImageAtlasLoadSystem;
+export module Ortha.Gfx.ImageAtlasLoadSystem;
 
-import Core.Scheduler;
+import Ortha.Core.Scheduler;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class ImageAtlasLoadSystem {
 	public:
@@ -21,4 +21,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

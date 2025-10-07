@@ -1,26 +1,26 @@
 
-export module Gfx.Reflection;
+export module Ortha.Gfx.Reflection;
 
-export import Gfx.Reflection.Camera;
-export import Gfx.Reflection.FontObject;
-export import Gfx.Reflection.ImageAtlas;
-export import Gfx.Reflection.ImageDescriptor;
-export import Gfx.Reflection.MaterialDescriptor;
-export import Gfx.Reflection.Projection;
-export import Gfx.Reflection.RenderObject;
-export import Gfx.Reflection.ShaderProgramDescriptor;
-export import Gfx.Reflection.Sprite;
-export import Gfx.Reflection.SpriteObject;
-export import Gfx.Reflection.TextureCoordinates;
-export import Gfx.Reflection.Tilemap;
-export import Gfx.Reflection.TilemapObject;
-export import Gfx.Reflection.Viewport;
+export import Ortha.Gfx.Reflection.Camera;
+export import Ortha.Gfx.Reflection.FontObject;
+export import Ortha.Gfx.Reflection.ImageAtlas;
+export import Ortha.Gfx.Reflection.ImageDescriptor;
+export import Ortha.Gfx.Reflection.MaterialDescriptor;
+export import Ortha.Gfx.Reflection.Projection;
+export import Ortha.Gfx.Reflection.RenderObject;
+export import Ortha.Gfx.Reflection.ShaderProgramDescriptor;
+export import Ortha.Gfx.Reflection.Sprite;
+export import Ortha.Gfx.Reflection.SpriteObject;
+export import Ortha.Gfx.Reflection.TextureCoordinates;
+export import Ortha.Gfx.Reflection.Tilemap;
+export import Ortha.Gfx.Reflection.TilemapObject;
+export import Ortha.Gfx.Reflection.Viewport;
 
 import Ortha.RTTI.ReflectionContext;
-import Gfx.Systems;
+import Ortha.Gfx.Systems;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	void reflectAll(Ortha::RTTI::ReflectionContext&);
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -5,12 +5,12 @@ module;
 #include <memory>
 #include <variant>
 
-export module Gfx.SpriteObject;
+export module Ortha.Gfx.SpriteObject;
 
-import Core.ResourceHandle;
-import Gfx.Sprite;
+import Ortha.Core.ResourceHandle;
+import Ortha.Gfx.Sprite;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct SpriteObject {
 		std::variant<Sprite, std::shared_ptr<Core::ResourceHandle>> spriteResource{};
@@ -18,4 +18,4 @@ export namespace Gfx {
 		std::chrono::time_point<std::chrono::steady_clock> lastAnimUpdateTime{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

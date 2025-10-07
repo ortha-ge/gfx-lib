@@ -6,13 +6,13 @@ module;
 
 #include <tracy/Tracy.hpp>
 
-module Gfx.SpriteAnimationSystem;
+module Ortha.Gfx.SpriteAnimationSystem;
 
-import Core.ResourceHandle;
-import Core.ResourceHandleUtils;
-import Gfx.SpriteObject;
+import Ortha.Core.ResourceHandle;
+import Ortha.Core.ResourceHandleUtils;
+import Ortha.Gfx.SpriteObject;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	SpriteAnimationSystem::SpriteAnimationSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -66,4 +66,4 @@ namespace Gfx {
 		}
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

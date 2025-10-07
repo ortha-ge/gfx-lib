@@ -5,11 +5,11 @@ module;
 
 #include <glm/vec2.hpp>
 
-export module Gfx.ImageAtlasDescriptor;
+export module Ortha.Gfx.ImageAtlasDescriptor;
 
-import Gfx.TextureCoordinates;
+import Ortha.Gfx.TextureCoordinates;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct ImageAtlasRegion {
 		std::string name;
@@ -21,4 +21,4 @@ export namespace Gfx {
 		std::vector<ImageAtlasRegion> regions;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

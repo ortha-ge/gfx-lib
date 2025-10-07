@@ -3,15 +3,15 @@ module;
 #include <cstdio>
 #include <type_traits>
 
-export module Gfx.Reflection.Projection;
+export module Ortha.Gfx.Reflection.Projection;
 
-export import Gfx.Projection;
+export import Ortha.Gfx.Projection;
 
-import Core.Reflect;
+import Ortha.Core.Reflect;
 
 template<>
-void Core::reflect<Gfx::Projection>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::Projection>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 
 	if constexpr (requires(Projection a, Projection b) { a = b; }) {
 		printf("Yup\n");

@@ -3,20 +3,20 @@ module;
 #include <memory>
 #include <utility>
 
-module Gfx.MaterialLoadSystem;
+module Ortha.Gfx.MaterialLoadSystem;
 
-import Core.FileDescriptor;
-import Core.FileLoadRequest;
-import Core.JsonTypeLoaderAdapter;
-import Core.ResourceHandle;
-import Core.ResourceLoadRequest;
-import Core.TypeLoader;
-import Gfx.ImageDescriptor;
-import Gfx.Material;
-import Gfx.MaterialDescriptor;
-import Gfx.Reflection.ShaderProgramDescriptor;
+import Ortha.Core.FileDescriptor;
+import Ortha.Core.FileLoadRequest;
+import Ortha.Core.JsonTypeLoaderAdapter;
+import Ortha.Core.ResourceHandle;
+import Ortha.Core.ResourceLoadRequest;
+import Ortha.Core.TypeLoader;
+import Ortha.Gfx.ImageDescriptor;
+import Ortha.Gfx.Material;
+import Ortha.Gfx.MaterialDescriptor;
+import Ortha.Gfx.Reflection.ShaderProgramDescriptor;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	MaterialLoadSystem::MaterialLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
@@ -51,4 +51,4 @@ namespace Gfx {
 		registry.emplace<Material>(entity, std::move(material));
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -4,11 +4,11 @@ module;
 #include <string>
 #include <vector>
 
-export module Gfx.ShaderProgramDescriptor;
+export module Ortha.Gfx.ShaderProgramDescriptor;
 
 import Ortha.RTTI.TypeId;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	// Vertex Layout
 	// Uniform Descriptors
@@ -44,4 +44,4 @@ export namespace Gfx {
 	size_t getStrideForVertexLayout(const ShaderVertexLayoutDescriptor&);
 	size_t getOffsetForVertexLayoutAttribute(const ShaderVertexLayoutDescriptor&, ShaderVertexLayoutAttributeId attributeId);
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

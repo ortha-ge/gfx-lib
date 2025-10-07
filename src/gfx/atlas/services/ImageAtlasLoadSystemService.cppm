@@ -1,13 +1,13 @@
-export module Gfx.ImageAtlasLoadSystemService;
+export module Ortha.Gfx.ImageAtlasLoadSystemService;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
-import Gfx.ImageAtlasLoadSystem;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
+import Ortha.Gfx.ImageAtlasLoadSystem;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct ImageAtlasLoadSystemService
 		: kgr::single_service<ImageAtlasLoadSystem, kgr::dependency<Core::EnTTRegistryService, Core::SchedulerService>> {};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

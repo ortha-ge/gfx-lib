@@ -1,9 +1,9 @@
-export module Gfx.FontLoadSystem;
+export module Ortha.Gfx.FontLoadSystem;
 
-import Core.Scheduler;
+import Ortha.Core.Scheduler;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 	class FontLoadSystem {
 	public:
 
@@ -19,4 +19,4 @@ export namespace Gfx {
 		Core::TaskHandle mTickHandle;
 
 	};
-} // namespace Gfx
+} // namespace Ortha::Gfx

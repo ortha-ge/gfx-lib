@@ -2,14 +2,14 @@ module;
 
 #include <list>
 
-export module Gfx.ShaderProgramLoadSystem;
+export module Ortha.Gfx.ShaderProgramLoadSystem;
 
-import Core.Scheduler;
-import Gfx.ShaderPlatformInfo;
-import Gfx.ShaderProgramDescriptor;
+import Ortha.Core.Scheduler;
+import Ortha.Gfx.ShaderPlatformInfo;
+import Ortha.Gfx.ShaderProgramDescriptor;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class ShaderProgramLoadSystem {
 	public:
@@ -35,4 +35,4 @@ export namespace Gfx {
 		std::list<TrackedShaderProgramResources> mTrackedShaderPrograms{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

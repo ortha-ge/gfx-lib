@@ -2,19 +2,19 @@ module;
 
 #include <string>
 
-module Gfx.ShaderProgramLoadSystem;
+module Ortha.Gfx.ShaderProgramLoadSystem;
 
-import Core.FileDescriptor;
-import Core.FileLoadRequest;
-import Core.ProcessError;
-import Core.ResourceHandle;
-import Core.ResourceLoadRequest;
-import Gfx.ShaderDescriptor;
-import Gfx.ShaderPlatformInfo;
-import Gfx.ShaderProgram;
-import Gfx.ShaderProgramDescriptor;
+import Ortha.Core.FileDescriptor;
+import Ortha.Core.FileLoadRequest;
+import Ortha.Core.ProcessError;
+import Ortha.Core.ResourceHandle;
+import Ortha.Core.ResourceLoadRequest;
+import Ortha.Gfx.ShaderDescriptor;
+import Ortha.Gfx.ShaderPlatformInfo;
+import Ortha.Gfx.ShaderProgram;
+import Ortha.Gfx.ShaderProgramDescriptor;
 
-namespace Gfx::ShaderProgramLoadSystemInternal {
+namespace Ortha::Gfx::ShaderProgramLoadSystemInternal {
 	std::string getMappedShaderFilePath(const std::string& shaderFolderPath, std::string shaderFilePath) {
 		if (auto forwardSlashPos = shaderFilePath.find_last_of('/'); forwardSlashPos != std::string::npos) {
 			shaderFilePath.replace(forwardSlashPos, 1, "/" + shaderFolderPath + "/");
@@ -26,7 +26,7 @@ namespace Gfx::ShaderProgramLoadSystemInternal {
 	}
 }
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	ShaderProgramLoadSystem::ShaderProgramLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
@@ -114,4 +114,4 @@ namespace Gfx {
 		}
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

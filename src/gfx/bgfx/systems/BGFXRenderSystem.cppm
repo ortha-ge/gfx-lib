@@ -5,17 +5,17 @@ module;
 
 #include <bgfx/bgfx.h>
 
-export module Gfx.BGFX.BGFXRenderSystem;
+export module Ortha.Gfx.BGFX.BGFXRenderSystem;
 
 import Ortha.RTTI.Any;
-import Core.Scheduler;
-import Gfx.RenderCommand;
-import Gfx.BGFX.BGFXFrameBuffer;
-import Gfx.BGFX.BGFXTexture;
-import Gfx.BGFX.BGFXUniform;
+import Ortha.Core.Scheduler;
+import Ortha.Gfx.RenderCommand;
+import Ortha.Gfx.BGFX.BGFXFrameBuffer;
+import Ortha.Gfx.BGFX.BGFXTexture;
+import Ortha.Gfx.BGFX.BGFXUniform;
 import entt;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	class BGFXRenderSystem {
 	public:
@@ -42,4 +42,4 @@ export namespace Gfx::BGFX {
 
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

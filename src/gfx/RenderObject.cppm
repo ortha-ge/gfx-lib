@@ -3,15 +3,15 @@ module;
 #include <memory>
 #include <variant>
 
-export module Gfx.RenderObject;
+export module Ortha.Gfx.RenderObject;
 
-import Core.ResourceHandle;
-import Gfx.MaterialDescriptor;
+import Ortha.Core.ResourceHandle;
+import Ortha.Gfx.MaterialDescriptor;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct RenderObject {
 		std::variant<MaterialDescriptor, std::shared_ptr<Core::ResourceHandle>> materialResource{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

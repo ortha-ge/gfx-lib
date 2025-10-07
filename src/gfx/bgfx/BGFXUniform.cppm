@@ -5,9 +5,9 @@ module;
 
 #include <bgfx/bgfx.h>
 
-export module Gfx.BGFX.BGFXUniform;
+export module Ortha.Gfx.BGFX.BGFXUniform;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	struct BGFXUniform {
 		bgfx::UniformHandle handle = BGFX_INVALID_HANDLE;
@@ -17,4 +17,4 @@ export namespace Gfx::BGFX {
 		std::unordered_map<std::string, bgfx::UniformHandle> uniforms{};
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

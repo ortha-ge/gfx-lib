@@ -1,16 +1,16 @@
 module;
 
-export module Gfx.FontRenderSystemService;
+export module Ortha.Gfx.FontRenderSystemService;
 
-export import Gfx.FontRenderSystem;
+export import Ortha.Gfx.FontRenderSystem;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct FontRenderSystemService
 		: kgr::single_service<FontRenderSystem, kgr::dependency<Core::EnTTRegistryService, Core::SchedulerService>> {};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

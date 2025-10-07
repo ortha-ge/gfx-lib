@@ -7,35 +7,35 @@ module;
 
 #include <tracy/Tracy.hpp>
 
-module Gfx.SpriteRenderSystem;
+module Ortha.Gfx.SpriteRenderSystem;
 
 import Ortha.RTTI.Any;
-import Core.GlobalSpatial;
-import Core.ResourceHandle;
-import Core.ResourceHandleUtils;
-import Core.Spatial;
+import Ortha.Core.GlobalSpatial;
+import Ortha.Core.ResourceHandle;
+import Ortha.Core.ResourceHandleUtils;
+import Ortha.Core.Spatial;
 import Ortha.RTTI.TypeId;
-import Gfx.Camera;
-import Gfx.RenderCandidates;
-import Gfx.Image;
-import Gfx.IndexBuffer;
-import Gfx.Material;
-import Gfx.MaterialDescriptor;
-import Gfx.RenderCandidates;
-import Gfx.RenderCommand;
-import Gfx.RenderObject;
-import Gfx.RenderState;
-import Gfx.ShaderProgram;
-import Gfx.ShaderProgramDescriptor;
-import Gfx.Sprite;
-import Gfx.SpriteObject;
-import Gfx.TextureCoordinates;
-import Gfx.VertexBuffer;
-import Gfx.Viewport;
+import Ortha.Gfx.Camera;
+import Ortha.Gfx.RenderCandidates;
+import Ortha.Gfx.Image;
+import Ortha.Gfx.IndexBuffer;
+import Ortha.Gfx.Material;
+import Ortha.Gfx.MaterialDescriptor;
+import Ortha.Gfx.RenderCandidates;
+import Ortha.Gfx.RenderCommand;
+import Ortha.Gfx.RenderObject;
+import Ortha.Gfx.RenderState;
+import Ortha.Gfx.ShaderProgram;
+import Ortha.Gfx.ShaderProgramDescriptor;
+import Ortha.Gfx.Sprite;
+import Ortha.Gfx.SpriteObject;
+import Ortha.Gfx.TextureCoordinates;
+import Ortha.Gfx.VertexBuffer;
+import Ortha.Gfx.Viewport;
 import entt;
 import glm;
 
-namespace Gfx::SpriteRenderSystemInternal {
+namespace Ortha::Gfx::SpriteRenderSystemInternal {
 
 	struct MaterialBuffers {
 		VertexBuffer vertexBuffer;
@@ -308,9 +308,9 @@ namespace Gfx::SpriteRenderSystemInternal {
 		}
 	}
 
-} // namespace Gfx::SpriteRenderSystemInternal
+} // namespace Ortha::Gfx::SpriteRenderSystemInternal
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	SpriteRenderSystem::SpriteRenderSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
@@ -370,4 +370,4 @@ namespace Gfx {
 			});
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -5,9 +5,9 @@ module;
 
 #include <glm/vec2.hpp>
 
-export module Gfx.TilemapDescriptor;
+export module Ortha.Gfx.TilemapDescriptor;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct Tile {
 		glm::ivec2 coordinates{};

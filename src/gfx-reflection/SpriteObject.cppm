@@ -1,14 +1,14 @@
-export module Gfx.Reflection.SpriteObject;
+export module Ortha.Gfx.Reflection.SpriteObject;
 
-export import Gfx.SpriteObject;
+export import Ortha.Gfx.SpriteObject;
 
-import Core.EnTTComponentAttribute;
-import Core.Reflect;
-import Gfx.Reflection.TextureCoordinates;
+import Ortha.Core.EnTTComponentAttribute;
+import Ortha.Core.Reflect;
+import Ortha.Gfx.Reflection.TextureCoordinates;
 
 template<>
-void Core::reflect<Gfx::SpriteObject>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::SpriteObject>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 	reflectionContext.addClass<SpriteObject>("Sprite")
 		.field<&SpriteObject::currentFrame>("currentFrame")
 		//.annotate(createEnTTComponentAttribute<SpriteObject>())

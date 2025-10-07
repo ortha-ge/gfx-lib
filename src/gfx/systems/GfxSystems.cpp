@@ -1,7 +1,7 @@
-module Gfx.Systems;
+module Ortha.Gfx.Systems;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	GfxSystems::GfxSystems() = default;
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

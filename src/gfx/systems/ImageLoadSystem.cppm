@@ -4,12 +4,12 @@ module;
 
 #include <bx/allocator.h>
 
-export module Gfx.ImageLoadSystem;
+export module Ortha.Gfx.ImageLoadSystem;
 
-import Core.Scheduler;
+import Ortha.Core.Scheduler;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class ImageLoadSystem {
 	public:
@@ -26,4 +26,4 @@ export namespace Gfx {
 		std::unique_ptr<bx::AllocatorI> mAllocator{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

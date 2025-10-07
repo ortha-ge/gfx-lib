@@ -1,8 +1,8 @@
-module Gfx.Reflection;
+module Ortha.Gfx.Reflection;
 
-import Core.Reflect;
+import Ortha.Core.Reflect;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	void reflectAll(Ortha::RTTI::ReflectionContext& reflectionContext) {
 		using namespace Core;
@@ -25,4 +25,4 @@ namespace Gfx {
 		reflect<Viewport>(reflectionContext);
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

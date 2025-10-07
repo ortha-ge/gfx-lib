@@ -4,31 +4,31 @@ module;
 #include <utility>
 #include <vector>
 
-module Gfx.TilemapRenderSystem;
+module Ortha.Gfx.TilemapRenderSystem;
 
 import Ortha.RTTI.Any;
-import Core.GlobalSpatial;
-import Core.ResourceHandleUtils;
-import Core.Spatial;
+import Ortha.Core.GlobalSpatial;
+import Ortha.Core.ResourceHandleUtils;
+import Ortha.Core.Spatial;
 import Ortha.RTTI.TypeHandle;
 import Ortha.RTTI.TypeId;
-import Gfx.Camera;
-import Gfx.Image;
-import Gfx.ImageAtlas;
-import Gfx.IndexBuffer;
-import Gfx.RenderCandidates;
-import Gfx.RenderCommand;
-import Gfx.RenderState;
-import Gfx.ShaderProgram;
-import Gfx.TextureCoordinates;
-import Gfx.Tilemap;
-import Gfx.TilemapObject;
-import Gfx.VertexBuffer;
-import Gfx.Viewport;
+import Ortha.Gfx.Camera;
+import Ortha.Gfx.Image;
+import Ortha.Gfx.ImageAtlas;
+import Ortha.Gfx.IndexBuffer;
+import Ortha.Gfx.RenderCandidates;
+import Ortha.Gfx.RenderCommand;
+import Ortha.Gfx.RenderState;
+import Ortha.Gfx.ShaderProgram;
+import Ortha.Gfx.TextureCoordinates;
+import Ortha.Gfx.Tilemap;
+import Ortha.Gfx.TilemapObject;
+import Ortha.Gfx.VertexBuffer;
+import Ortha.Gfx.Viewport;
 import entt;
 import glm;
 
-namespace Gfx::TilemapRenderSystemInternal {
+namespace Ortha::Gfx::TilemapRenderSystemInternal {
 
 	struct MappedTile {
 		glm::ivec2 coordinates;
@@ -44,7 +44,7 @@ namespace Gfx::TilemapRenderSystemInternal {
 		entt::registry& registry, const Tilemap& tilemap, const ImageAtlas& atlas,
 		const Core::GlobalSpatial& spatial, const entt::entity shaderProgramEntity, const entt::entity viewportEntity, const glm::mat4& viewMatrix) {
 		using namespace Core;
-		using namespace Gfx;
+		using namespace Ortha::Gfx;
 
 		auto&& [atlasImageEntity, atlasImage] = getResourceAndEntity<Image>(registry, atlas.image);
 		if (!atlasImage) {
@@ -144,9 +144,9 @@ namespace Gfx::TilemapRenderSystemInternal {
 		registry.emplace<RenderCommand>(renderCommandEntity, renderCommand);
 	}
 
-} // namespace Gfx::TilemapRenderSystemInternal
+} // namespace Ortha::Gfx::TilemapRenderSystemInternal
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	TilemapRenderSystem::TilemapRenderSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry(registry)
@@ -220,4 +220,4 @@ namespace Gfx {
 			});
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

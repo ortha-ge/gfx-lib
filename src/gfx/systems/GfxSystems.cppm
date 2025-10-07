@@ -1,6 +1,6 @@
-export module Gfx.Systems;
+export module Ortha.Gfx.Systems;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class GfxSystems {
 	public:
@@ -14,4 +14,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

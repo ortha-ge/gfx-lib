@@ -3,12 +3,12 @@ module;
 #include <cstdint>
 #include <optional>
 
-module Gfx.ViewportUtilities;
+module Ortha.Gfx.ViewportUtilities;
 
-import Core.Window;
-import Gfx.RenderTexture;
+import Ortha.Core.Window;
+import Ortha.Gfx.RenderTexture;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	std::optional<glm::ivec2> getViewportRenderTargetSize(entt::registry& registry, const Viewport& viewport) {
 		using namespace Core;
@@ -67,4 +67,4 @@ namespace Gfx {
 		};
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

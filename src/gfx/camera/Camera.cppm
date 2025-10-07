@@ -1,8 +1,8 @@
-export module Gfx.Camera;
+export module Ortha.Gfx.Camera;
 
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct Camera {
 		entt::entity viewport { entt::null };
@@ -10,4 +10,4 @@ export namespace Gfx {
 		float fov{ 60.0f };
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

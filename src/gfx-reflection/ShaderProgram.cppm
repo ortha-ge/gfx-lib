@@ -3,15 +3,15 @@ module;
 #include <functional>
 #include <utility>
 
-export module Gfx.Reflection.ShaderProgramDescriptor;
+export module Ortha.Gfx.Reflection.ShaderProgramDescriptor;
 
-export import Gfx.ShaderProgramDescriptor;
+export import Ortha.Gfx.ShaderProgramDescriptor;
 
-import Core.Reflect;
+import Ortha.Core.Reflect;
 
 template<>
-void Core::reflect<Gfx::ShaderVertexLayoutAttributeId>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::ShaderVertexLayoutAttributeId>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 	reflectionContext.addEnum<ShaderVertexLayoutAttributeId>("ShaderVertexLayoutAttributeId")
 		.constant<ShaderVertexLayoutAttributeId::Position>("Position")
 		.constant<ShaderVertexLayoutAttributeId::TexCoord0>("TexCoord0")
@@ -20,8 +20,8 @@ void Core::reflect<Gfx::ShaderVertexLayoutAttributeId>(Ortha::RTTI::ReflectionCo
 }
 
 template<>
-void Core::reflect<Gfx::ShaderVertexLayoutAttribute>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::ShaderVertexLayoutAttribute>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 
 	reflect<ShaderVertexLayoutAttributeId>(reflectionContext);
 
@@ -34,8 +34,8 @@ void Core::reflect<Gfx::ShaderVertexLayoutAttribute>(Ortha::RTTI::ReflectionCont
 }
 
 template<>
-void Core::reflect<Gfx::ShaderVertexLayoutDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::ShaderVertexLayoutDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 
 	reflect<ShaderVertexLayoutAttribute>(reflectionContext);
 
@@ -45,8 +45,8 @@ void Core::reflect<Gfx::ShaderVertexLayoutDescriptor>(Ortha::RTTI::ReflectionCon
 }
 
 template<>
-void Core::reflect<Gfx::ShaderUniformType>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::ShaderUniformType>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 	reflectionContext.addEnum<ShaderUniformType>("ShaderUniformType")
 		.constant<ShaderUniformType::Sampler>("Sampler")
 		.constant<ShaderUniformType::Float4>("Float4")
@@ -54,8 +54,8 @@ void Core::reflect<Gfx::ShaderUniformType>(Ortha::RTTI::ReflectionContext& refle
 }
 
 template<>
-void Core::reflect<Gfx::ShaderUniformDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::ShaderUniformDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 
 	reflect<ShaderUniformType>(reflectionContext);
 
@@ -66,8 +66,8 @@ void Core::reflect<Gfx::ShaderUniformDescriptor>(Ortha::RTTI::ReflectionContext&
 }
 
 template<>
-void Core::reflect<Gfx::ShaderProgramDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
-	using namespace Gfx;
+void Core::reflect<Ortha::Gfx::ShaderProgramDescriptor>(Ortha::RTTI::ReflectionContext& reflectionContext) {
+	using namespace Ortha::Gfx;
 	reflect<ShaderUniformDescriptor>(reflectionContext);
 	reflect<ShaderVertexLayoutDescriptor>(reflectionContext);
 

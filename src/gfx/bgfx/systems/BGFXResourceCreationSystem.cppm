@@ -1,15 +1,15 @@
-export module Gfx.BGFX.BGFXResourceCreationSystem;
+export module Ortha.Gfx.BGFX.BGFXResourceCreationSystem;
 
-import Core.RawDataResource;
-import Core.Scheduler;
-import Gfx.Image;
-import Gfx.IndexBuffer;
-import Gfx.RenderTexture;
-import Gfx.ShaderProgram;
-import Gfx.VertexBuffer;
+import Ortha.Core.RawDataResource;
+import Ortha.Core.Scheduler;
+import Ortha.Gfx.Image;
+import Ortha.Gfx.IndexBuffer;
+import Ortha.Gfx.RenderTexture;
+import Ortha.Gfx.ShaderProgram;
+import Ortha.Gfx.VertexBuffer;
 import entt;
 
-export namespace Gfx::BGFX {
+export namespace Ortha::Gfx::BGFX {
 
 	class BGFXResourceCreationSystem {
 	public:
@@ -38,4 +38,4 @@ export namespace Gfx::BGFX {
 
 	};
 
-} // namespace Gfx::BGFX
+} // namespace Ortha::Gfx::BGFX

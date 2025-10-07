@@ -2,15 +2,15 @@ module;
 
 #include <string>
 
-export module Gfx.FontObject;
+export module Ortha.Gfx.FontObject;
 
-import Core.ResourceHandle;
+import Ortha.Core.ResourceHandle;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct FontObject {
 		std::string text;
 		Core::ResourceHandlePtr font;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

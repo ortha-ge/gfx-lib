@@ -8,18 +8,18 @@ module;
 #include <bimg/decode.h>
 #include <stb_truetype.h>
 
-module Gfx.FontLoadSystem;
+module Ortha.Gfx.FontLoadSystem;
 
-import Core.FileLoadRequest;
-import Core.ProcessError;
-import Core.RawDataResource;
-import Gfx.Font;
-import Gfx.FontDescriptor;
-import Gfx.Image;
+import Ortha.Core.FileLoadRequest;
+import Ortha.Core.ProcessError;
+import Ortha.Core.RawDataResource;
+import Ortha.Gfx.Font;
+import Ortha.Gfx.FontDescriptor;
+import Ortha.Gfx.Image;
 import entt;
 import glm;
 
-namespace Gfx::FontLoadSystemInternal {
+namespace Ortha::Gfx::FontLoadSystemInternal {
 
 	struct StbFont {
 		stbtt_fontinfo fontInfo{};
@@ -201,9 +201,9 @@ namespace Gfx::FontLoadSystemInternal {
 		registry.emplace<Font>(entity, std::move(font));
 	}
 
-} // namespace Gfx::FontLoadSystemInternal
+} // namespace Ortha::Gfx::FontLoadSystemInternal
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 
 
@@ -235,4 +235,4 @@ namespace Gfx {
 			});
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

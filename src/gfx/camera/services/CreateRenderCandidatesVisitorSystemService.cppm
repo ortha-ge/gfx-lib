@@ -1,12 +1,12 @@
-export module Gfx.CreateRenderCandidatesVisitorSystemService;
+export module Ortha.Gfx.CreateRenderCandidatesVisitorSystemService;
 
-export import Gfx.CreateRenderCandidatesVisitorSystem;
+export import Ortha.Gfx.CreateRenderCandidatesVisitorSystem;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct CreateRenderCandidatesVisitorSystemService
 		: kgr::single_service<

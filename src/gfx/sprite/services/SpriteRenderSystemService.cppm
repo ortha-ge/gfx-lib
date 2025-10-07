@@ -1,15 +1,15 @@
 
-export module Gfx.SpriteRenderSystemService;
+export module Ortha.Gfx.SpriteRenderSystemService;
 
-export import Gfx.SpriteRenderSystem;
+export import Ortha.Gfx.SpriteRenderSystem;
 
 import kangaru;
-import Core.EnTTRegistryService;
-import Core.SchedulerService;
+import Ortha.Core.EnTTRegistryService;
+import Ortha.Core.SchedulerService;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct SpriteRenderSystemService
 		: kgr::single_service<SpriteRenderSystem, kgr::dependency<Core::EnTTRegistryService, Core::SchedulerService>> {};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

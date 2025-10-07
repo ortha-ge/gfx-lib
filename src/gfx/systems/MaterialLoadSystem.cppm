@@ -1,10 +1,10 @@
-export module Gfx.MaterialLoadSystem;
+export module Ortha.Gfx.MaterialLoadSystem;
 
-import Core.Scheduler;
-import Gfx.MaterialDescriptor;
+import Ortha.Core.Scheduler;
+import Ortha.Gfx.MaterialDescriptor;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class MaterialLoadSystem {
 	public:
@@ -21,4 +21,4 @@ export namespace Gfx {
 		Core::TaskHandle mTickHandle;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

@@ -6,16 +6,16 @@ module;
 #include <bx/error.h>
 #include <tracy/Tracy.hpp>
 
-module Gfx.ImageLoadSystem;
+module Ortha.Gfx.ImageLoadSystem;
 
-import Core.FileLoadRequest;
-import Core.Log;
-import Core.ProcessError;
-import Core.RawDataResource;
-import Gfx.Image;
-import Gfx.ImageDescriptor;
+import Ortha.Core.FileLoadRequest;
+import Ortha.Core.Log;
+import Ortha.Core.ProcessError;
+import Ortha.Core.RawDataResource;
+import Ortha.Gfx.Image;
+import Ortha.Gfx.ImageDescriptor;
 
-namespace Gfx {
+namespace Ortha::Gfx {
 
 	ImageLoadSystem::ImageLoadSystem(entt::registry& registry, Core::Scheduler& scheduler)
 		: mRegistry{ registry }
@@ -56,4 +56,4 @@ namespace Gfx {
 			});
 	}
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

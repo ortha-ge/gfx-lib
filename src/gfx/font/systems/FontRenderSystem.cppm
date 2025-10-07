@@ -1,10 +1,10 @@
-export module Gfx.FontRenderSystem;
+export module Ortha.Gfx.FontRenderSystem;
 
-import Core.ResourceHandle;
-import Core.Scheduler;
+import Ortha.Core.ResourceHandle;
+import Ortha.Core.Scheduler;
 import entt;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	class FontRenderSystem {
 	public:
@@ -24,4 +24,4 @@ export namespace Gfx {
 
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

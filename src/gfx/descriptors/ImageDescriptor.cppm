@@ -2,12 +2,12 @@ module;
 
 #include <string>
 
-export module Gfx.ImageDescriptor;
+export module Ortha.Gfx.ImageDescriptor;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct ImageDescriptor {
 		std::string imageFilePath;
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

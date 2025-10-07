@@ -1,8 +1,8 @@
-export module Gfx.TextureCoordinates;
+export module Ortha.Gfx.TextureCoordinates;
 
 import glm;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct TextureCoordinates {
 		bool operator==(const TextureCoordinates&) const = default;
@@ -10,4 +10,4 @@ export namespace Gfx {
 		glm::vec2 topRight{ 1.0f, 1.0f };
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx

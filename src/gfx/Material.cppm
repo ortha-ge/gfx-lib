@@ -3,13 +3,13 @@ module;
 #include <memory>
 #include <optional>
 
-export module Gfx.Material;
+export module Ortha.Gfx.Material;
 
-import Core.ResourceHandle;
-import Gfx.TextureCoordinates;
+import Ortha.Core.ResourceHandle;
+import Ortha.Gfx.TextureCoordinates;
 import glm;
 
-export namespace Gfx {
+export namespace Ortha::Gfx {
 
 	struct Material {
 		std::shared_ptr<Core::ResourceHandle> shaderProgram{};
@@ -17,4 +17,4 @@ export namespace Gfx {
 		std::optional<glm::vec4> alphaColour{};
 	};
 
-} // namespace Gfx
+} // namespace Ortha::Gfx
