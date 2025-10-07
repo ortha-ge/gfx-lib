@@ -1,5 +1,5 @@
 
-target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
+target_sources(ortha-gfx PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
         ImageDescriptor.cppm
         MaterialDescriptor.cppm
         ShaderDescriptor.cppm
@@ -7,6 +7,6 @@ target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
         ViewportDescriptor.cppm
 )
 
-target_sources(gfx-lib PRIVATE
+target_sources(ortha-gfx PRIVATE
         ShaderProgramDescriptor.cpp
 )

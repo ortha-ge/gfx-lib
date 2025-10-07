@@ -1,5 +1,5 @@
 
-target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
+target_sources(ortha-gfx PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
         BGFXContext.cppm
         BGFXFrameBuffer.cppm
         BGFXShader.cppm
@@ -12,11 +12,11 @@ target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
         BGFXVertexLayout.cppm
 )
 
-target_sources(gfx-lib PRIVATE
+target_sources(ortha-gfx PRIVATE
         BGFXState.cpp
 )
 
-target_link_libraries(gfx-lib PUBLIC bgfx::bgfx)
+target_link_libraries(ortha-gfx PUBLIC bgfx::bgfx)
 
 add_subdirectory(services)
 add_subdirectory(systems)

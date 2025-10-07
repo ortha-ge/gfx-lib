@@ -1,4 +1,4 @@
 
-target_sources(gfx-lib-tests PRIVATE
+target_sources(ortha-gfx-tests PRIVATE
         BGFXStateTests.cpp
 )

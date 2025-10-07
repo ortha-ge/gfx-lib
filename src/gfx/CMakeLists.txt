@@ -1,5 +1,5 @@
 
-target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
+target_sources(ortha-gfx PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
         Image.cppm
         IndexBuffer.cppm
         Material.cppm
@@ -16,7 +16,7 @@ target_sources(gfx-lib PUBLIC FILE_SET modules TYPE CXX_MODULES FILES
         ViewportUtilities.cppm
 )
 
-target_sources(gfx-lib PRIVATE
+target_sources(ortha-gfx PRIVATE
         ViewportUtilities.cpp
 )
 
