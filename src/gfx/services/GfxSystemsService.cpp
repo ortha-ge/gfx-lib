@@ -20,7 +20,9 @@ import Ortha.RTTI.ReflectionContext;
 namespace Ortha::Gfx {
 
 	void initGfxSubSystems(GfxSystems&, kgr::container& container) {
-		reflectAll(static_cast<Ortha::RTTI::ReflectionContext&>(Ortha::RTTI::getCurrentReflectionContext()));
+		using namespace RTTI;
+
+		reflectAll(ReflectionContextStack::getCurrentContext());
 
 		// Camera + RenderCandidates
 		container.emplace<CreateRenderCandidatesVisitorSystemService>();

@@ -277,8 +277,8 @@ namespace Ortha::Gfx::SpriteRenderSystemInternal {
 
 		renderCommand.sortDepth = sortDepth;
 
-		renderCommand.uniformData["s_texColour"] = Ortha::RTTI::Any(entt::entity{ textureEntity });
-		renderCommand.uniformData["u_alphaColour"] = Ortha::RTTI::Any(material.alphaColour.value_or(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }));
+		renderCommand.uniformData["s_texColour"] = RTTI::Any(entt::entity{ textureEntity });
+		renderCommand.uniformData["u_alphaColour"] = RTTI::Any(material.alphaColour.value_or(glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f }));
 
 		RenderState renderState{};
 		renderState.bufferWriting = BufferWriting::RGB | BufferWriting::Alpha;
