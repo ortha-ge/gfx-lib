@@ -1,28 +1,28 @@
 module Ortha.Gfx.Reflection;
 
-import Ortha.Core.Reflect;
+import Ortha.RTTI.Reflect;
 
 namespace Ortha::Gfx {
 
-	void reflectAll(Ortha::RTTI::ReflectionContext& reflectionContext) {
-		using namespace Ortha::Core;
+	void reflectAll(RTTI::ReflectionContext& reflectionContext) {
+		using namespace Ortha::RTTI;
 
-		reflect<CameraDescriptor>(reflectionContext);
-		reflect<Camera>(reflectionContext);
-		reflect<FontObject>(reflectionContext);
-		reflect<ImageAtlasDescriptor>(reflectionContext);
-		reflect<ImageDescriptor>(reflectionContext);
-		reflect<MaterialDescriptor>(reflectionContext);
-		reflect<Projection>(reflectionContext);
-		reflect<RenderObject>(reflectionContext);
-		reflect<ShaderProgramDescriptor>(reflectionContext);
-		reflect<SpriteDescriptor>(reflectionContext);
-		reflect<SpriteObject>(reflectionContext);
-		reflect<TextureCoordinates>(reflectionContext);
-		reflect<TilemapDescriptor>(reflectionContext);
-		reflect<TilemapObject>(reflectionContext);
-		reflect<ViewportDescriptor>(reflectionContext);
-		reflect<Viewport>(reflectionContext);
+		ensureReflected<CameraDescriptor>(reflectionContext);
+		ensureReflected<Camera>(reflectionContext);
+		ensureReflected<FontObject>(reflectionContext);
+		ensureReflected<ImageAtlasDescriptor>(reflectionContext);
+		ensureReflected<ImageDescriptor>(reflectionContext);
+		ensureReflected<MaterialDescriptor>(reflectionContext);
+		//ensureReflected<Projection>(reflectionContext);
+		ensureReflected<RenderObject>(reflectionContext);
+		ensureReflected<ShaderProgramDescriptor>(reflectionContext);
+		ensureReflected<SpriteDescriptor>(reflectionContext);
+		ensureReflected<SpriteObject>(reflectionContext);
+		//ensureReflected<TextureCoordinates>(reflectionContext);
+		ensureReflected<TilemapDescriptor>(reflectionContext);
+		ensureReflected<TilemapObject>(reflectionContext);
+		ensureReflected<ViewportDescriptor>(reflectionContext);
+		ensureReflected<Viewport>(reflectionContext);
 	}
 
 } // namespace Ortha::Gfx

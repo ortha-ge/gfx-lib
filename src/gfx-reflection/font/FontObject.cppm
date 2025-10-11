@@ -3,18 +3,17 @@ export module Ortha.Gfx.Reflection.FontObject;
 export import Ortha.Gfx.FontObject;
 
 import Ortha.Core.EnTTComponentAttribute;
-import Ortha.Core.Reflect;
+import Ortha.RTTI.ReflectionContext;
 
-namespace Ortha::Core {
+namespace Ortha::RTTI {
 
 	template <>
-	void reflect<Gfx::FontObject>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::FontObject>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 
 		reflectionContext.addClass<FontObject>("FontObject")
-			.field<&FontObject::text>("text")
+			.field<&FontObject::text>("text");
 			//.annotate(createEnTTComponentAttribute<FontObject>())
-			;
 	}
 
 }

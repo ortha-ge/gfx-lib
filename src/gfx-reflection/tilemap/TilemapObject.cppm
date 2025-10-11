@@ -3,12 +3,12 @@ export module Ortha.Gfx.Reflection.TilemapObject;
 export import Ortha.Gfx.TilemapObject;
 
 import Ortha.Core.EnTTComponentAttribute;
-import Ortha.Core.Reflect;
+import Ortha.RTTI.ReflectionContext;
 
-namespace Ortha::Core {
+namespace Ortha::RTTI {
 
 	template <>
-	void reflect<Gfx::TilemapObject>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::TilemapObject>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 
 		reflectionContext.addClass<TilemapObject>("TilemapObject")

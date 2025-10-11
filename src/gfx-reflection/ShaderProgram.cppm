@@ -7,78 +7,69 @@ export module Ortha.Gfx.Reflection.ShaderProgramDescriptor;
 
 export import Ortha.Gfx.ShaderProgramDescriptor;
 
-import Ortha.Core.Reflect;
+import Ortha.RTTI.ReflectionContext;
 
-namespace Ortha::Core {
+namespace Ortha::RTTI {
 
 	template<>
-	void reflect<Gfx::ShaderVertexLayoutAttributeId>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::ShaderVertexLayoutAttributeId>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 		reflectionContext.addEnum<ShaderVertexLayoutAttributeId>("ShaderVertexLayoutAttributeId")
 			.constant<ShaderVertexLayoutAttributeId::Position>("Position")
 			.constant<ShaderVertexLayoutAttributeId::TexCoord0>("TexCoord0")
-			.constant<ShaderVertexLayoutAttributeId::Colour0>("Colour0")
-			;
+			.constant<ShaderVertexLayoutAttributeId::Colour0>("Colour0");
 	}
 
 	template<>
-	void reflect<Gfx::ShaderVertexLayoutAttribute>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::ShaderVertexLayoutAttribute>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 
-		reflect<ShaderVertexLayoutAttributeId>(reflectionContext);
-
+		ensureReflected<ShaderVertexLayoutAttributeId>(reflectionContext);
 		reflectionContext.addClass<ShaderVertexLayoutAttribute>("ShaderVertexLayoutAttribute")
 			.field<&ShaderVertexLayoutAttribute::attributeId>("id")
 			.field<&ShaderVertexLayoutAttribute::count>("elementCount")
 			.field<&ShaderVertexLayoutAttribute::typeId>("elementType")
-			.field<&ShaderVertexLayoutAttribute::isNormalized>("isNormalized")
-			;
+			.field<&ShaderVertexLayoutAttribute::isNormalized>("isNormalized");
 	}
 
 	template<>
-	void reflect<Gfx::ShaderVertexLayoutDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::ShaderVertexLayoutDescriptor>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 
-		reflect<ShaderVertexLayoutAttribute>(reflectionContext);
-
+		ensureReflected<ShaderVertexLayoutAttribute>(reflectionContext);
 		reflectionContext.addClass<ShaderVertexLayoutDescriptor>("ShaderVertexLayout")
-			.field<&ShaderVertexLayoutDescriptor::attributes>("attributes")
-			;
+			.field<&ShaderVertexLayoutDescriptor::attributes>("attributes");
 	}
 
 	template<>
-	void reflect<Gfx::ShaderUniformType>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::ShaderUniformType>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 		reflectionContext.addEnum<ShaderUniformType>("ShaderUniformType")
 			.constant<ShaderUniformType::Sampler>("Sampler")
-			.constant<ShaderUniformType::Float4>("Float4")
-			;
+			.constant<ShaderUniformType::Float4>("Float4");
 	}
 
 	template<>
-	void reflect<Gfx::ShaderUniformDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::ShaderUniformDescriptor>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 
-		reflect<ShaderUniformType>(reflectionContext);
-
+		ensureReflected<ShaderUniformType>(reflectionContext);
 		reflectionContext.addClass<ShaderUniformDescriptor>("ShaderUniform")
 			.field<&ShaderUniformDescriptor::name>("name")
-			.field<&ShaderUniformDescriptor::type>("type")
-			;
+			.field<&ShaderUniformDescriptor::type>("type");
 	}
 
 	template<>
-	void reflect<Gfx::ShaderProgramDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::ShaderProgramDescriptor>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
-		reflect<ShaderUniformDescriptor>(reflectionContext);
-		reflect<ShaderVertexLayoutDescriptor>(reflectionContext);
 
+		ensureReflected<ShaderUniformDescriptor>(reflectionContext);
+		ensureReflected<ShaderVertexLayoutDescriptor>(reflectionContext);
 		reflectionContext.addClass<ShaderProgramDescriptor>("ShaderProgram")
 			.field<&ShaderProgramDescriptor::vertexShaderFilePath>("vertexShaderFilePath")
 			.field<&ShaderProgramDescriptor::fragmentShaderFilePath>("fragmentShaderFilePath")
 			.field<&ShaderProgramDescriptor::uniforms>("uniforms")
-			.field<&ShaderProgramDescriptor::vertexLayout>("vertexLayout")
-			;
+			.field<&ShaderProgramDescriptor::vertexLayout>("vertexLayout");
 	}
 
 }

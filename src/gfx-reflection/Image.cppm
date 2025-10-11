@@ -3,16 +3,15 @@ export module Ortha.Gfx.Reflection.ImageDescriptor;
 
 export import Ortha.Gfx.ImageDescriptor;
 
-import Ortha.Core.Reflect;
+import Ortha.RTTI.ReflectionContext;
 
-namespace Ortha::Core {
+namespace Ortha::RTTI {
 
 	template<>
-	void reflect<Gfx::ImageDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::ImageDescriptor>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 		reflectionContext.addClass<ImageDescriptor>("Image")
-			.field<&ImageDescriptor::imageFilePath>("imageFilePath")
-			;
+			.field<&ImageDescriptor::imageFilePath>("imageFilePath");
 	}
 
 }

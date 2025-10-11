@@ -7,12 +7,12 @@ export module Ortha.Gfx.Reflection.Projection;
 
 export import Ortha.Gfx.Projection;
 
-import Ortha.Core.Reflect;
+import Ortha.RTTI.ReflectionContext;
 
-namespace Ortha::Core {
+namespace Ortha::RTTI {
 
 	template<>
-	void reflect<Gfx::Projection>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::Projection>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 
 		reflectionContext.addEnum<Projection>("Projection")

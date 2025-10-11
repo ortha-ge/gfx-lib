@@ -4,13 +4,13 @@ export import Ortha.Gfx.Camera;
 export import Ortha.Gfx.CameraDescriptor;
 
 import Ortha.Core.EnTTComponentAttribute;
-import Ortha.Core.Reflect;
 import Ortha.Gfx.Reflection.Projection;
+import Ortha.RTTI.ReflectionContext;
 
-namespace Ortha::Core {
+namespace Ortha::RTTI {
 
 	template<>
-	void reflect<Gfx::CameraDescriptor>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::CameraDescriptor>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 		reflectionContext.addClass<CameraDescriptor>("CameraDescriptor")
 			.field<&CameraDescriptor::projection>("projection")
@@ -18,7 +18,7 @@ namespace Ortha::Core {
 	}
 
 	template <>
-	void reflect<Gfx::Camera>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::Camera>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 		reflectionContext.addClass<Camera>("Camera")
 			//.annotate(createEnTTComponentAttribute<Camera>())

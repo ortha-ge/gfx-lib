@@ -3,18 +3,17 @@ export module Ortha.Gfx.Reflection.SpriteObject;
 export import Ortha.Gfx.SpriteObject;
 
 import Ortha.Core.EnTTComponentAttribute;
-import Ortha.Core.Reflect;
 import Ortha.Gfx.Reflection.TextureCoordinates;
+import Ortha.RTTI.ReflectionContext;
 
-namespace Ortha::Core {
+namespace Ortha::RTTI {
 
 	template<>
-	void reflect<Gfx::SpriteObject>(RTTI::ReflectionContext& reflectionContext) {
+	void reflect<Gfx::SpriteObject>(ReflectionContext& reflectionContext) {
 		using namespace Gfx;
 		reflectionContext.addClass<SpriteObject>("Sprite")
-			.field<&SpriteObject::currentFrame>("currentFrame")
+			.field<&SpriteObject::currentFrame>("currentFrame");
 			//.annotate(createEnTTComponentAttribute<SpriteObject>())
-			;
 	}
 
 }
